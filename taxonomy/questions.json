@@ -1,0 +1,152 @@
+{
+  "document_type": {
+    "type": "choice",
+    "instructions": {
+      "question": "What kind of document is `text`? Classify it by its purpose, not by the topics it mentions.",
+      "note": "If `text` holds several documents, classify the main one. `other` covers every document that is not one of the four business types."
+    },
+    "criteria": {
+      "invoice": "A request for payment from a seller to a buyer, stating what is owed: typically an invoice number and date, line items, amounts, a total or balance due, a due date, tax lines and payment details. Includes bills and overdue payment reminders. Not quotes, estimates, purchase orders or receipts.",
+      "contract": "An agreement setting out obligations between named parties, signed or meant to be signed: typically the parties, recitals, definitions, numbered clauses, term and termination, governing law and signature blocks. Includes NDAs, statements of work, employment contracts, leases, licences and amendments. Not quotes, proposals or general policies.",
+      "resume": "A person's own summary of their work history, education and skills, written to apply for jobs (a resume or CV): typically a name and contact details, then sections such as Experience, Education and Skills with dated roles. Not cover letters on their own, job descriptions or reference letters.",
+      "support_ticket": "A request for help, or a report of a problem, sent by a customer or user to the team behind a product or service: typically a description of the issue, and often a ticket number, subject, priority or steps to reproduce. Includes complaints, bug reports and billing disputes raised with support. Not internal incident reports.",
+      "other": "Any other document, including quotes, estimates, purchase orders, receipts, account statements, proposals, policies, cover letters, job descriptions, reports, letters, forms and marketing material."
+    }
+  },
+  "text_legible": {
+    "type": "noul",
+    "instructions": "`text` reads as a coherent document rather than garbled OCR output, encoding noise or disconnected fragments.",
+    "criteria": {
+      "true": "Readable sentences or structured content a person could follow",
+      "false": "Mostly garbled characters, broken words or meaningless fragments"
+    }
+  },
+  "tag_contains_personal_data": {
+    "type": "noul",
+    "instructions": "`text` names an identifiable person together with personal details such as contact details, a home address, a date of birth or an ID number.",
+    "criteria": {
+      "true": "An identifiable person with personal details",
+      "false": "No identifiable person, or only names with no personal details"
+    }
+  },
+  "tag_contains_financial_amounts": {
+    "type": "noul",
+    "instructions": "`text` states specific monetary amounts.",
+    "criteria": {
+      "true": "Specific amounts of money appear",
+      "false": "No specific amounts of money"
+    }
+  },
+  "tag_time_sensitive": {
+    "type": "noul",
+    "instructions": "`text` states a deadline, a due date or a required response time.",
+    "criteria": {
+      "true": "A deadline, due date or response time is stated",
+      "false": "No deadline or due date"
+    }
+  },
+  "tag_signed": {
+    "type": "noul",
+    "instructions": "`text` shows that the document has been signed: completed signature blocks, 'signed by', dated signatures or an e-signature certificate.",
+    "criteria": {
+      "true": "Evidence of completed signatures",
+      "false": "No signatures, or only empty signature lines"
+    }
+  },
+  "tag_draft_or_template": {
+    "type": "noul",
+    "instructions": "`text` is marked as a draft, template, sample or specimen, or contains unfilled placeholders such as [NAME] or ____.",
+    "criteria": {
+      "true": "A draft, template or sample",
+      "false": "A finished, real document"
+    }
+  },
+  "tag_multiple_documents": {
+    "type": "noul",
+    "instructions": "`text` contains more than one distinct document, for example an invoice followed by an unrelated letter, or a resume followed by a cover letter.",
+    "criteria": {
+      "true": "Two or more distinct documents",
+      "false": "One document, possibly with its own attachments or schedules"
+    }
+  },
+  "tag_non_english": {
+    "type": "noul",
+    "instructions": "The main language of `text` is not English.",
+    "criteria": {
+      "true": "Mostly in a language other than English",
+      "false": "Mostly in English"
+    }
+  },
+  "tag_invoice_reminder": {
+    "type": "noul",
+    "instructions": "`text` is a payment reminder, an overdue notice or a final notice about an unpaid invoice.",
+    "criteria": {
+      "true": "A reminder or overdue notice",
+      "false": "Not a payment reminder"
+    }
+  },
+  "tag_invoice_credit_note": {
+    "type": "noul",
+    "instructions": "`text` credits or refunds money to the customer rather than charging them.",
+    "criteria": {
+      "true": "A credit note or refund",
+      "false": "Not a credit or refund"
+    }
+  },
+  "tag_contract_nda": {
+    "type": "noul",
+    "instructions": "`text` is a non-disclosure or confidentiality agreement.",
+    "criteria": {
+      "true": "An NDA or confidentiality agreement",
+      "false": "Not an NDA"
+    }
+  },
+  "tag_contract_employment": {
+    "type": "noul",
+    "instructions": "`text` is an employment contract, or sets out the terms of someone's employment.",
+    "criteria": {
+      "true": "Sets employment terms",
+      "false": "Not about employment terms"
+    }
+  },
+  "tag_contract_amendment": {
+    "type": "noul",
+    "instructions": "`text` amends, renews or extends an existing agreement.",
+    "criteria": {
+      "true": "An amendment, renewal or extension",
+      "false": "Not an amendment, renewal or extension"
+    }
+  },
+  "tag_ticket_urgent": {
+    "type": "noul",
+    "instructions": "`text` reports something blocking, an outage or money being lost now, or explicitly asks for urgent help.",
+    "criteria": {
+      "true": "Urgent or blocking",
+      "false": "No urgency expressed"
+    }
+  },
+  "tag_ticket_complaint": {
+    "type": "noul",
+    "instructions": "`text` expresses dissatisfaction, or asks for escalation or compensation.",
+    "criteria": {
+      "true": "A complaint",
+      "false": "No complaint"
+    }
+  },
+  "tag_ticket_billing": {
+    "type": "noul",
+    "instructions": "`text` is about billing, payments, charges or refunds.",
+    "criteria": {
+      "true": "About billing or payments",
+      "false": "Not about billing"
+    }
+  },
+  "tag_ticket_bug_report": {
+    "type": "noul",
+    "instructions": "`text` reports a defect or an error in a product or service.",
+    "criteria": {
+      "true": "Reports a defect or error",
+      "false": "Does not report a defect"
+    }
+  }
+}

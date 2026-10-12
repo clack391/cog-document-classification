@@ -1,0 +1,111 @@
+[workspace]
+name = "cog-document-classification"
+version = "0.1.0"
+description = "Classifies one business document as an invoice, contract, resume, support ticket or other, with tags and the model confidence, and flags uncertain or unreadable documents for review."
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[dependencies]
+# 3.11+: the machinery reads this file's [tool.cog] manifest with tomllib
+python = ">=3.11"
+# reads cog.yaml-format manifests
+pyyaml = "*"
+# normative question, answer, input and output schema validation
+jsonschema = "*"
+
+[tasks]
+# --- usage ops (face users and the Op layer) ---
+# Live answers come only through a host-admitted System One binding that
+# Workbench activated for this Cog (`suite activate-composition`).
+ask-composed = "python scripts/composed_usage.py"
+# --- lifecycle ops (face the hosting environment) ---
+composition = "python src/cog_cli.py bridge"
+prepare = "python src/cog_cli.py prepare"
+replay = "python src/cog_cli.py replay"
+export-fixtures = "python src/cog_cli.py export-fixtures"
+derive-schema = "python src/cog_cli.py derive-schema --write"
+check = "python src/cog_cli.py --check"
+test = "python -m unittest discover -s tests -v"
+
+# ---------------------------------------------------------------------------
+# Profile manifest: openteams/cog-manifest [0.1], hosted in pixi.toml under
+# [tool.cog] (cog-execution ADR D9). `version` and `summary` are stated once,
+# in [workspace] above (version / description); readers fall back to them.
+# ---------------------------------------------------------------------------
+[tool.cog]
+schema = "openteams/cog-manifest [0.1]"
+id = "openteams/cog-document-classification"
+# A decision Cog is a context Cog whose context is a typed question set: a
+# System One model answers, and task_logic.decide turns answers into a decision.
+kind = "context"
+owner = "clack391@gmail.com"
+license = "Apache-2.0"
+frames = ["taxonomy/document-taxonomy.frame.md"]
+memory = "none"
+# Evidence-tier boundary: prohibitions are structural today (no tool grants
+# exist that could perform them); they become Guard-enforced when a hosting
+# environment supplies tools.
+prohibits = ["send_external_message", "modify_source_data"]
+
+[tool.cog.context]
+input_schema = "context/input-schema.json"
+output_schema = "context/output-schema.json"
+output_example = "context/output-example.json"
+
+# The requirement is a CAPABILITY. No default satisfier is named: a host
+# admits a System One binding (TypeSafe Jev, or an LLM through the System One
+# adapter) and composes it with this Cog. The input never selects it.
+[[tool.cog.requires]]
+capability = "system-one/decisions"
+locality = "any"
+
+[[tool.cog.interfaces]]
+name = "decide"
+kind = "command"
+task = "ask-composed"
+audience = "usage"
+default = true
+
+[[tool.cog.interfaces]]
+name = "composition"
+kind = "command"
+task = "composition"
+audience = "lifecycle"
+
+[[tool.cog.interfaces]]
+name = "prepare"
+kind = "command"
+task = "prepare"
+audience = "lifecycle"
+
+[[tool.cog.interfaces]]
+name = "replay"
+kind = "command"
+task = "replay"
+audience = "lifecycle"
+
+[[tool.cog.interfaces]]
+name = "health"
+kind = "command"
+task = "check"
+audience = "lifecycle"
+
+[tool.cog.io]
+accepts = ["task_request"]
+produces = ["document_classification"]
+
+[tool.cog.extensions.system_one]
+contract = "openteams/system-one-decision [0.1-draft]"
+questions = "context/questions.json"
+
+[tool.cog.extensions.workbench_composition]
+contract = "openteams/context-composition [0.1-draft]"
+capability = "system-one/decisions"
+bridge_interface = "composition"
+accepted_compositions = ["model+harness", "harness"]
+required_features = ["choice", "noul", "score"]
+allowed_localities = ["local", "cloud"]
+tools = "none"
+checks = "packaged-before-and-after"
+evidence_scope = "composed-system"
+

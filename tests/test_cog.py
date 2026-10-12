@@ -1,0 +1,155 @@
+"""Model-free suite for cog-document-classification (created by cog-smith, decision Cog).
+
+Covers: manifest and question-set consistency, the prepared turn, deciding
+from saved answers, and refusal of answers that do not fit the questions.
+Extend it with saved results for the inputs your thresholds care about.
+"""
+import copy
+import json
+import sys
+import unittest
+from unittest import mock
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "src"))
+
+import cog_core                          # noqa: E402
+import system_one_contract as contract   # noqa: E402
+import task_logic                        # noqa: E402
+
+
+def sample_bundle():
+    return json.loads((ROOT / "examples" / "sample-bundle.json").read_text())
+
+
+def sample_result():
+    return json.loads((ROOT / "examples" / "sample-result.json").read_text())
+
+
+class TestPackage(unittest.TestCase):
+    def test_self_check_is_clean(self):
+        self.assertEqual(cog_core.self_check(), [])
+
+    def test_output_schema_answers_follow_the_questions(self):
+        self.assertEqual(cog_core.OUTPUT_SCHEMA["$defs"]["answers"],
+                         contract.answers_schema(cog_core.QUESTIONS))
+
+    def test_requires_the_system_one_capability_and_names_no_satisfier(self):
+        required = cog_core.MANIFEST["requires"]
+        self.assertEqual([r["capability"] for r in required], [contract.CAPABILITY])
+        self.assertNotIn("satisfied_by", required[0])
+
+    def test_exactly_one_default_interface(self):
+        defaults = [i for i in cog_core.MANIFEST["interfaces"] if i.get("default")]
+        self.assertEqual(len(defaults), 1)
+
+
+class TestTurn(unittest.TestCase):
+    def test_prepare_renders_a_valid_turn(self):
+        prepared = cog_core.prepare(sample_bundle())
+        self.assertEqual(prepared["consumer"], cog_core.SELF_ID)
+        self.assertEqual(prepared["context"], [])
+        self.assertEqual(contract.task_problems(prepared["task"]), [])
+
+    def test_invalid_input_is_refused_before_any_turn(self):
+        with self.assertRaises(ValueError):
+            cog_core.prepare({"ticket_id": "x"})
+
+    def test_saved_answers_produce_a_clean_decision(self):
+        env = cog_core.finish(sample_bundle(), sample_result(), {"kind": "test"})
+        self.assertTrue(env["ok"], env)
+        self.assertEqual(env["problems"], [])
+        self.assertEqual(env["provider_result"], sample_result())
+        self.assertEqual(env["payload"]["answered_by"]["answer_source"], "system-one-model")
+        self.assertIsInstance(env["payload"]["decision"], dict)
+
+    def test_answers_that_do_not_fit_the_questions_fail(self):
+        result = sample_result()
+        question = next(iter(cog_core.QUESTIONS))
+        del result["answers"][question]
+        env = cog_core.finish(sample_bundle(), result, None)
+        self.assertFalse(env["ok"])
+        self.assertEqual(env["error"]["code"], "answers-invalid")
+        self.assertNotIn("provider_result", env)
+
+    def test_question_wording_may_vary_but_not_the_answer_space(self):
+        original = task_logic.questions
+        try:
+            def widened(bundle, declared):
+                changed = copy.deepcopy(declared)
+                qid = next(iter(changed))
+                if changed[qid]["type"] == "noul":
+                    changed[qid] = {"type": "choice", "instructions": "x",
+                                    "criteria": {"a": None, "b": None}}
+                else:
+                    changed[qid] = {"type": "noul", "instructions": "x"}
+                return changed
+            task_logic.questions = widened
+            with self.assertRaises(ValueError):
+                cog_core.prepare(sample_bundle())
+        finally:
+            task_logic.questions = original
+
+
+class TestInputSeverity(unittest.TestCase):
+    def invoke_sample(self):
+        cog_core.prepare(sample_bundle())
+        return cog_core.finish(sample_bundle(), sample_result())
+
+    def test_warning_only_input_proceeds_and_keeps_input_and_output_findings(self):
+        warning = cog_core.problem("input-thin", "optional evidence is thin", "warning")
+        output = cog_core.problem("output-note", "review the result", "warning")
+        with mock.patch.object(task_logic, "check_input", return_value=[warning]), \
+             mock.patch.object(task_logic, "check_output", return_value=[output]):
+            env = self.invoke_sample()
+        self.assertTrue(env["ok"], env)
+        self.assertIsNotNone(env["payload"])
+        self.assertEqual(env["problems"], [warning, output])
+
+    def test_input_errors_refuse_even_alongside_warnings(self):
+        error = cog_core.problem("input-bad", "required evidence is missing")
+        warning = cog_core.problem("input-thin", "optional evidence is thin", "warning")
+        for problems in ([error], [warning, error], [warning] * 5 + [error]):
+            with self.subTest(problems=problems), \
+                 mock.patch.object(task_logic, "check_input", return_value=problems):
+                with self.assertRaisesRegex(ValueError, "required evidence is missing"):
+                    cog_core.prepare(sample_bundle())
+                with self.assertRaisesRegex(ValueError, "required evidence is missing"):
+                    cog_core.finish(sample_bundle(), sample_result())
+
+    def test_warn_input_proceeds(self):
+        warning = cog_core.problem("input-thin", "optional evidence is thin", "warn")
+        with mock.patch.object(task_logic, "check_input", return_value=[warning]):
+            env = self.invoke_sample()
+        self.assertTrue(env["ok"], env)
+        self.assertIn(warning, env["problems"])
+
+    def test_unrecognised_input_severity_refuses(self):
+        for severity in ("Error", "ERROR", "fatal", None, "missing"):
+            rejected = cog_core.problem("input-bad", "unusable input", severity)
+            if severity == "missing":
+                del rejected["severity"]
+            with self.subTest(severity=severity), \
+                 mock.patch.object(task_logic, "check_input", return_value=[rejected]):
+                with mock.patch.object(task_logic, "state") as work:
+                    with self.assertRaisesRegex(ValueError, "unusable input"):
+                        cog_core.prepare(sample_bundle())
+                work.assert_not_called()
+                with mock.patch.object(task_logic, "decide") as work:
+                    with self.assertRaisesRegex(ValueError, "unusable input"):
+                        cog_core.finish(sample_bundle(), sample_result())
+                work.assert_not_called()
+
+    def test_input_warning_is_preserved_when_later_work_fails(self):
+        warning = cog_core.problem("input-thin", "optional evidence is thin", "warning")
+        with mock.patch.object(task_logic, "check_input", return_value=[warning]):
+            result = sample_result()
+            del result["answers"][next(iter(cog_core.QUESTIONS))]
+            env = cog_core.finish(sample_bundle(), result)
+        self.assertFalse(env["ok"])
+        self.assertIn(warning, env["problems"])
+
+
+if __name__ == "__main__":
+    unittest.main()
