@@ -14,7 +14,7 @@ The Document Classification Cog serves as the "front door" for incoming document
 
 * **Primary Function:** Take one document file and extract its text in our own code. Run OCR for scanned pages. Then ask a System One model a fixed set of typed questions about the text. Supported formats are PDF, scanned images and text-based files; the exact list and the maximum length are **[TBD: decision 4]**. Email attachments reach the Cog as files from whatever system receives the email. From the model's answers, the Cog:
    * assigns one document type: `invoice`, `contract`, `resume` (résumé), `support_ticket` or `other`;
-   * assigns tags from a fixed vocabulary **[TBD: decision 5]**;
+   * assigns tags from a fixed vocabulary of 16 tags;
    * reports the model's confidence in the type;
    * records file and extraction metadata: file type, page count, size, sha256, whether OCR was used **[TBD: decision 3]**;
    * marks any document it cannot classify reliably as `needs_review`, with reasons.
@@ -71,7 +71,7 @@ To ensure accountability and prevent misclassification:
 
 * **Specification & Contract:** Author `COG.md`, the human-readable contract, and the schemas in `context/`:
    * `input-schema.json`, the input bundle.
-   * `output-schema.json`. Our fields (`document_type`, `tags`, `confidence`, `status`, `reasons` and metadata) go in its `decision` section.
+   * `output-schema.json`. Our fields (`document_id`, `status`, `document_type`, `confidence`, `tags`, `flags`, `reasons`, and metadata once decision 3 is settled) go in its `decision` section.
    * `questions.json`, together with Precious.
 * **Package Manifest:** Maintain the `[tool.cog]` table in `pixi.toml`, the file Nebi publishes.
    * Include the extraction dependencies (for example pypdf, pypdfium2 and tesseract) and the declared prohibitions.
