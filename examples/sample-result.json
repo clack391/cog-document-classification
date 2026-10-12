@@ -1,25 +1,90 @@
 {
-  "model": "jev-1.13.0",
+  "model": "illustrative-fixture",
   "answer_source": "system-one-model",
   "answers": {
-    "department": {
+    "document_type": {
       "type": "choice",
-      "choice": "technical",
-      "probabilities": { "billing": 0.15, "technical": 0.85, "sales": 0.0 },
-      "confidence": 0.78
-    },
-    "frustration": {
-      "type": "score",
-      "score": 1.0,
-      "legend": {
-        "0": "Calm, just stating facts",
-        "1": "Frustrated but civil",
-        "2": "Very angry, strong language"
+      "choice": "invoice",
+      "probabilities": {
+        "invoice": 0.94,
+        "contract": 0.01,
+        "resume": 0.0,
+        "support_ticket": 0.02,
+        "other": 0.03
       },
-      "probabilities": { "0": 0.0, "1": 1.0, "2": 0.0 },
-      "confidence": 1.0
+      "confidence": 0.93
     },
-    "is_urgent": { "type": "noul", "noul": 1.0 }
+    "text_legible": {
+      "type": "noul",
+      "noul": 0.98
+    },
+    "tag_contains_personal_data": {
+      "type": "noul",
+      "noul": 0.1
+    },
+    "tag_contains_financial_amounts": {
+      "type": "noul",
+      "noul": 0.99
+    },
+    "tag_time_sensitive": {
+      "type": "noul",
+      "noul": 0.85
+    },
+    "tag_signed": {
+      "type": "noul",
+      "noul": 0.03
+    },
+    "tag_draft_or_template": {
+      "type": "noul",
+      "noul": 0.02
+    },
+    "tag_multiple_documents": {
+      "type": "noul",
+      "noul": 0.02
+    },
+    "tag_non_english": {
+      "type": "noul",
+      "noul": 0.01
+    },
+    "tag_invoice_reminder": {
+      "type": "noul",
+      "noul": 0.04
+    },
+    "tag_invoice_credit_note": {
+      "type": "noul",
+      "noul": 0.02
+    },
+    "tag_contract_nda": {
+      "type": "noul",
+      "noul": 0.0
+    },
+    "tag_contract_employment": {
+      "type": "noul",
+      "noul": 0.0
+    },
+    "tag_contract_amendment": {
+      "type": "noul",
+      "noul": 0.01
+    },
+    "tag_ticket_urgent": {
+      "type": "noul",
+      "noul": 0.01
+    },
+    "tag_ticket_complaint": {
+      "type": "noul",
+      "noul": 0.01
+    },
+    "tag_ticket_billing": {
+      "type": "noul",
+      "noul": 0.05
+    },
+    "tag_ticket_bug_report": {
+      "type": "noul",
+      "noul": 0.0
+    }
   },
-  "usage": { "input_tokens": 392, "output_tokens": 65 }
+  "usage": {
+    "input_tokens": 1650,
+    "output_tokens": 120
+  }
 }

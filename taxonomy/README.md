@@ -4,62 +4,66 @@ Owner: Precious.
 
 ## What's here
 
-| File | What it is | Who reads it |
-|---|---|---|
-| `document-taxonomy.frame.md` | The taxonomy as a Frame (Frame Spec v0.2): types, boundary rules and the tag vocabulary | People, and any model or Cog given the Frame |
-| `questions.json` | A draft of the same taxonomy as System One questions | The model behind the Cog. Apart from the document text, it is all the model sees. |
+[`document-taxonomy.frame.md`](document-taxonomy.frame.md) is the taxonomy as a
+Frame (Frame Spec v0.2): the types, boundary rules and tag vocabulary. It is the
+source of truth.
 
-`questions.json` is a draft. It replaces `context/questions.json` once the input
-and output schemas are agreed. Until then, `context/` still holds Smith's starter
-question set, so the package keeps passing its checks.
+The Cog uses it in three places:
 
-Keep the two files in sync: change one, change the other. When `questions.json`
-moves into `context/`, a test will compare its types and tags with the Frame's.
-
-## How the Frame maps to the questions
-
-| In the Frame | In `questions.json` |
+| Where | What it holds |
 |---|---|
-| Type definitions, signals and boundary rules | Option descriptions of the `document_type` choice question |
+| `context/questions.json` | The questions the model answers. Apart from the document text, they are all the model sees. |
+| `src/task_logic.py` | The decision policy: thresholds, review, contradictions, and which tags are reported |
+| `context/output-schema.json` | The types and tags a result may contain |
+
+`tests/test_frame_sync.py` fails whenever these disagree with the Frame on the
+types or the tags. Change the Frame first, then the rest, and run `pixi run test`.
+
+## How the Frame maps to the Cog
+
+| In the Frame | In the Cog |
+|---|---|
+| Type definitions, signals and borderline cases | Option descriptions of the `document_type` question |
 | Each tag in the Tag Vocabulary | One yes/no question named `tag_<tag>` |
-| The rule on garbled or fragmentary text | The `text_legible` yes/no question |
-| Contradiction rules, review rules and thresholds | Not questions: policy in `decide` in `src/task_logic.py` |
+| The rule on garbled or fragmentary text | The `text_legible` question |
+| Review, contradiction and tag-reporting rules | `decide` in `src/task_logic.py` |
+| "Not the filename" | `state` sends only the text |
 
-The manifest lists the Frame under `frames`. The suite carries that field as
-metadata and does not load Frames into a decision Cog, so the questions remain
-the operative copy.
-
-The questions use only `choice` and `noul`. When they move into `context/`, set
-`required_features = ["choice", "noul"]` in the manifest's
-`workbench_composition`.
+The manifest also lists the Frame under `frames`. The suite carries that field
+as metadata but does not load Frames into a decision Cog.
 
 ## Thresholds
 
-These are placeholders until the benchmark sets tune them, separately for each
-model.
+These are placeholders until the benchmark sets tune them. They are constants
+at the top of `src/task_logic.py`.
 
-| Check | Threshold | Result |
+| Constant | Value | Rule |
 |---|---|---|
-| `document_type` confidence | 0.85 | below it: review |
-| Tag probability | 0.7 | below it: tag not applied |
-| `text_legible` probability | 0.5 | below it: review |
-| Type-tag contradiction | 0.9 | at or above it, for another type: review |
-| Invoice amount check (`contains_financial_amounts`) | 0.3 | below it, on an invoice: review |
+| `MIN_TYPE_CONFIDENCE` | 0.85 | Below it, the document goes to review |
+| `TAG_THRESHOLD` | 0.7 | At or above it, the tag applies |
+| `MIN_LEGIBLE` | 0.5 | Below it, the document goes to review |
+| `CONTRADICTION` | 0.9 | A type tag this strong for another type sends the document to review |
+| `INVOICE_MIN_AMOUNTS` | 0.3 | An invoice whose amounts answer is below it goes to review |
 
-## Working assumptions to confirm
+**One set of thresholds for every model, for now.** The machinery calls
+`decide(bundle, answers)` without saying which model answered, so `decide`
+cannot apply a different threshold to Jev and to an LLM. The options are:
+- choose the thresholds for whichever provider we deploy;
+- have `check_output` add a warning for LLM-answered results;
+- ask cog-smith to pass `answered_by` to `decide`.
 
-These are marked in the Frame. Each needs a yes or a different rule.
+## Decisions
 
-1. The filename is not sent to the model.
-2. Pro-forma invoices and credit notes are `invoice`. Receipts and statements are `other`.
-3. Offer letters and unsigned contract templates are `contract`. Published terms of use are `other`.
-4. A cover letter on its own is `other`. Exported network profiles are `resume`.
-5. Sales enquiries are `other`. A support reply without the customer's request is `support_ticket`.
-6. The two contradiction rules.
-7. The final tag list: drop any tag nobody will route on.
+- **12 Oct 2026:** all working assumptions confirmed by Precious: the
+  filename, the borderline cases, the contradiction rules, and the 16-tag
+  vocabulary.
+- **12 Oct 2026:** type-tag questions now describe a document of their own
+  type, for example "a support request about billing" rather than "about
+  billing". An invoice would otherwise answer yes to the billing tag and trip
+  the contradiction rule.
 
 ## Validation
 
 - **The Frame's frontmatter:** check it with `frame_validator.py` from the Frames toolkit.
-- **`questions.json`:** checked by the System One contract, `src/system_one_contract.py`. Once it is in `context/`, `pixi run derive-schema` and `pixi run test` check it too.
+- **The questions, the policy and the sync with the Frame:** `pixi run test`.
 - **The content:** an acceptance test on labeled sample documents. That is step 8 of the Frame playbook, and it is the same work as the benchmark set.

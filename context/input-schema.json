@@ -1,13 +1,23 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Document Classification input",
-  "description": "Task bundle for openteams/cog-document-classification (a decision Cog). Declared from the manifest as context.input_schema.",
+  "description": "One document to classify. Provisional: until extraction is built (Phase 2), the caller supplies the document's extracted text. The final input, a file path or an embedded file, is decision 4.",
   "type": "object",
-  "required": ["ticket_id", "body"],
+  "required": ["document_id", "text"],
   "properties": {
-    "ticket_id": { "type": "string", "minLength": 1 },
-    "subject": { "type": "string" },
-    "body": { "type": "string", "minLength": 1, "x-cog-input": { "widget": "textarea" } }
+    "document_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "The caller's identifier for the document. It is echoed in the decision and never sent to the model."
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100000,
+      "description": "The document's extracted text. The filename is deliberately not part of the input.",
+      "x-cog-input": { "widget": "textarea" }
+    }
   },
   "additionalProperties": false
 }

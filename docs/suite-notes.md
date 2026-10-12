@@ -60,7 +60,11 @@ The payload is always `{decision, answers, answered_by}`. Our fields go inside
 | cog-typesafe | TypeSafe's Jev, a versioned ID such as `jev-1.13.0` | Cloud: the state and questions go to TypeSafe. Input tokens are billed. Needs `TYPESAFE_API_KEY`. | Trained for calibration. The suite publishes no accuracy figures. |
 | cog-system-one-adapter | A local cog-qwen or cog-openrouter model | cog-qwen keeps data on the machine. | Stated by an LLM, so not calibrated. |
 
-`answered_by.answer_source` records which kind of model answered.
+`answered_by.answer_source` records which kind of model answered. The
+machinery calls `decide(bundle, answers)` without it, so `decide` cannot apply a
+different threshold to each provider. To treat providers differently, use
+`check_output`, which sees the whole payload, or ask cog-smith to pass
+`answered_by` to `decide`.
 
 ## Limits that shape the design
 

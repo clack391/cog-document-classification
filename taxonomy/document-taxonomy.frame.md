@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.1.0
+version: 0.2.0
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -20,14 +20,14 @@ maintainer: Document Classification Cog team
 ## Inputs
 
 - The extracted text of one document. Scanned pages arrive as OCR text and may contain recognition errors.
-- Not the filename. Filenames are often generic or wrong, and can contain personal data. *(Working assumption; confirm.)*
+- Not the filename. Filenames are often generic or wrong, and can contain personal data.
 
 ## Terminology
 
-- **`invoice`**: a request for payment from a seller to a buyer for goods or services, stating what is owed. Includes tax and VAT invoices, utility and subscription bills, and payment reminders or overdue notices for an invoice.
-- **`contract`**: an agreement that sets out obligations between two or more named parties, signed or meant to be signed. Includes service and supply agreements, statements of work, non-disclosure agreements, employment contracts, leases, licences, and amendments or renewals of an agreement.
-- **`resume`**: a person's own summary of their work history, education and skills, written to apply for jobs. Also called a CV. The ID is always ASCII `resume`; "Résumé" is only a display label.
-- **`support_ticket`**: a request for help, or a report of a problem, sent by a customer or user to the team behind a product or service. Includes helpdesk tickets, support emails, bug reports, complaints, access requests and billing disputes raised with support.
+- **`invoice`**: a request for payment from a seller to a buyer for goods or services, stating what is owed. Includes tax and VAT invoices, pro-forma invoices, credit notes, utility and subscription bills, and payment reminders or overdue notices for an invoice.
+- **`contract`**: an agreement that sets out obligations between two or more named parties, signed or meant to be signed. Includes service and supply agreements, statements of work, non-disclosure agreements, employment contracts, job offer letters, leases, licences, amendments or renewals of an agreement, and unsigned contract templates.
+- **`resume`**: a person's own summary of their work history, education and skills, written to apply for jobs. Also called a CV. Includes profiles exported from professional networking sites. The ID is always ASCII `resume`; "Résumé" is only a display label.
+- **`support_ticket`**: a request for help, or a report of a problem, sent by a customer or user to the team behind a product or service. Includes helpdesk tickets, support emails, bug reports, complaints, access requests, billing disputes raised with support, and the support team's replies within a ticket.
 - **`other`**: any document that is not one of the four types above. It is a real type, not a holding place for uncertainty.
 - **Tag**: a yes/no label from the vocabulary below. General tags can apply to any type. Type tags are reported only with their own type.
 - **Review**: the outcome when no type can be assigned reliably. It carries no type, and it states its reasons.
@@ -51,14 +51,14 @@ Type tags:
 | Tag | Type | Applies when |
 |---|---|---|
 | `invoice_reminder` | `invoice` | It is a payment reminder, overdue notice or final notice |
-| `invoice_credit_note` | `invoice` | It credits or refunds money rather than charging it |
+| `invoice_credit_note` | `invoice` | It is a credit note: it credits or refunds money rather than charging it |
 | `contract_nda` | `contract` | It is a non-disclosure or confidentiality agreement |
-| `contract_employment` | `contract` | It is an employment contract or sets employment terms |
-| `contract_amendment` | `contract` | It amends, renews or extends an existing agreement |
-| `ticket_urgent` | `support_ticket` | It reports something blocking, an outage or money being lost now, or states urgency |
-| `ticket_complaint` | `support_ticket` | It expresses dissatisfaction, or asks for escalation or compensation |
-| `ticket_billing` | `support_ticket` | It is about billing, payments, charges or refunds |
-| `ticket_bug_report` | `support_ticket` | It reports a defect or error in a product or service |
+| `contract_employment` | `contract` | It is an employment contract or a job offer letter that sets employment terms |
+| `contract_amendment` | `contract` | It is an agreement that amends, renews or extends an earlier agreement |
+| `ticket_urgent` | `support_ticket` | It is a support request reporting something blocking, an outage or money being lost now, or stating urgency |
+| `ticket_complaint` | `support_ticket` | It is a complaint: it expresses dissatisfaction, or asks for escalation or compensation |
+| `ticket_billing` | `support_ticket` | It is a support request about billing, payments, charges or refunds |
+| `ticket_bug_report` | `support_ticket` | It is a support request reporting a defect or error in a product or service |
 
 ## Rules
 
@@ -73,7 +73,7 @@ Type boundaries:
 - Job descriptions, job adverts, reference letters and performance reviews are `other`.
 - Internal incident reports, post-mortems and feedback surveys are `other`.
 
-Working assumptions for borderline cases *(confirm before relying on them)*:
+Borderline cases (confirmed 12 October 2026):
 - Pro-forma invoices are `invoice`: they request payment, even in advance.
 - Credit notes are `invoice`, tagged `invoice_credit_note`.
 - Receipts, payment confirmations and account statements are `other`.
@@ -98,7 +98,8 @@ Signals (evidence, never the decision on their own):
 Tagging:
 - Apply a tag only when its statement clearly holds. Leave it off when unsure.
 - Report a type tag only when the document has that type.
-- Contradictions go to review *(working assumption; confirm)*:
+- Type tags describe a document of their own type, so a strong type tag for another type is a contradiction.
+- Contradictions go to review:
   - a type tag clearly holds for a different type than the one chosen;
   - an `invoice` states no monetary amounts.
 

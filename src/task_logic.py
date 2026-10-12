@@ -1,84 +1,119 @@
-"""THE per-cog module of a decision Cog — the only file in src/ you edit.
+"""Document Classification task logic: the only file in src/ this Cog owns.
 
-Everything else in src/ is shared cog-smith decision-cog machinery,
-byte-identical across created decision Cogs and verified by `smith check`.
-Your Cog's identity lives in:
-  - the manifest — [tool.cog] in pixi.toml, or cog.yaml
-  - context/questions.json (the typed questions a System One model answers)
-  - context/*-schema.json (input shape; `$defs.decision` in the output schema
-    is yours, `$defs.answers` is derived: `pixi run derive-schema`)
-  - this file (what state is sent, and how typed answers become a decision)
+A System One model answers the typed questions in context/questions.json about
+one document's text: which of five types it is, whether the text is legible,
+and one yes/no question per tag. This code turns those answers into the
+classification, applying the policy in taxonomy/document-taxonomy.frame.md:
 
-The starter is a working toy: a support ticket goes in; the department,
-frustration and urgency questions come back typed and calibrated; a routing
-decision comes out, with low-confidence routing sent to a person. Replace it.
+- the type is the model's `document_type` choice when its confidence is at
+  least MIN_TYPE_CONFIDENCE;
+- low confidence, illegible text or contradicting answers send the document to
+  review instead; a document in review gets no type, and every reason is
+  stated;
+- tags apply at TAG_THRESHOLD, and a type's own tags are reported only with
+  that type.
 
-The division of labour is deliberate. The model answers narrow, typed
-questions with probabilities; THIS code makes the decision from them, with
-thresholds you can read, test and change. Keep judgment in the questions and
-policy in the code.
+Provisional: the input is the document's extracted text until extraction is
+built (Phase 2), and the thresholds are placeholders until the benchmark sets
+tune them.
 """
 
-# Policy thresholds. Tune them against real answers for the model version you
-# pin; TypeSafe advises pinning a versioned model ID once thresholds are tuned.
-MIN_ROUTE_CONFIDENCE = 0.5
-URGENT_PROBABILITY = 0.7
-ESCALATE_FRUSTRATION = 1.5
+# Placeholder thresholds (taxonomy/README.md). decide() is not told which model
+# answered, so one set of thresholds applies to every provider for now.
+MIN_TYPE_CONFIDENCE = 0.85
+TAG_THRESHOLD = 0.7
+MIN_LEGIBLE = 0.5
+CONTRADICTION = 0.9         # a type tag this strong for another type contradicts the type
+INVOICE_MIN_AMOUNTS = 0.3   # an invoice whose amounts answer is below this is suspect
+
+TAG_PREFIX = "tag_"
+GENERAL_TAGS = ("contains_personal_data", "contains_financial_amounts", "time_sensitive",
+                "signed", "draft_or_template", "multiple_documents", "non_english")
+TYPE_TAGS = {
+    "invoice": ("invoice_reminder", "invoice_credit_note"),
+    "contract": ("contract_nda", "contract_employment", "contract_amendment"),
+    "resume": (),
+    "support_ticket": ("ticket_urgent", "ticket_complaint", "ticket_billing", "ticket_bug_report"),
+    "other": (),
+}
 
 
 def check_input(bundle):
-    """Input checks beyond the declared input schema. Return a list of
-    cog_core.problem(...) dicts (import inside to avoid a load-time cycle).
-    error (the default) refuses the invocation; warning proceeds and is carried into problems."""
+    """Input checks beyond the input schema. An `error` refuses the run."""
     import cog_core
     problems = []
-    if not str(bundle.get("body", "")).strip():
-        problems.append(cog_core.problem("input", "body must contain text"))
+    if not str(bundle.get("text", "")).strip():
+        problems.append(cog_core.problem("input", "text must contain more than whitespace"))
     return problems
 
 
 def state(bundle):
-    """The state the model evaluates: text, or a JSON object whose field names
-    your questions can point at in backticks. Send only what the questions
-    need; state leaves the machine when the admitted provider is remote."""
-    return {"subject": bundle.get("subject", ""), "body": bundle["body"]}
+    """Only the document's text. The caller's ID stays here, and the filename
+    is never part of the input (Frame: Inputs)."""
+    return {"text": bundle["text"]}
 
 
 def questions(bundle, declared):
-    """The question set for this input. `declared` is context/questions.json.
-    You may adjust wording per input; ids, types, options and levels must stay
-    as declared (the machinery refuses anything else)."""
     return declared
 
 
+def _probability(answers, tag):
+    return answers[TAG_PREFIX + tag]["noul"]
+
+
 def decide(bundle, answers):
-    """Typed answers -> this Cog's decision (`$defs.decision`)."""
-    department = answers["department"]
-    urgency = answers["is_urgent"]["noul"]
-    frustration = answers["frustration"]["score"]
-    reasons = []
-    route = department["choice"]
-    if department["confidence"] < MIN_ROUTE_CONFIDENCE:
-        route = "human-review"
-        reasons.append(f"department confidence {department['confidence']:.2f} "
-                       f"is below {MIN_ROUTE_CONFIDENCE}")
-    escalate = urgency >= URGENT_PROBABILITY or frustration >= ESCALATE_FRUSTRATION
-    if urgency >= URGENT_PROBABILITY:
-        reasons.append(f"urgency probability {urgency:.2f}")
-    if frustration >= ESCALATE_FRUSTRATION:
-        reasons.append(f"frustration score {frustration:.2f}")
-    return {"ticket_id": bundle["ticket_id"], "route": route,
-            "escalate": escalate, "reasons": reasons}
+    answer = answers["document_type"]
+    top, confidence = answer["choice"], answer["confidence"]
+    flags, reasons = [], []
+
+    if confidence < MIN_TYPE_CONFIDENCE:
+        flags.append("low-confidence")
+        reasons.append(f"type confidence {confidence:.2f} is below {MIN_TYPE_CONFIDENCE} (top type: {top})")
+    legible = answers["text_legible"]["noul"]
+    if legible < MIN_LEGIBLE:
+        flags.append("illegible-text")
+        reasons.append(f"text legibility {legible:.2f} is below {MIN_LEGIBLE}")
+    for other_type, tags in TYPE_TAGS.items():
+        for tag in tags if other_type != top else ():
+            if _probability(answers, tag) >= CONTRADICTION:
+                if "signals-disagree" not in flags:
+                    flags.append("signals-disagree")
+                reasons.append(f"{tag} is {_probability(answers, tag):.2f} but the top type is {top}")
+    amounts = _probability(answers, "contains_financial_amounts")
+    if top == "invoice" and amounts < INVOICE_MIN_AMOUNTS:
+        flags.append("invoice-without-amounts")
+        reasons.append(f"top type is invoice but contains_financial_amounts is {amounts:.2f}")
+
+    review = bool(flags)
+    candidates = GENERAL_TAGS if review else GENERAL_TAGS + TYPE_TAGS[top]
+    if not review:
+        reasons.insert(0, f"document_type {top} (confidence {confidence:.2f})")
+    return {"document_id": bundle["document_id"],
+            "status": "needs_review" if review else "classified",
+            "document_type": None if review else top,
+            "confidence": confidence,
+            "tags": [tag for tag in candidates if _probability(answers, tag) >= TAG_THRESHOLD],
+            "flags": flags,
+            "reasons": reasons}
 
 
 def check_output(payload, bundle):
-    """Contract checks — the Cog's OWN validation, reported in `problems`.
-    A Gate decides what they mean; this Cog never does."""
+    """Contract checks, reported in `problems`. A document in review is also
+    reported as a warning, so an Op's Gate passes it with problems rather than
+    as clean."""
     import cog_core
     problems = []
     decision = payload["decision"]
-    if decision["ticket_id"] != bundle["ticket_id"]:
-        problems.append(cog_core.problem("consistency", "decision names a different ticket"))
-    if decision["route"] == "human-review" and not decision["reasons"]:
-        problems.append(cog_core.problem("consistency", "human review needs a stated reason"))
+    if decision["document_id"] != bundle["document_id"]:
+        problems.append(cog_core.problem("consistency", "decision names a different document"))
+    if decision["status"] == "classified" and decision["document_type"] is None:
+        problems.append(cog_core.problem("consistency", "a classified document needs a type"))
+    if decision["status"] == "needs_review":
+        if decision["document_type"] is not None:
+            problems.append(cog_core.problem("consistency", "a document in review must not get a type"))
+        if not decision["flags"] or not decision["reasons"]:
+            problems.append(cog_core.problem("consistency", "review needs a flag and a stated reason"))
+        else:
+            problems.append(cog_core.problem(
+                "needs-review", "document needs review: " + "; ".join(decision["reasons"]), "warning"))
     return problems

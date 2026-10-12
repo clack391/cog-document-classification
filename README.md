@@ -16,14 +16,26 @@ read and test.
 
 ## Status
 
-Early scaffold. The package passes Smith's checks and its offline tests on the
-suite's current pins. It is not yet a working classifier:
+Phase 1, in progress. The package passes Smith's checks and its offline tests
+on the suite's current pins.
 
-- `context/`, `src/task_logic.py` and `examples/` still hold Smith's starter, a
-  support-ticket router.
+**What works**
+- The confirmed taxonomy: the [Frame](taxonomy/document-taxonomy.frame.md) and
+  the 18 questions in `context/questions.json` built from it.
+- A first decision policy in `src/task_logic.py`: the type at confidence 0.85
+  or above, tags at 0.7, and review for low confidence, illegible text or
+  contradicting answers.
+- Tests that keep the Frame, the questions, the policy and the output schema in
+  agreement.
+
+**What is provisional**
+- The input is the document's extracted text. File input and extraction come
+  in Phase 2, and the final input format is decision 4.
+- The output schema has no metadata fields yet. That waits on decision 3.
+- The thresholds are placeholders until the benchmark sets tune them.
+
+**What is not started**
 - `COG.md` still has the starter's placeholder sections.
-- Our taxonomy is drafted in [`taxonomy/`](taxonomy/). Its questions replace the
-  starter's once the input and output schemas are agreed.
 
 See the [proposal](docs/proposal.md) for the plan, the phases and the open
 decisions.
@@ -37,7 +49,7 @@ decisions.
 | `pixi.lock` | Exact pinned dependencies for Linux x86-64 and Apple Silicon | Francis |
 | `context/` | Input schema, output schema and the questions the model answers | Francis, with Precious for the questions |
 | `src/task_logic.py` | Extraction hookup and the decision policy. Every other file in `src/` is Smith machinery; never edit it. | Francis, with Precious for the policy |
-| `taxonomy/` | The taxonomy Frame, the draft questions and the thresholds | Precious |
+| `taxonomy/` | The taxonomy Frame (the source of truth) and its notes | Precious |
 | `tests/` | Offline tests. They need no model. | Both |
 | `docs/` | The proposal and notes on the suite | Both |
 

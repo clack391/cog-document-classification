@@ -1,5 +1,4 @@
 {
-  "ticket_id": "T-1042",
-  "subject": "Stripe integration broken",
-  "body": "Hi, I've been trying to connect my Stripe account for 3 days and the integration keeps failing. I'm losing sales. Please help ASAP."
+  "document_id": "doc-0001",
+  "text": "INVOICE\nInvoice no. INV-2026-0142\nInvoice date: 2 October 2026\nDue date: 1 November 2026\n\nLarkspur Office Supplies Ltd\n14 Mill Road, Leeds\n\nBill to: Harbour Lane Studio, 3 Quay Street, Bristol\n\nDescription                 Qty   Unit price    Amount\nA4 copier paper (box)        10      GBP 24.00   GBP 240.00\nToner cartridge, black        4      GBP 56.50   GBP 226.00\n\nSubtotal GBP 466.00\nVAT 20% GBP 93.20\nTotal due GBP 559.20\n\nPayment terms: 30 days. Please pay by bank transfer, quoting INV-2026-0142."
 }

@@ -92,8 +92,8 @@ To ensure accountability and prevent misclassification:
 
 * **Phase 1: Setup, Contract & Questions** *(in progress)*
    * Create the Cog with `smith new --class decision`. *(Done 12 Oct 2026.)*
-   * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(The Frame and draft questions are in `taxonomy/`. The working assumptions and the tag list still need confirming, and the questions are not yet in `context/`.)*
-   * Write `COG.md` and the input and output schemas. *(Not started. The input schema needs decision 4; the output schema needs decision 3.)*
+   * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(Done 12 Oct 2026: the working assumptions and 16 tags are confirmed, and the questions are in `context/questions.json`.)*
+   * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. The final versions wait on decisions 4 and 3. `COG.md` is not started.)*
    * Smith validation passes from this phase onward. *(It passes on the scaffold, and CI is set up.)*
 * **Phase 2: Extraction & Provider**
    * Add the extraction dependencies to `pixi.toml` and commit `pixi.lock`.
@@ -117,7 +117,7 @@ To ensure accountability and prevent misclassification:
 2. **Cloud Jev or local Qwen:** Jev sends the extracted text to TypeSafe. Contracts and résumés hold personal data. Owners: Trent & Inessa. Needed before Phase 2.
 3. **What "metadata" covers:** file and extraction facts only, or content fields such as invoice numbers. Content fields would need a second Cog. Owners: the team with Trent & Inessa. Needed before the output schema is fixed.
 4. **How documents arrive:** a file path with its sha256 recorded, or the file embedded in the input; plus the supported formats and maximum length. Owner: Francis. Needed before the input schema is fixed.
-5. **Tag vocabulary:** which tags, up to 63. Owner: Precious. Needed in Phase 1. *(Draft: 16 tags in `taxonomy/`, to be confirmed.)*
+5. **Tag vocabulary:** *settled 12 Oct 2026.* 16 tags, confirmed by Precious, are listed in the taxonomy Frame.
 6. **What review looks like:** consumers routing on `needs_review`, or an Op with a human approval Gate on every document. Owners: Trent & Inessa. Needed before Phase 3.
 
 **6. What Changed from v1**
