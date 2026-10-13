@@ -3,6 +3,7 @@ Guard on this repo and on planted files. Secrets and personal data used here
 are built at run time and written only to temporary folders."""
 import copy
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -130,11 +131,39 @@ class RepositoryGuard(unittest.TestCase):
     def test_personal_data_in_sample_data_is_found(self):
         with tempfile.TemporaryDirectory() as tmp:
             (Path(tmp) / "examples").mkdir()
-            (Path(tmp) / "examples" / "doc.json").write_text('{"text": "mail ' + "jo" + "@" + 'example.org"}\n')
-            (Path(tmp) / "README.md").write_text("owner: " + "jo" + "@" + "example.org\n")
+            (Path(tmp) / "examples" / "doc.json").write_text('{"text": "mail ' + "jo" + "@" + 'mailhost.co.uk"}\n')
+            (Path(tmp) / "README.md").write_text("owner: " + "jo" + "@" + "mailhost.co.uk\n")
             findings = repo_guard.scan(tmp, ["examples/doc.json", "README.md"])
         self.assertEqual(len(findings), 1, findings)
         self.assertIn("examples/doc.json", findings[0])
+
+    def test_reserved_fictional_contacts_are_allowed_in_sample_data(self):
+        allowed = ["a.person" + "@" + "example.com", "x" + "@" + "team.example.org", "+44 20 " + "7946 0123",
+                   "0161 " + "496 0721", "07700 " + "900341", "(312) " + "555-0142"]
+        flagged = ["a.person" + "@" + "realmail.co", "+44 20 " + "7123 4567", "(312) " + "555-7788"]
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "benchmarks").mkdir()
+            for i, text in enumerate(allowed + flagged):
+                (Path(tmp) / "benchmarks" / f"d{i}.txt").write_text(f"contact {text}\n")
+            names = [f"benchmarks/d{i}.txt" for i in range(len(allowed) + len(flagged))]
+            findings = repo_guard.scan(tmp, names)
+        flagged_files = sorted(f.split(":")[0] for f in findings)
+        self.assertEqual(flagged_files, names[len(allowed):], findings)
+
+    def test_the_output_guard_never_allows_fictional_contacts(self):
+        self.assertEqual(result_guard.personal_identifiers("x" + "@" + "example.org"), ["email address"])
+        self.assertEqual(result_guard.personal_identifiers("x" + "@" + "example.org", allow_fictional=True), [])
+
+    def test_new_files_are_scanned_before_they_are_committed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["git", "init", "-q", tmp], check=True)
+            (Path(tmp) / ".gitignore").write_text("ignored/\n")
+            (Path(tmp) / "ignored").mkdir()
+            (Path(tmp) / "ignored" / "secret.txt").write_text("x")
+            (Path(tmp) / "new.md").write_text("draft\n")
+            files = repo_guard.tracked_files(tmp)
+        self.assertIn("new.md", files)
+        self.assertNotIn("ignored/secret.txt", files)
 
 
 if __name__ == "__main__":

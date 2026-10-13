@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Repository Guard: no credentials or real personal data are committed.
 
-Two checks over the files Git tracks:
+Two checks over every file in the repository except those Git ignores, so
+new files are checked before they're committed:
 - secrets: private keys, access tokens, API keys with a value, and .env files,
   in every text file;
 - personal identifiers: email addresses, phone numbers, payment card numbers,
-  IBANs and US Social Security numbers, in the sample and test data, which must
-  be synthetic.
+  IBANs and US Social Security numbers, in the sample, test and benchmark data,
+  which must be synthetic. Reserved fictional contact details are allowed
+  there: example.com, .org and .net emails, UK Ofcom drama numbers, and US
+  555-0100 to 555-0199.
 
     python guards/repo_guard.py [--root PATH]
 
@@ -37,7 +40,8 @@ SKIP = ("pixi.lock",)
 
 def tracked_files(root):
     try:
-        out = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True, check=True).stdout
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard"],
+                             capture_output=True, text=True, check=True).stdout
         return [f for f in out.splitlines() if f]
     except (OSError, subprocess.CalledProcessError):
         return [str(p.relative_to(root)) for p in Path(root).rglob("*")
@@ -67,7 +71,7 @@ def scan(root, files):
                 if match:
                     findings.append(f"{name}:{number}: {kind} ({_mask(match.group())})")
             if is_data:
-                for kind in personal_identifiers(line):
+                for kind in personal_identifiers(line, allow_fictional=True):
                     findings.append(f"{name}:{number}: {kind} in sample or test data")
     return findings
 
