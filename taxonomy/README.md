@@ -64,20 +64,11 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
 - **13 Oct 2026:** `bank_statement` added as a sixth type: bank and credit
   card statements and transaction-history exports. It has no type tags. The
   Frame is now v0.3.0.
-
-## Working assumptions to confirm
-
-Added with `bank_statement` and marked in the Frame:
-
-1. A supplier's statement of account, listing invoices owed to that supplier,
-   is `other`.
-2. Investment, pension and loan statements are `other`.
-3. Payslips are `other`.
-
-Other possible additions, not yet decided:
-- type tags for bank statements;
-- a rule that a bank statement with no amounts goes to review, like an
-  invoice with no amounts.
+- **13 Oct 2026:** Precious confirmed the bank statement boundaries: supplier
+  statements of account, investment, pension and loan statements, and payslips
+  are all `other`. No type tags for bank statements, and no extra review rule
+  for a bank statement without amounts. The Frame is now v0.3.1, with no open
+  working assumptions.
 
 ## Validation
 

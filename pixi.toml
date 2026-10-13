@@ -1,7 +1,7 @@
 [workspace]
 name = "cog-document-classification"
 version = "0.1.0"
-description = "Classifies one business document as an invoice, contract, resume, support ticket or other, with tags and the model confidence, and flags uncertain or unreadable documents for review."
+description = "Classifies one business document as an invoice, contract, resume, support ticket, bank statement or other, with tags and the model confidence, and flags uncertain or unreadable documents for review."
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
 

@@ -1,7 +1,7 @@
 ---
 type: cog [0.1]
 name: cog-document-classification
-description: "Decision Cog. Classifies one business document as an invoice, contract, resume, support ticket or other, with tags and the model confidence, and flags uncertain or unreadable documents for review. A System One model answers its typed questions; its code makes the decision."
+description: "Decision Cog. Classifies one business document as an invoice, contract, resume, support ticket, bank statement or other, with tags and the model confidence, and flags uncertain or unreadable documents for review. A System One model answers its typed questions; its code makes the decision."
 version: "0.1.0"
 license: Apache-2.0
 publisher: OpenTeams
@@ -13,7 +13,7 @@ manifest_schema: openteams/cog-manifest [0.1]
 
 ## Purpose
 
-Classifies one business document as an invoice, contract, resume, support ticket or other, with tags and the model confidence, and flags uncertain or unreadable documents for review.
+Classifies one business document as an invoice, contract, resume, support ticket, bank statement or other, with tags and the model confidence, and flags uncertain or unreadable documents for review.
 
 *(Created by cog-smith as a **decision Cog**: a context Cog whose context is a
 typed question set. A System One model answers Noul, Choice and Score

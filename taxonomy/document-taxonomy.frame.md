@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.3.0
+version: 0.3.1
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -90,7 +90,7 @@ Bank statements (added 13 October 2026):
 - Bank and credit card statements, and transaction-history exports, are `bank_statement`.
 - A complaint or question about a bank transaction is a `support_ticket`.
 
-Working assumptions *(confirm before relying on them)*:
+Confirmed 13 October 2026:
 - A supplier's statement of account, listing invoices owed to that supplier, is `other`.
 - Investment, pension and loan statements are `other`.
 - Payslips are `other`.
