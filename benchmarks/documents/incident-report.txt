@@ -1,0 +1,28 @@
+Post-incident review: Ledgerly Cloud report exports failing
+Incident ID: INC-2026-117
+Severity: 2
+Date of incident: 9 October 2026, 08:40 to 13:15 UTC
+Author: Platform Reliability team
+Status: Final
+
+Summary
+After the 08:30 release, CSV exports from the Reports page returned HTTP 500 errors for all customers for about four and a half hours.
+
+Impact
+Around 1,900 export attempts failed. 63 customers opened support tickets.
+
+Root cause
+A configuration change renamed the storage bucket used for temporary export files. The export service still used the old name.
+
+Timeline
+08:30 Release deployed.
+08:40 First error alerts.
+11:05 Root cause identified.
+13:15 Fix deployed and exports recovered.
+
+What went well
+Alerts fired within ten minutes.
+
+What we will change
+1. Add an automated export test to the release checklist.
+2. Load bucket names from shared configuration only.

@@ -1,0 +1,19 @@
+PRO-FORMA INVOICE
+
+Tidewater Audio Supplies Ltd
+22 Harbour Road, Plymouth PL1 3TP
+
+Pro-forma number: PF-2026-0087
+Date: 9 October 2026
+
+Customer: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
+
+Description                                   Qty    Unit price        Amount
+Broadcast microphone, dynamic                    4    GBP 249.00    GBP 996.00
+Boom arm, studio grade                           4     GBP 89.00    GBP 356.00
+
+Subtotal                                                          GBP 1,352.00
+VAT at 20%                                                          GBP 270.40
+Total to pay before dispatch                                      GBP 1,622.40
+
+This pro-forma invoice requests payment in advance. Goods are dispatched once payment is received. Please pay within 7 days. A final VAT invoice will follow.

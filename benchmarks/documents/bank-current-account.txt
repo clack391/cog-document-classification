@@ -1,0 +1,26 @@
+MERIDIAN BANK
+Current Account Statement
+
+Mr Samuel Adebayo
+42 Thornfield Road
+Sheffield S10 3LP
+
+Account: Everyday Current Account
+Sort code: 40-22-17    Account number: 63118204
+Statement period: 1 September 2026 to 30 September 2026
+Statement number: 118
+
+Date      Description                              Paid out     Paid in      Balance
+01 Sep    Balance brought forward                                           1,482.36
+02 Sep    Card payment GREENWAY GROCERS               42.18                 1,440.18
+04 Sep    Direct debit NORTHGATE ENERGY               96.40                 1,343.78
+05 Sep    Faster payment from J ADEBAYO                            150.00   1,493.78
+12 Sep    Card payment CITY RAIL                      38.90                 1,454.88
+15 Sep    Standing order RENT                        725.00                   729.88
+25 Sep    Salary QUAYSIDE PAYMENTS LTD                          2,316.45   3,046.33
+28 Sep    Cash withdrawal                             60.00                 2,986.33
+30 Sep    Balance carried forward                                           2,986.33
+
+Total paid out: 962.48     Total paid in: 2,466.45
+
+Your deposits are eligible for protection under the Financial Services Compensation Scheme.

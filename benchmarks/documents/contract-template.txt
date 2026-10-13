@@ -1,0 +1,25 @@
+SERVICE AGREEMENT - TEMPLATE
+[Delete this note before sending. Fill in every field in square brackets.]
+
+This Service Agreement is made on [DATE] between:
+
+(1) [SUPPLIER NAME], whose registered office is at [SUPPLIER ADDRESS] ("Supplier"); and
+(2) [CUSTOMER NAME], whose registered office is at [CUSTOMER ADDRESS] ("Customer").
+
+1. Services
+The Supplier will provide the services described in Schedule 1 ("Services").
+
+2. Term
+This Agreement starts on [START DATE] and continues for [TERM] months.
+
+3. Fees
+The Customer will pay [FEE] per month, plus VAT, within [NUMBER] days of each invoice.
+
+4. Termination
+Either party may end this Agreement by giving [NOTICE PERIOD] written notice.
+
+5. Governing law
+This Agreement is governed by the laws of England and Wales.
+
+Signed for the Supplier: ____________________   Name: [NAME]   Date: [DATE]
+Signed for the Customer: ____________________   Name: [NAME]   Date: [DATE]

@@ -1,0 +1,19 @@
+CREDIT NOTE
+
+Brightline IT Services Ltd
+Unit 4, Canal Wharf, Leeds LS11 5PZ
+
+Credit note number: CN-2026-0019
+Date: 10 October 2026
+Relates to invoice: BIS-2026-0418 (1 October 2026)
+
+Credit to: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
+
+Reason: two Microsoft 365 licences were cancelled before the billing date.
+
+Description                                    Qty   Unit price      Amount
+Microsoft 365 Business licences (credited)       2     GBP 9.80   GBP 19.60
+VAT at 20%                                                          GBP 3.92
+Total credited                                                     GBP 23.52
+
+This amount has been credited to your account and will be deducted from your next invoice.

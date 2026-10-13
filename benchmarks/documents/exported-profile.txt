@@ -1,0 +1,29 @@
+Profile export: Proflink
+Exported 3 October 2026
+
+Ruth Okonkwo
+Senior Data Analyst at Meridian Bank
+Manchester, England, United Kingdom
+Contact: ruth.okonkwo@example.org | proflink.example.com/in/ruth-okonkwo
+
+About
+Data analyst with 8 years in retail banking. I turn messy transaction data into decisions about fraud, pricing and customer experience.
+
+Experience
+Senior Data Analyst, Meridian Bank
+Jan 2022 to present (4 yrs 10 mos)
+Built the fraud-alert dashboard used by 300 branch staff.
+
+Data Analyst, Northgate Energy
+Sep 2018 to Dec 2021 (3 yrs 4 mos)
+Forecast customer churn and modelled tariff changes.
+
+Education
+University of Manchester
+MSc, Data Science, 2017 to 2018
+
+Skills
+SQL, Python, Power BI, Statistics, Stakeholder management
+
+Languages
+English (native), Igbo (professional working)

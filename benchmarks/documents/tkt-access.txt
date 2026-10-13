@@ -1,0 +1,13 @@
+From: Ana Lima <ana.lima@harbourlane.example.com>
+To: support@ledgerly.example.com
+Subject: Access request for a new team member
+
+Hi Ledgerly support,
+
+We have a new bookkeeper starting on Monday, Joseph Grant. Could you please add him to our Ledgerly Cloud account with the "Accountant" role? His work email is joseph.grant@harbourlane.example.com.
+
+I'm the account owner, so I'm happy to confirm by phone on 020 7946 0384 if needed.
+
+Thanks,
+Ana Lima
+Office Manager, Harbour Lane Studio

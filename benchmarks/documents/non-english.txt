@@ -1,0 +1,22 @@
+RECHNUNG
+
+Lindenhof Druckerei GmbH
+Bahnhofstraße 12, 80335 München
+USt-IdNr.: DE 129 384 756
+
+Rechnungsnummer: 2026-0731
+Rechnungsdatum: 6. Oktober 2026
+Fällig am: 5. November 2026
+
+Rechnungsempfänger:
+Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB, Vereinigtes Königreich
+
+Pos.  Beschreibung                              Menge   Einzelpreis       Gesamt
+1     Fotobuch A4, Hardcover, 48 Seiten            50     18,40 EUR   920,00 EUR
+2     Versandkosten                                 1     35,00 EUR    35,00 EUR
+
+Nettobetrag                                                           955,00 EUR
+Umsatzsteuer (Reverse-Charge-Verfahren)                                 0,00 EUR
+Gesamtbetrag                                                          955,00 EUR
+
+Zahlbar innerhalb von 30 Tagen ohne Abzug.

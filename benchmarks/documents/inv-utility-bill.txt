@@ -1,0 +1,24 @@
+NORTHGATE ENERGY
+Your electricity bill
+
+Account holder: Ms Amara Okoye
+Supply address: 27 Willow Crescent, Didsbury, Manchester M20 6QT
+Account number: 70042318
+Bill date: 5 October 2026
+Billing period: 1 September 2026 to 30 September 2026
+
+Meter readings
+Previous reading (actual)        41,282 kWh
+Current reading (actual)         41,596 kWh
+Units used                          314 kWh
+
+Charges
+Electricity, 314 kWh at 27.40p per kWh          GBP 86.04
+Standing charge, 30 days at 53.35p              GBP 16.01
+Total charges before VAT                       GBP 102.05
+VAT at 5%                                        GBP 5.10
+Amount due                                     GBP 107.15
+
+Please pay by 19 October 2026.
+Your Direct Debit of GBP 107.15 will be collected on or after this date.
+Questions about your bill? Call us on 0161 496 0721.

@@ -1,0 +1,20 @@
+Ticket #48213
+Subject: CSV export fails with "Error 500" on the Reports page
+Status: Open
+Priority: High
+Product: Ledgerly Cloud
+Requester: Tom Whitfield (Harbour Lane Studio)
+
+Description:
+Since this morning's update, clicking "Export to CSV" on the Reports page shows "Error 500 - something went wrong". It happens for every report I try, including the monthly VAT summary.
+
+Steps to reproduce:
+1. Go to Reports > VAT summary.
+2. Choose September 2026.
+3. Click "Export to CSV".
+
+Expected: a CSV file downloads.
+Actual: an error page with "Error 500".
+
+Browser: Firefox 131 on Windows 11.
+We need this export for our VAT return, so any workaround would help.

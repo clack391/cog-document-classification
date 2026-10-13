@@ -1,0 +1,5 @@
+{
+  "silent_error_rate_max": 0.02,
+  "review_rate_max": 0.15,
+  "note": "Set by Precious on 13 October 2026. silent_error_rate_max: at most 2% of documents may get a wrong type without going to a person. review_rate_max: at most 15% of documents should need a person. Change these only as a policy decision."
+}

@@ -35,8 +35,10 @@ as metadata but does not load Frames into a decision Cog.
 
 ## Thresholds
 
-These are placeholders until the benchmark sets tune them. They are constants
-at the top of `src/task_logic.py`.
+These are placeholders until the benchmark set tunes them (#8). They are
+constants at the top of `src/task_logic.py`. `benchmarks/score.py` sweeps
+`MIN_TYPE_CONFIDENCE` against the targets in `benchmarks/targets.json`: at most
+2% silent errors and at most 15% of documents sent to a person.
 
 | Constant | Value | Rule |
 |---|---|---|
@@ -79,4 +81,4 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
 
 - **The Frame's frontmatter:** check it with `frame_validator.py` from the Frames toolkit.
 - **The questions, the policy and the sync with the Frame:** `pixi run test`.
-- **The content:** an acceptance test on labeled sample documents. That is step 8 of the Frame playbook, and it is the same work as the benchmark set.
+- **The content:** the [benchmark set](../benchmarks/README.md), which is step 8 of the Frame playbook. `REQUIRED_RULES` in `benchmarks/bench.py` lists the Frame's rules; every rule needs at least one labeled document.

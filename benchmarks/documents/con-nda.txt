@@ -1,0 +1,26 @@
+MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement is entered into as of 14 August 2026 by and between Larkspur Analytics Inc., a Delaware corporation ("Larkspur"), and Fernhill Biotech Ltd, a company incorporated in England ("Fernhill").
+
+WHEREAS the parties wish to explore a possible collaboration on laboratory data analysis (the "Purpose") and, in doing so, may disclose confidential information to each other;
+
+NOW, THEREFORE, the parties agree as follows:
+
+1. Confidential Information. "Confidential Information" means any non-public information disclosed by one party to the other, in any form, that is marked confidential or would reasonably be understood to be confidential.
+2. Obligations. The receiving party shall use Confidential Information only for the Purpose and shall not disclose it to any third party without the prior written consent of the disclosing party.
+3. Exclusions. These obligations do not apply to information that is or becomes public through no fault of the receiving party.
+4. Term. This Agreement remains in force for three (3) years from the date above.
+5. Return of Materials. On request, the receiving party shall return or destroy all Confidential Information.
+6. Governing Law. This Agreement is governed by the laws of the State of New York.
+
+LARKSPUR ANALYTICS INC.
+By: /s/ Marcus Hale
+Name: Marcus Hale
+Title: Chief Executive Officer
+Date: 14 August 2026
+
+FERNHILL BIOTECH LTD
+By: /s/ Eleanor Voss
+Name: Eleanor Voss
+Title: Director of Research
+Date: 15 August 2026

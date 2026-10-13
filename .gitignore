@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 runs/
 .op-composition.json
+
+# Benchmark runs (machine-specific provenance; export fixtures deliberately)
+benchmarks/results/
