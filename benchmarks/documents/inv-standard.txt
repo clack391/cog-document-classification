@@ -1,0 +1,27 @@
+INVOICE
+
+Brightline IT Services Ltd
+Unit 4, Canal Wharf, Leeds LS11 5PZ
+VAT reg. GB 284 1937 66
+accounts@brightline.example.com
+
+Invoice number: BIS-2026-0418
+Invoice date: 1 October 2026
+Due date: 31 October 2026
+Customer reference: PO 77120
+
+Bill to:
+Harbour Lane Studio Ltd
+3 Quay Street, Bristol BS1 4DB
+
+Description                                   Qty   Unit price      Amount
+Managed IT support, October 2026                1   GBP 850.00   GBP 850.00
+Laptop setup and imaging                        3    GBP 65.00   GBP 195.00
+Microsoft 365 Business licences                12     GBP 9.80   GBP 117.60
+
+Subtotal                                                       GBP 1,162.60
+VAT at 20%                                                       GBP 232.52
+Total due                                                      GBP 1,395.12
+
+Payment terms: 30 days from invoice date.
+Please pay by bank transfer, quoting BIS-2026-0418.

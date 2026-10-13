@@ -1,0 +1,26 @@
+INVOICE
+
+Tidewater Audio Supplies Ltd
+22 Harbour Road, Plymouth PL1 3TP
+
+Invoice number: TAS-2026-1140
+Invoice date: 16 October 2026
+Due date: 15 November 2026
+
+Bill to: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
+
+Description                                   Qty    Unit price       Amount
+Acoustic foam panels, pack of 12                 3     GBP 79.00   GBP 237.00
+Studio monitor stands                            2     GBP 64.50   GBP 129.00
+
+Subtotal                                                          GBP 366.00
+VAT at 20%                                                         GBP 73.20
+Total due                                                         GBP 439.20
+
+Please pay by 15 November 2026, quoting TAS-2026-1140.
+
+----------------------------------------------------------------------
+
+Tidewater Audio Supplies: News, October 2026
+
+Our Plymouth showroom is moving! From 2 November you'll find us at Unit 9, Sutton Harbour Business Park. Come and see the new acoustic panel range, and enjoy 10% off any order placed in the showroom during opening week.

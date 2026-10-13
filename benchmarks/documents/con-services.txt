@@ -1,0 +1,38 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement ("Agreement") is made on 2 June 2026 between:
+
+(1) Brightline IT Services Ltd, a company registered in England and Wales under number 08841276, whose registered office is at Unit 4, Canal Wharf, Leeds LS11 5PZ ("Supplier"); and
+(2) Harbour Lane Studio Ltd, a company registered in England and Wales under number 11902345, whose registered office is at 3 Quay Street, Bristol BS1 4DB ("Customer").
+
+Together "the Parties".
+
+1. DEFINITIONS
+1.1 "Services" means the managed IT support services described in Schedule 1.
+1.2 "Service Credits" means the credits set out in Schedule 2.
+
+2. TERM
+2.1 This Agreement starts on 1 July 2026 and continues for an initial term of 24 months.
+2.2 Either Party may terminate this Agreement on 90 days' written notice after the initial term.
+
+3. FEES AND PAYMENT
+3.1 The Customer shall pay a monthly fee of GBP 850.00 plus VAT.
+3.2 The Supplier shall invoice monthly in advance. Invoices are payable within 30 days.
+
+4. CONFIDENTIALITY
+4.1 Each Party shall keep the other Party's confidential information secret.
+
+5. GOVERNING LAW
+5.1 This Agreement is governed by the laws of England and Wales.
+
+IN WITNESS WHEREOF the Parties have signed this Agreement on the date above.
+
+Signed for and on behalf of Brightline IT Services Ltd
+Signature: /s/ Daniel Mercer
+Name: Daniel Mercer, Director
+Date: 2 June 2026
+
+Signed for and on behalf of Harbour Lane Studio Ltd
+Signature: /s/ Priya Raman
+Name: Priya Raman, Managing Director
+Date: 2 June 2026

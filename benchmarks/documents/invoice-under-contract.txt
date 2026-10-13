@@ -1,0 +1,16 @@
+TAX INVOICE
+
+From: Brightline IT Services Ltd, Unit 4, Canal Wharf, Leeds LS11 5PZ
+To: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
+
+Invoice no.: BIS-2026-0451
+Date: 1 November 2026
+Contract: Master Services Agreement dated 2 June 2026, clause 3.1 (monthly fee)
+Period: November 2026
+
+Item                                                  Amount
+Managed IT support, monthly fee (Schedule 1)       GBP 850.00
+VAT at 20%                                         GBP 170.00
+Total payable                                    GBP 1,020.00
+
+Payable within 30 days, by 1 December 2026, as set out in clause 3.2 of the Agreement.

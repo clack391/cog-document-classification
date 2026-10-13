@@ -168,6 +168,14 @@ On 13 October 2026, `select` matched two providers:
 Both example bindings offer the `choice`, `noul` and `score` question types,
 which covers the `choice` and `noul` this Cog uses.
 
+The benchmark set, from this package. See `benchmarks/README.md`:
+
+```bash
+pixi run python benchmarks/bench.py                                  # check the labels
+pixi run python benchmarks/run.py live --name NAME                   # once a provider is active
+pixi run python benchmarks/score.py benchmarks/results/NAME --split tune
+```
+
 Live, after admitting a provider in cog-workbench:
 
 ```bash

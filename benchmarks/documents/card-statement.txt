@@ -1,0 +1,27 @@
+MERIDIAN BANK
+Platinum Credit Card: Monthly Statement
+
+Mr Samuel Adebayo
+42 Thornfield Road, Sheffield S10 3LP
+
+Card number: **** **** **** 4821
+Statement date: 20 September 2026
+Credit limit: GBP 4,000.00
+
+Previous balance                              GBP 612.40
+Payments received                            -GBP 612.40
+New purchases                                 GBP 389.27
+Interest                                        GBP 0.00
+New balance                                   GBP 389.27
+
+Minimum payment                                GBP 25.00
+Payment due date                           15 October 2026
+
+Transactions
+22 Aug   SKYWAY AIRLINES                        214.00
+29 Aug   CITY RAIL                               38.90
+03 Sep   PAYMENT RECEIVED, THANK YOU           -612.40
+07 Sep   LAKESIDE HOTEL                         118.62
+16 Sep   GREENWAY GROCERS                        17.75
+
+If you pay your full balance by the due date, you won't be charged interest on purchases.

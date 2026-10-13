@@ -1,0 +1,24 @@
+DANIEL ADEYEMI
+Software Engineer
+14 Rowan Terrace, Leeds LS6 2QB  |  07700 900341  |  daniel.adeyemi@example.com
+
+PROFILE
+Backend engineer with six years' experience building payment and data platforms in Python and Go.
+
+EXPERIENCE
+Senior Software Engineer, Quayside Payments, Leeds              March 2023 - present
+- Led the migration of card settlement services to an event-driven architecture.
+- Cut nightly reconciliation time from 4 hours to 35 minutes.
+
+Software Engineer, Brightline IT Services, Leeds                July 2020 - February 2023
+- Built internal tooling for device provisioning used by 40 client companies.
+- Introduced automated testing, raising coverage from 30% to 85%.
+
+EDUCATION
+BSc Computer Science, University of Leeds, 2020 (First Class Honours)
+
+SKILLS
+Python, Go, PostgreSQL, Kafka, Docker, Kubernetes, AWS
+
+REFERENCES
+Available on request.

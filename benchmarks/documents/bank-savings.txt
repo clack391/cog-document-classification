@@ -1,0 +1,21 @@
+HOLLYBANK BUILDING SOCIETY
+Easy Access Saver - Annual Statement
+
+Mrs Grace Whitmore
+5 Badger Lane, Harrogate HG1 4RT
+Member number: 2219084
+Account number: 88017253
+
+Statement period: 1 October 2025 to 30 September 2026
+
+Date          Transaction                        Withdrawals   Deposits     Balance
+01 Oct 2025   Opening balance                                                6,210.00
+15 Nov 2025   Transfer in                                         500.00     6,710.00
+02 Jan 2026   Withdrawal to current account        1,200.00                  5,510.00
+31 Mar 2026   Interest                                             92.14     5,602.14
+18 Jun 2026   Transfer in                                         750.00     6,352.14
+30 Sep 2026   Interest                                            104.37     6,456.51
+30 Sep 2026   Closing balance                                                6,456.51
+
+Interest rate: 3.40% AER (variable)
+Total interest this year: GBP 196.51

@@ -1,0 +1,24 @@
+QUAYSIDE PAYMENTS LTD
+Payslip
+
+Employee: Daniel Adeyemi
+Employee number: 00417
+NI number: QQ 12 34 56 C
+Tax code: 1257L
+Pay date: 25 September 2026
+Pay period: September 2026
+
+Payments                               Amount
+Basic salary                     GBP 4,166.67
+On-call allowance                  GBP 150.00
+Gross pay                        GBP 4,316.67
+
+Deductions                             Amount
+Income tax                         GBP 662.40
+National Insurance                 GBP 252.94
+Pension (5%)                       GBP 215.83
+Total deductions                 GBP 1,131.17
+
+Net pay                          GBP 3,185.50
+
+Year to date: gross pay GBP 25,900.02, tax GBP 3,974.40

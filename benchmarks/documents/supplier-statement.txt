@@ -1,0 +1,20 @@
+STATEMENT OF ACCOUNT
+
+Greenfold Office Interiors
+18 Mill Lane, Bath BA2 3DX
+
+Customer: Harbour Lane Studio Ltd
+Customer account: HLS-001
+Statement date: 30 September 2026
+
+Date          Reference   Description            Debit       Credit      Balance
+01 Jul 2026   INV-5521    Office chairs        1,110.00                 1,110.00
+15 Jul 2026   PAY-0912    Payment received                 1,110.00         0.00
+02 Sep 2026   INV-5688    Meeting table          860.00                   860.00
+21 Sep 2026   INV-5702    Delivery                75.00                   935.00
+
+Balance outstanding: GBP 935.00
+
+Current: GBP 935.00   30 days: GBP 0.00   60 days: GBP 0.00   Over 90 days: GBP 0.00
+
+This statement lists your invoices and payments. Please contact us if anything is missing.

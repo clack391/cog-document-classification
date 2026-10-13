@@ -1,0 +1,20 @@
+PURCHASE ORDER
+
+PO number: 77214
+Order date: 8 October 2026
+
+Buyer: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
+Supplier: Greenfold Office Interiors, 18 Mill Lane, Bath BA2 3DX
+Your quote reference: Q-2026-0912
+
+Line  Description                              Qty    Unit price    Line total
+1     Height-adjustable desk, 160 cm             6    GBP 420.00  GBP 2,520.00
+2     Task chair, mesh back                      6    GBP 185.00  GBP 1,110.00
+3     Delivery and installation                  1    GBP 240.00    GBP 240.00
+
+Order total (excluding VAT): GBP 3,870.00
+
+Deliver to: 3 Quay Street, Bristol BS1 4DB, by 30 October 2026.
+Please quote PO 77214 on your invoice.
+
+Authorised by: Priya Raman, Managing Director

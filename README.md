@@ -34,6 +34,9 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   agreement.
 - Guards that check every result independently, and a repository Guard. See
   [Guards](#guards).
+- The [benchmark set](benchmarks/README.md): 43 labeled synthetic documents
+  covering every Frame rule, with a runner, a scorer and a threshold sweep. It
+  is checked offline today and runs live once a model is connected.
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
   the System One adapter) match its requirements. Neither is set up yet;
   choosing one is decision 2.
@@ -66,7 +69,8 @@ decisions.
 | `tests/test_policy.py`, `tests/test_frame_sync.py` | Tests for the policy and the taxonomy | Precious |
 | `guards/` | The output Guards and the repository Guard | Precious |
 | `tests/test_guards.py` | Tests for the Guards | Precious |
-| `benchmarks/` (coming next) | Labeled test documents and results | Precious |
+| `benchmarks/` | Labeled synthetic documents, the runner, the scorer and the targets | Precious |
+| `tests/test_benchmarks.py` | Tests for the benchmark set and its scoring | Precious |
 | `COG.md` | The human-readable contract | Francis |
 | `pixi.toml`, `pixi.lock` | Environment, `[tool.cog]` manifest and pinned dependencies for Linux x86-64 and Apple Silicon | Francis |
 | `context/input-schema.json`, `context/output-schema.json` | The input and output contracts | Francis, with Precious for the decision fields |
@@ -135,8 +139,11 @@ and what happens when it fails:
 | `review-is-visible` | A result in review is reported as a warning | Fail |
 | `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |
 
-A separate repository Guard checks that no credentials, keys or `.env` files
-are committed, and that sample and test data hold no personal identifiers.
+A separate repository Guard checks every file Git doesn't ignore, including new
+ones before they're committed. It looks for credentials, keys and `.env` files,
+and for personal identifiers in sample, test and benchmark data. Reserved
+fictional contact details (`example.com` emails, UK drama numbers, US
+555-01xx) are allowed in that data.
 CI runs both on every push. The Op layer can't run Guards yet, so for now they
 run as scripts:
 
@@ -160,6 +167,7 @@ the repo and out of AI tools.
 - [Proposal (v2)](docs/proposal.md)
 - [Taxonomy Frame](taxonomy/document-taxonomy.frame.md) and [taxonomy notes](taxonomy/README.md)
 - [Notes on the suite](docs/suite-notes.md)
+- [Benchmark set](benchmarks/README.md): plan, labeling, targets and how to run it
 
 ## License
 

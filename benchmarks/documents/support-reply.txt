@@ -1,0 +1,16 @@
+Ticket #48213: reply from Ledgerly Support
+Subject: Re: CSV export fails with "Error 500" on the Reports page
+Status: Pending customer
+Agent: Hannah Cole
+
+Hi Tom,
+
+Thanks for your patience today. Our engineers found the cause: a configuration change in this morning's release broke CSV exports for all customers. A fix was deployed at 13:15 UTC and exports are working again.
+
+Could you try exporting the September VAT summary again and let us know if it works? If you still see the error, please reply with the time you tried and a screenshot, and we'll look into it straight away.
+
+We're sorry for the disruption, especially with your VAT return due.
+
+Kind regards,
+Hannah Cole
+Ledgerly Support
