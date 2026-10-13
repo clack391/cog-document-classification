@@ -44,14 +44,20 @@ decisions.
 
 | Path | What it is | Owner |
 |---|---|---|
-| `COG.md` | The human-readable contract | Francis |
-| `pixi.toml` | Environment and the `[tool.cog]` manifest | Francis |
-| `pixi.lock` | Exact pinned dependencies for Linux x86-64 and Apple Silicon | Francis |
-| `context/` | Input schema, output schema and the questions the model answers | Francis, with Precious for the questions |
-| `src/task_logic.py` | Extraction hookup and the decision policy. Every other file in `src/` is Smith machinery; never edit it. | Francis, with Precious for the policy |
 | `taxonomy/` | The taxonomy Frame (the source of truth) and its notes | Precious |
-| `tests/` | Offline tests. They need no model. | Both |
-| `docs/` | The proposal and notes on the suite | Both |
+| `context/questions.json` | The questions the model answers, built from the Frame | Precious |
+| `src/task_logic.py`: `decide` and the thresholds | The confidence and review policy | Precious |
+| `tests/test_policy.py`, `tests/test_frame_sync.py` | Tests for the policy and the taxonomy | Precious |
+| `benchmarks/` (coming next) | Labeled test documents and results | Precious |
+| `COG.md` | The human-readable contract | Francis |
+| `pixi.toml`, `pixi.lock` | Environment, `[tool.cog]` manifest and pinned dependencies for Linux x86-64 and Apple Silicon | Francis |
+| `context/input-schema.json`, `context/output-schema.json` | The input and output contracts | Francis, with Precious for the decision fields |
+| `src/task_logic.py`: `check_input` and `state` | Input checks and the extraction hookup | Francis |
+| `tests/test_cog.py` | Package and contract tests | Francis |
+| `docs/` | The proposal and notes on the suite | Both; Precious leads stakeholder updates |
+
+Every other file in `src/` is Smith machinery: never edit it. All tests run
+offline and need no model.
 
 ## Getting started
 
