@@ -16,7 +16,7 @@ The Document Classification Cog serves as the "front door" for incoming document
    * assigns one document type: `invoice`, `contract`, `resume` (résumé), `support_ticket`, `bank_statement` (bank or transaction history) or `other`;
    * assigns tags from a fixed vocabulary of 16 tags;
    * reports the model's confidence in the type;
-   * records file and extraction metadata: file type, page count, size, sha256, whether OCR was used **[TBD: decision 3]**;
+   * records file and extraction metadata: file type, page count, size, sha256, whether OCR was used (decision 3);
    * marks any document it cannot classify reliably as `needs_review`, with reasons.
 * **How It Works:**
    * The model answers narrow questions with probabilities. The Cog's own code turns those answers into the classification and applies our thresholds.
@@ -40,7 +40,7 @@ To ensure accountability and prevent misclassification:
 * **Escalation:**
    * Unclear documents are marked `needs_review` and reported as a warning in the result, so any workflow or consumer sees them. This covers a confidence below the threshold, poor or partial text extraction, and answers that contradict each other.
    * Documents with no extractable text are refused with a clear input error.
-   * Whoever consumes the result routes `needs_review` documents to a person. Whether we also ship an Op with a human approval Gate is **[TBD: decision 6]**.
+   * Whoever consumes the result routes `needs_review` documents to a person. We don't ship an Op with a human approval Gate (decision 6). Who reviews is still to be named.
 * **Accountability:** Every result records:
    * which model answered, and whether it was Jev or an LLM;
    * every typed answer;
@@ -74,13 +74,13 @@ To ensure accountability and prevent misclassification:
    * Measure accuracy and calibration for each model, and tune the thresholds.
    * Save real model answers as replay tests, so the policy stays tested without calling a model.
 * **Guards:** Define the Guards and their failure behaviour in the Frame, and keep `guards/` in step with them.
-* **Stakeholder Alignment:** Lead project updates with Trent, Inessa, and the broader team, including decisions 2, 3 and 6.
+* **Stakeholder Alignment:** Lead project updates with Trent, Inessa, and the broader team, including decision 2 and naming who reviews.
 
 **Francis: Lead for Package Engineering, Extraction & Work Contract**
 
 * **Specification & Contract:** Author `COG.md`, the human-readable contract, and the schemas in `context/`:
    * `input-schema.json`, the input bundle.
-   * `output-schema.json`. Our fields (`document_id`, `status`, `document_type`, `confidence`, `tags`, `flags`, `reasons`, and metadata once decision 3 is settled) go in its `decision` section.
+   * `output-schema.json`. Our fields (`document_id`, `status`, `document_type`, `confidence`, `tags`, `flags`, `reasons`, and the file and extraction metadata from decision 3) go in its `decision` section.
 * **Package Manifest:** Maintain the `[tool.cog]` table in `pixi.toml`, the file Nebi publishes.
    * Include the extraction dependencies (for example pypdf, pypdfium2 and tesseract) and the declared prohibitions.
    * Commit `pixi.lock`. It pins exact versions for Linux x86-64 and Apple Silicon.
@@ -101,7 +101,7 @@ To ensure accountability and prevent misclassification:
 * **Phase 1: Setup, Contract & Questions** *(in progress)*
    * Create the Cog with `smith new --class decision`. *(Done 12 Oct 2026.)*
    * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(Done 12 Oct 2026: the working assumptions and 16 tags are confirmed, and the questions are in `context/questions.json`.)*
-   * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. The final versions wait on decisions 4 and 3. `COG.md` is not started.)*
+   * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. Decision 3 has settled what the metadata is, and its fields arrive with file input in Phase 2. The final input schema waits on decision 4. `COG.md` is not started.)*
    * Smith validation passes from this phase onward. *(It passes, and CI runs it on Linux and macOS for every push.)*
 * **Phase 2: Extraction & Provider**
    * Add the extraction dependencies to `pixi.toml` and commit `pixi.lock`.
@@ -112,7 +112,7 @@ To ensure accountability and prevent misclassification:
 * **Phase 3: Decision Policy & Review** *(started early)*
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
-   * Settle decision 6, then implement the agreed review path.
+   * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Naming who reviews is with Trent and Inessa.)*
    * Add Guards to the Frame and run them on every result. *(Done 13 Oct 2026, after the 12 October sync.)*
 * **Phase 4: Benchmarks, Validation & Handoff**
    * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
@@ -124,10 +124,10 @@ To ensure accountability and prevent misclassification:
 
 1. **Which cog-smith version:** *settled 12 Oct 2026.* The suite's pins moved on 10 October to include the newer cog-smith, with input warnings and test-fixture export (decision machinery 0.1.4). We build on the suite's current pins.
 2. **Cloud Jev or local Qwen:** Jev sends the extracted text to TypeSafe. Contracts and résumés hold personal data. Owners: Trent & Inessa. Needed before Phase 2.
-3. **What "metadata" covers:** file and extraction facts only, or content fields such as invoice numbers. Content fields would need a second Cog. Owners: the team with Trent & Inessa. Needed before the output schema is fixed.
+3. **What "metadata" covers:** *settled 13 Oct 2026 by Precious and Francis.* File and extraction facts only: file type, page count, size, sha256, and whether OCR was used. Content fields such as invoice numbers need a model that writes text, so they're left to the specialised Cogs downstream. Shared with Trent & Inessa, who can still object.
 4. **How documents arrive:** a file path with its sha256 recorded, or the file embedded in the input; plus the supported formats and maximum length. Owner: Francis. Needed before the input schema is fixed.
 5. **Tag vocabulary:** *settled 12 Oct 2026.* 16 tags, confirmed by Precious, are listed in the taxonomy Frame.
-6. **What review looks like:** consumers routing on `needs_review`, or an Op with a human approval Gate on every document. Owners: Trent & Inessa. Needed before Phase 3.
+6. **What review looks like:** *settled 13 Oct 2026 by Precious and Francis.* Flag and route: the Cog marks uncertain documents `needs_review`, with reasons and a warning, and whichever workflow uses the result sends them to a person. There's no Op with a human approval Gate, which would pause for every document. Shared with Trent & Inessa, who can still object. **Still open:** who reviews, which we've asked Trent & Inessa.
 
 **6. What Changed from v1**
 
@@ -135,10 +135,10 @@ To ensure accountability and prevent misclassification:
 * **Bank statements:** added as a sixth type, `bank_statement`, on 13 October 2026. At the 5 October sync, Francis described bank and transaction history as in scope.
 * **"Compute a classification confidence score":** the Cog now reports the model's confidence and applies a threshold.
 * **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog. Real Guards were added separately on 13 October: they're defined in the Frame and check every result.
-* **Human Approval Gate, "immediately diverted":** the Cog now sets a `needs_review` flag and reports a warning, and the consumer routes on it. The suite's human Gate pauses every run and cannot route selectively. An Op with a human Gate is decision 6.
+* **Human Approval Gate, "immediately diverted":** the Cog now sets a `needs_review` flag and reports a warning, and the consumer routes on it. The suite's human Gate pauses every run and cannot route selectively. Decision 6 settled it: no Op with a human Gate.
 * **`cog.md` with the schemas inside:** it becomes `COG.md`, with the schemas in `context/*.json` and the questions in `questions.json`.
 * **Harness development and model binding:** this becomes an extraction module plus provider setup. The suite's host connects the model.
 * **"Pinned Nebi environment dependencies":** pinning comes from `pixi.lock`.
 * **"Read-only permissions to guarantee zero operational risk":** the Cog now "never writes, sends or modifies anything". The suite does not sandbox Cogs, so "zero risk" overstated it.
-* **Metadata:** it is scoped to file and extraction facts until decision 3.
+* **Metadata:** it is scoped to file and extraction facts (decision 3).
 * **Phasing:** creating the Cog and validating it with Smith now start in Phase 1, and the choice of model provider is a named step in Phase 2.

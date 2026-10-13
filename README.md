@@ -41,11 +41,17 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
 **What is provisional**
 - The input is the document's extracted text. File input and extraction come
   in Phase 2, and the final input format is decision 4.
-- The output schema has no metadata fields yet. That waits on decision 3.
+- The output schema has no metadata fields yet. Decision 3 settled what they
+  are (file type, page count, size, sha256, and whether OCR was used), and they
+  arrive with file input in Phase 2.
 - The thresholds are placeholders until the benchmark sets tune them.
 
 **What is not started**
 - `COG.md` still has the starter's placeholder sections.
+
+**Review works by flagging (decision 6):** a document the Cog is unsure of is
+marked `needs_review` with its reasons and a warning, and whichever workflow
+uses the result sends it to a person. Who reviews is still to be named.
 
 See the [proposal](docs/proposal.md) for the plan, the phases and the open
 decisions.
