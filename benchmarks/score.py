@@ -17,6 +17,7 @@ on the saved answers at each threshold, so it shows exactly what the policy
 would do. Pick thresholds on the tune split and report them on the test split.
 """
 import argparse
+import bisect
 import json
 import math
 import sys
@@ -30,7 +31,7 @@ sys.path.insert(0, str(bench.ROOT / "src"))
 import task_logic  # noqa: E402  (the Cog's real policy, for the threshold sweep)
 
 SWEEP = [round(0.50 + 0.05 * i, 2) for i in range(10)]          # 0.50 .. 0.95
-CONFIDENCE_BINS = [0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0000001]
+BIN_EDGES = (0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)   # the last bin includes 1.0
 PERSON = ("review", "blocked", "failed")
 
 
@@ -116,7 +117,13 @@ def confusion(rows, outcomes, vocab):
     for row in rows:
         kind, kind_type = outcomes[row["id"]]
         column = kind_type if kind == "classified" else kind
-        table.setdefault(row["expected"], {c: 0 for c in columns})[column] += 1
+        if column not in columns:
+            columns.append(column)
+        cells = table.setdefault(row["expected"], {})
+        cells[column] = cells.get(column, 0) + 1
+    for cells in table.values():
+        for column in columns:
+            cells.setdefault(column, 0)
     return {"columns": columns, "rows": table}
 
 
@@ -124,6 +131,7 @@ def tag_scores(rows, envelopes, outcomes, vocab):
     """Per-tag precision and recall over the tags each result could report.
     Optional tags are never counted as right or wrong."""
     counts = {t: {"tp": 0, "fp": 0, "fn": 0} for t in vocab["tags"]}
+    count = lambda tag: counts.setdefault(tag, {"tp": 0, "fp": 0, "fn": 0})  # noqa: E731
     for row in rows:
         kind, kind_type = outcomes[row["id"]]
         if kind not in ("classified", "review"):
@@ -133,11 +141,11 @@ def tag_scores(rows, envelopes, outcomes, vocab):
         expected = set(row["tags"]) & reportable
         optional = set(row["optional_tags"])
         for tag in predicted & expected:
-            counts[tag]["tp"] += 1
+            count(tag)["tp"] += 1
         for tag in predicted - expected - optional:
-            counts[tag]["fp"] += 1
+            count(tag)["fp"] += 1
         for tag in expected - predicted:
-            counts[tag]["fn"] += 1
+            count(tag)["fn"] += 1
     for c in counts.values():
         c["precision"] = _rate(c["tp"], c["tp"] + c["fp"])
         c["recall"] = _rate(c["tp"], c["tp"] + c["fn"])
@@ -150,31 +158,27 @@ def tag_scores(rows, envelopes, outcomes, vocab):
 def calibration(rows, envelopes):
     """Is the model right as often as its confidence suggests? Uses the
     model's top type for documents that have a true type."""
-    bins = [{"from": lo, "to": min(hi, 1.0), "documents": 0, "right": 0, "confidence_sum": 0.0, "probability_sum": 0.0}
-            for lo, hi in zip(CONFIDENCE_BINS, CONFIDENCE_BINS[1:])]
+    bins = [{"from": lo, "to": hi, "documents": 0, "right": 0, "confidence_sum": 0.0, "probability_sum": 0.0}
+            for lo, hi in zip(BIN_EDGES, BIN_EDGES[1:])]
     ece_terms, counted = 0.0, 0
     for row in rows:
         envelope = envelopes.get(row["id"])
         if row["expected"] == bench.REVIEW or not envelope or not envelope.get("payload"):
             continue
         answer = envelope["payload"]["answers"]["document_type"]
-        right = answer["choice"] in [row["expected"]] + row["alternatives"]
         confidence, probability = answer["confidence"], answer["probabilities"][answer["choice"]]
-        for b in bins:
-            if b["from"] <= confidence < (b["to"] if b["to"] < 1.0 else 1.0000001):
-                b["documents"] += 1
-                b["right"] += right
-                b["confidence_sum"] += confidence
-                b["probability_sum"] += probability
-                break
+        b = bins[bisect.bisect_right(BIN_EDGES[1:-1], confidence)]
+        b["documents"] += 1
+        b["right"] += answer["choice"] in [row["expected"]] + row["alternatives"]
+        b["confidence_sum"] += confidence
+        b["probability_sum"] += probability
         counted += 1
     for b in bins:
         b["accuracy"] = _rate(b["right"], b["documents"])
         b["mean_confidence"] = _rate(b.pop("confidence_sum"), b["documents"])
-        mean_probability = _rate(b.pop("probability_sum"), b["documents"])
-        b["mean_top_probability"] = mean_probability
+        b["mean_top_probability"] = _rate(b.pop("probability_sum"), b["documents"])
         if b["documents"]:
-            ece_terms += b["documents"] * abs(b["accuracy"] - mean_probability)
+            ece_terms += b["documents"] * abs(b["accuracy"] - b["mean_top_probability"])
     return {"bins": bins, "documents": counted,
             "expected_calibration_error": (ece_terms / counted) if counted else None}
 
@@ -217,6 +221,26 @@ def sweep(rows, envelopes, outcomes, target):
             "recommended_meets_review_target": pick["meets_both_targets"] if pick else False}
 
 
+def provenance_warnings(run_dir, labels_path, recomputed):
+    """Say when the report may not describe the run as it happened."""
+    warnings = []
+    run_json = Path(run_dir) / "run.json"
+    recorded = (json.loads(run_json.read_text()).get("fingerprints") or {}) if run_json.exists() else {}
+    if not recorded:
+        warnings.append("This run recorded no fingerprints, so changes since the run can't be detected.")
+    current = bench.fingerprints(labels_path)
+    messages = {"labels": "The labels changed after this run; results are judged against the current labels.",
+                "task_logic": "The decision code changed after this run; the threshold sweep uses the current code, "
+                              "so its rows may not match the saved decisions.",
+                "frame": "The Frame changed after this run; types and tags are checked against the current Frame."}
+    for name, message in messages.items():
+        if recorded.get(name) and recorded[name] != current[name]:
+            warnings.append(message)
+    if recomputed:
+        warnings.append(f"Guard reports were missing for {len(recomputed)} document(s) and were run now.")
+    return warnings
+
+
 def score(run_dir, split="all", labels_path=bench.LABELS):
     header, rows = bench.load_labels(labels_path)
     vocab = bench.vocabulary()
@@ -226,6 +250,10 @@ def score(run_dir, split="all", labels_path=bench.LABELS):
     envelopes, guards = load_run(run_dir)
     missing = [row["id"] for row in rows if row["id"] not in envelopes]
     rows = [row for row in rows if row["id"] in envelopes]
+    recomputed = [row["id"] for row in rows if guards.get(row["id"]) is None]
+    for doc_id in recomputed:
+        row = next(r for r in rows if r["id"] == doc_id)
+        guards[doc_id] = bench.result_guard.run(bench.bundle(row), envelopes[doc_id])
     outcomes = {row["id"]: outcome(envelopes[row["id"]], guards[row["id"]]) for row in rows}
     groups = {}
     for row in rows:
@@ -233,6 +261,7 @@ def score(run_dir, split="all", labels_path=bench.LABELS):
         key = f"{answered.get('answer_source', 'none')}:{answered.get('model', 'none')}"
         groups.setdefault(key, []).append(row)
     report = {"run": str(run_dir), "split": split, "targets": target, "missing": missing,
+              "warnings": provenance_warnings(run_dir, labels_path, recomputed),
               "overall": summarise(rows, outcomes, target),
               "per_model": {k: summarise(v, outcomes, target) for k, v in groups.items()},
               "per_type": {}, "confusion": confusion(rows, outcomes, vocab),
@@ -258,7 +287,9 @@ def markdown(report):
     o, t, s = report["overall"], report["targets"], report["threshold_sweep"]
     ok = lambda flag: "meets target" if flag else "**misses target**"  # noqa: E731
     lines = [f"# Benchmark report: {Path(report['run']).name} ({report['split']} split)", "",
-             f"{o['documents']} documents scored. " + (f"Not in this run: {', '.join(report['missing'])}." if report["missing"] else ""), "",
+             f"{o['documents']} documents scored. " + (f"Not in this run: {', '.join(report['missing'])}." if report["missing"] else ""), ""]
+    lines += [f"> **Warning:** {w}" for w in report["warnings"]] + ([""] if report["warnings"] else [])
+    lines += [
              "## Headline", "",
              "| Measure | Value | Target |", "|---|---|---|",
              f"| Silent error rate (wrong type, no review) | {_pct(o['silent_error_rate'])} "

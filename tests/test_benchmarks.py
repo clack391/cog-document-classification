@@ -10,8 +10,10 @@ import json
 import shutil
 import sys
 import tempfile
+import subprocess
 import unittest
 from contextlib import redirect_stdout
+from unittest import mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -101,6 +103,59 @@ class TheSet(unittest.TestCase):
 
 
 class Validation(unittest.TestCase):
+    def test_labels_saved_by_excel_still_load(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bom = Path(tmp) / "labels.csv"
+            bom.write_bytes(b"\xef\xbb\xbf" + bench.LABELS.read_bytes())
+            header, rows = bench.load_labels(bom)
+        self.assertEqual(bench.validate(header, rows, VOCAB), [])
+
+    def test_semicolon_separated_labels_get_a_clear_message(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            semi = Path(tmp) / "labels.csv"
+            semi.write_text(";".join(bench.COLUMNS) + "\n", encoding="utf-8")
+            header, rows = bench.load_labels(semi)
+        self.assertTrue(any("semicolons" in p for p in bench.validate(header, rows, VOCAB)))
+
+    def test_a_document_that_is_not_utf8_is_reported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "documents").mkdir()
+            (Path(tmp) / "documents" / "cp1252.txt").write_bytes("caf\u00e9 receipt".encode("cp1252"))
+            rows = copy.deepcopy(ROWS)
+            rows[0]["file"] = "documents/cp1252.txt"
+            problems = bench.validate(HEADER, rows, VOCAB, root=Path(tmp))
+        self.assertTrue(any("not UTF-8" in p for p in problems if "line 2 " in p), problems[:3])
+
+    def test_public_documents_live_in_external_and_synthetic_ones_do_not(self):
+        cases = {
+            "synthetic file in external/": (dict(file="external/x.txt"), "public ones in external/"),
+            "public file in documents/": (dict(source="public:CC-BY-4.0"), "public ones in external/"),
+            "public file not downloaded": (dict(file="external/missing.txt", source="public:CC-BY-4.0"),
+                                           "downloaded first"),
+        }
+        for name, (change, expected) in cases.items():
+            with self.subTest(case=name):
+                rows = copy.deepcopy(ROWS)
+                rows[0].update(change)
+                self.assertTrue(any(expected in p for p in bench.validate(HEADER, rows, VOCAB)), name)
+
+    def test_required_rules_stay_in_step_with_the_frame(self):
+        frame = bench.result_guard.FRAME.read_text()
+        self.assertEqual(sorted(bench.RULE_PHRASES), sorted(bench.REQUIRED_RULES))
+        for rule, phrase in {**bench.RULE_PHRASES, **{p: p for p in bench.EXEMPT_RULE_PHRASES}}.items():
+            with self.subTest(rule=rule):
+                self.assertIn(phrase, frame, "the Frame no longer contains this rule's wording")
+        rules = frame.split("## Rules", 1)[1].split("\n## ", 1)[0]
+        heading, unmatched = None, []
+        for line in rules.splitlines():
+            if line and not line.startswith(("-", " ")) and line.rstrip().endswith(":"):
+                heading = line
+            elif line.startswith("- ") and heading and not heading.startswith(bench.NON_DOCUMENT_SECTIONS):
+                phrases = list(bench.RULE_PHRASES.values()) + list(bench.EXEMPT_RULE_PHRASES)
+                if not any(p in line for p in phrases):
+                    unmatched.append(line)
+        self.assertEqual(unmatched, [], "Frame rules with no benchmark rule: add them to REQUIRED_RULES")
+
     def broken(self, **change):
         rows = copy.deepcopy(ROWS)
         rows[0].update(change)
@@ -237,7 +292,49 @@ class Scoring(Workspace):
         self.assertEqual(score.score(out)["overall"]["documents"], len(ROWS), "reports must not be read as results")
 
 
+class Robustness(Workspace):
+    def test_missing_guard_reports_are_recomputed_instead_of_crashing(self):
+        out = self.run_with({r["id"]: oracle_result(r) for r in ROWS})
+        for guard in out.glob("*.guard.json"):
+            guard.unlink()
+        envelope = json.loads((out / "payslip.json").read_text())
+        envelope["payload"]["decision"]["tags"].append("not_a_tag")
+        (out / "payslip.json").write_text(json.dumps(envelope))
+        report = score.score(out)
+        self.assertEqual(report["by_document"]["payslip"]["outcome"], "blocked")
+        self.assertTrue(any("were run now" in w for w in report["warnings"]))
+
+    def test_changes_since_the_run_are_reported(self):
+        out = self.run_with({r["id"]: oracle_result(r) for r in ROWS})
+        self.assertEqual(score.score(out)["warnings"], [])
+        edited = self.tmp / "labels.csv"
+        edited.write_text(bench.LABELS.read_text(encoding="utf-8").replace("Payslip", "Payslip, edited"),
+                          encoding="utf-8")
+        self.assertTrue(any("labels changed" in w for w in score.score(out, labels_path=edited)["warnings"]))
+        recorded = json.loads((out / "run.json").read_text())
+        recorded["fingerprints"]["task_logic"] = "0" * 64
+        (out / "run.json").write_text(json.dumps(recorded))
+        report = score.score(out)
+        self.assertTrue(any("decision code changed" in w for w in report["warnings"]))
+        self.assertIn("**Warning:**", score.markdown(report))
+        (out / "run.json").unlink()
+        self.assertTrue(any("no fingerprints" in w for w in score.score(out)["warnings"]))
+
+
 class Statistics(unittest.TestCase):
+    def test_calibration_bin_edges(self):
+        row = next(r for r in ROWS if r["id"] == "inv-standard")
+        expectations = {0.0: 0.0, 0.49: 0.0, 0.5: 0.5, 0.89: 0.8, 0.9: 0.9, 1.0: 0.9}
+        for confidence, low_edge in expectations.items():
+            with self.subTest(confidence=confidence):
+                result = oracle_result(row)
+                result["answers"]["document_type"]["confidence"] = confidence
+                envelope = {"payload": {"answers": result["answers"]}}
+                bins = score.calibration([row], {row["id"]: envelope})["bins"]
+                busy = [b for b in bins if b["documents"]]
+                self.assertEqual(len(busy), 1)
+                self.assertEqual(busy[0]["from"], low_edge)
+
     def test_wilson_upper_bound(self):
         self.assertAlmostEqual(score.wilson_upper(0, 30), 3.8416 / 33.8416, places=4)
         self.assertAlmostEqual(score.wilson_upper(1, 10), 0.4042, places=3)
@@ -283,10 +380,49 @@ class Runner(Workspace):
         bench_run.run(ROWS, bench_run.replay_invoker(answers), second, "replay", "second")
         self.assertEqual(score.score(first)["overall"], score.score(second)["overall"])
 
-    def test_live_mode_reports_a_missing_activation_as_a_failure(self):
+    def test_live_mode_never_calls_a_model_in_tests(self):
+        """live_invoke is tested with a fake subprocess, so the test suite stays
+        model-free even after a provider has been activated."""
         row = ROWS[0]
-        with self.assertRaises(RuntimeError):
-            bench_run.live_invoke(row, bench.bundle(row))
+        document = bench.bundle(row)
+        good = cog_core.finish(document, oracle_result(row), {"kind": "fake-live"})
+        cases = {
+            "success": (subprocess.CompletedProcess([], 0, json.dumps(good), ""), None),
+            "error from ask-composed": (subprocess.CompletedProcess([], 1, json.dumps({"error": "not activated"}), ""),
+                                        "not activated"),
+            "no JSON": (subprocess.CompletedProcess([], 1, "Traceback ...", "boom"), "no JSON"),
+            "timeout": (subprocess.TimeoutExpired(["ask-composed"], bench_run.LIVE_TIMEOUT_S), None),
+        }
+        for name, (outcome, message) in cases.items():
+            with self.subTest(case=name), mock.patch.object(bench_run.subprocess, "run") as fake:
+                if isinstance(outcome, Exception):
+                    fake.side_effect = outcome
+                    with self.assertRaises(subprocess.TimeoutExpired):
+                        bench_run.live_invoke(row, document)
+                    continue
+                fake.return_value = outcome
+                if message is None:
+                    self.assertEqual(bench_run.live_invoke(row, document)["payload"], good["payload"])
+                else:
+                    with self.assertRaisesRegex(RuntimeError, message):
+                        bench_run.live_invoke(row, document)
+                command = fake.call_args.args[0]
+                self.assertTrue(str(command[1]).endswith("composed_usage.py"))
+
+    def test_a_timeout_becomes_a_failed_document_not_a_crash(self):
+        with mock.patch.object(bench_run.subprocess, "run",
+                               side_effect=subprocess.TimeoutExpired(["ask-composed"], 1)):
+            summary = bench_run.run(ROWS[:2], bench_run.live_invoke, self.tmp / "timeouts", "live", "timeouts")
+        self.assertEqual(summary["failed"], [ROWS[0]["id"], ROWS[1]["id"]])
+        envelope = json.loads((self.tmp / "timeouts" / f"{ROWS[0]['id']}.json").read_text())
+        self.assertEqual((envelope["envelope"], envelope["cog"], envelope["ok"], envelope["error"]["code"]),
+                         (1, cog_core.SELF_ID, False, "invocation-failed"))
+
+    def test_a_run_records_what_it_was_built_from(self):
+        out = self.run_with({r["id"]: oracle_result(r) for r in ROWS})
+        recorded = json.loads((out / "run.json").read_text())
+        self.assertEqual(recorded["cog"], cog_core.SELF_ID)
+        self.assertEqual(recorded["fingerprints"], bench.fingerprints())
 
 
 if __name__ == "__main__":

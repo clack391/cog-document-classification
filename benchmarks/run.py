@@ -32,8 +32,8 @@ LIVE_TIMEOUT_S = 900
 
 
 def failed_envelope(detail):
-    return {"envelope": 1, "ok": False, "error": {"code": "invocation-failed", "detail": str(detail)[:500]},
-            "payload": None, "problems": []}
+    """A complete envelope v1 for a document whose invocation failed."""
+    return cog_core.envelope("decide", False, error={"code": "invocation-failed", "detail": str(detail)[:500]})
 
 
 def live_invoke(row, document):
@@ -67,6 +67,7 @@ def run(rows, invoke, out_dir, mode, name):
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=False)
     summary = {"name": name, "mode": mode, "started_at": datetime.now(timezone.utc).isoformat(),
+               "cog": dict(cog_core.SELF_ID), "fingerprints": bench.fingerprints(),
                "documents": 0, "failed": [], "guard_failures": [], "guard_warnings": [], "models": {}}
     for row in rows:
         document = bench.bundle(row)

@@ -7,9 +7,11 @@ new files are checked before they're committed:
   in every text file;
 - personal identifiers: email addresses, phone numbers, payment card numbers,
   IBANs and US Social Security numbers, in the sample, test and benchmark data,
-  which must be synthetic. Reserved fictional contact details are allowed
-  there: example.com, .org and .net emails, UK Ofcom drama numbers, and US
-  555-0100 to 555-0199.
+  which must be synthetic. Contact details reserved for fiction are allowed
+  there:
+  - example.com, .org and .net emails;
+  - the UK numbers Ofcom sets aside for drama;
+  - US 555-0100 to 555-0199.
 
     python guards/repo_guard.py [--root PATH]
 
@@ -23,7 +25,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from result_guard import personal_identifiers  # noqa: E402
+from result_guard import identifier_matches  # noqa: E402
 
 SECRETS = {
     "private key": re.compile(r"-----BEGIN (?:[A-Z]+ )*PRIVATE KEY-----"),
@@ -37,12 +39,54 @@ DATA_DIRS = ("examples/", "tests/fixtures/", "benchmarks/")
 DATA_FILES = ("context/output-example.json",)
 SKIP = ("pixi.lock",)
 
+# Reserved for fiction and documentation, so they never reach a real person:
+# RFC 2606 and 6761 domains, Ofcom's drama number ranges, and US 555-01xx.
+FICTIONAL_DOMAINS = ("example.com", "example.org", "example.net")
+FICTIONAL_TLDS = (".example", ".test", ".invalid")
+UK_DRAMA_PREFIXES = (
+    "01134960", "01144960", "01154960", "01164960", "01174960", "01184960",   # 0113-0118 496 0xxx
+    "01214960", "01314960", "01414960", "01514960", "01614960",               # 0121-0161 496 0xxx
+    "01914980",                                                               # 0191 498 0xxx
+    "02079460", "02896496", "02920180",                                       # London, Belfast, Cardiff
+    "01632960", "07700900", "08081570", "09098790", "03069990",               # no area, mobile, freephone, premium, UK-wide
+)
+
+
+def fictional_email(address):
+    domain = address.rsplit("@", 1)[-1].lower()
+    return domain in FICTIONAL_DOMAINS or domain.endswith(FICTIONAL_TLDS) or \
+        any(domain.endswith("." + d) for d in FICTIONAL_DOMAINS)
+
+
+def fictional_phone(number):
+    """True for a number reserved for fiction. Understands +44 and 0044,
+    including the '+44 (0)20' style, and US numbers with or without +1."""
+    text = number.strip()
+    digits = re.sub(r"\D", "", text)
+    if text.startswith(("+44", "0044")):
+        digits = "0" + digits[4 if text.startswith("0044") else 2:].lstrip("0")
+    if digits.startswith(UK_DRAMA_PREFIXES):
+        return True
+    if text.startswith("+1") or (len(digits) == 11 and digits.startswith("1")):
+        digits = digits[1:]
+    return len(digits) == 10 and digits[3:6] == "555" and digits[6:8] == "01"
+
+
+def fictional(kind, value):
+    if kind == "email address":
+        return fictional_email(value)
+    if kind == "phone number":
+        return fictional_phone(value)
+    return False
+
 
 def tracked_files(root):
+    """Every file Git doesn't ignore, tracked or new. NUL-separated, so names
+    with accents or spaces arrive exactly as they are on disk."""
     try:
-        out = subprocess.run(["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard"],
-                             capture_output=True, text=True, check=True).stdout
-        return [f for f in out.splitlines() if f]
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others",
+                              "--exclude-standard"], capture_output=True, text=True, check=True).stdout
+        return [f for f in out.split("\0") if f]
     except (OSError, subprocess.CalledProcessError):
         return [str(p.relative_to(root)) for p in Path(root).rglob("*")
                 if p.is_file() and not {".git", ".pixi"} & set(p.relative_to(root).parts)]
@@ -71,7 +115,11 @@ def scan(root, files):
                 if match:
                     findings.append(f"{name}:{number}: {kind} ({_mask(match.group())})")
             if is_data:
-                for kind in personal_identifiers(line, allow_fictional=True):
+                reported = set()
+                for kind, value in identifier_matches(line):
+                    if kind in reported or fictional(kind, value):
+                        continue
+                    reported.add(kind)
                     findings.append(f"{name}:{number}: {kind} in sample or test data")
     return findings
 

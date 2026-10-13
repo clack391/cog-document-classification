@@ -134,7 +134,7 @@ and what happens when it fails:
 | Guard | Checks | On failure |
 |---|---|---|
 | `no-document-text` | The result repeats no passage of the document | Fail |
-| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers | Fail |
+| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers. The caller's own document ID isn't checked. | Fail |
 | `known-vocabulary` | Types and tags come from the Frame, and a result in review has no type | Fail |
 | `review-is-visible` | A result in review is reported as a warning | Fail |
 | `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |

@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.4.0
+version: 0.4.1
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -135,6 +135,8 @@ Guards are checks on every classification result. They run independently of the 
 | `calibrated-answers` | The answers came from a System One model trained for calibration, not from an LLM asked for probabilities | Warn: keep the result, and note that its confidence is not calibrated |
 
 A failed guard is never repaired automatically. The result is held back, and the reason is recorded.
+
+Guards check what the system produced. The caller's own document identifier is echoed back in the result unchanged, so it is not checked.
 
 ## Style
 
