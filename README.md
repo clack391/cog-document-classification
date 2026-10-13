@@ -3,11 +3,14 @@
 A Cog that classifies one incoming business document, built on the
 [cogcloud-ai Cog / Op Builder suite](https://github.com/cogcloud-ai/cog-op-builder).
 
-It extracts the document's text, using OCR for scans. A System One model
-answers a fixed set of typed questions about that text. The Cog's own code then
-assigns one type (`invoice`, `contract`, `resume`, `support_ticket` or
-`other`), adds tags from a fixed vocabulary, and reports the model's confidence.
-Any document it cannot classify reliably is marked `needs_review`, with reasons.
+A System One model answers a fixed set of typed questions about the document's
+text. The Cog's own code then assigns one type (`invoice`, `contract`,
+`resume`, `support_ticket` or `other`), adds tags from a fixed vocabulary, and
+reports the model's confidence. Any document it cannot classify reliably is
+marked `needs_review`, with reasons.
+
+For now the Cog takes the document's extracted text. Reading PDF and image
+files, with OCR for scans, comes in Phase 2.
 
 It is a **decision Cog**, created with cog-smith's decision template
 (`smith new --class decision`). The model answers narrow questions; the policy
@@ -17,16 +20,21 @@ read and test.
 ## Status
 
 Phase 1, in progress. The package passes Smith's checks and its offline tests
-on the suite's current pins.
+on the suite's current pins, and CI runs both on Linux and macOS for every push.
 
 **What works**
 - The confirmed taxonomy: the [Frame](taxonomy/document-taxonomy.frame.md) and
   the 18 questions in `context/questions.json` built from it.
-- A first decision policy in `src/task_logic.py`: the type at confidence 0.85
-  or above, tags at 0.7, and review for low confidence, illegible text or
-  contradicting answers.
+- A first decision policy in `src/task_logic.py`:
+  - the type is assigned at confidence 0.85 or above, and tags at 0.7;
+  - low confidence, illegible text or contradicting answers send the document
+    to review;
+  - review is also reported to workflows as a warning.
 - Tests that keep the Frame, the questions, the policy and the output schema in
   agreement.
+- cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
+  the System One adapter) match its requirements. Neither is set up yet;
+  choosing one is decision 2.
 
 **What is provisional**
 - The input is the document's extracted text. File input and extraction come
@@ -61,9 +69,9 @@ offline and need no model.
 
 ## Getting started
 
-You need Git, Python 3.11 or newer, and [Pixi](https://pixi.sh). This Cog must
-sit next to the suite's components in one workspace folder, because its live
-entry point looks for `../cog-workbench`.
+You need Git, Python 3.11 or newer, and [Pixi](https://pixi.sh). The suite's
+CI uses Pixi v0.69.0. This Cog must sit next to the suite's components in one
+workspace folder, because its live entry point looks for `../cog-workbench`.
 
 ```bash
 mkdir cog-workspace && cd cog-workspace
@@ -80,13 +88,15 @@ pixi run check
 Smith's full package check, run from `cog-smith`:
 
 ```bash
+cd ../cog-smith
 pixi install
 pixi run check -- ../cog-document-classification --tests
 ```
 
-Working without a model:
+Working without a model, from this Cog's folder:
 
 ```bash
+cd ../cog-document-classification
 pixi run prepare -- --bundle examples/sample-bundle.json
 pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample-result.json
 ```
@@ -96,7 +106,9 @@ answers.
 
 Live runs need a model provider admitted in cog-workbench: TypeSafe's Jev in the
 cloud, or local Qwen through the System One adapter. Which one we use is still
-open; see the proposal.
+open; see the proposal. Until a provider is activated, `pixi run ask-composed`
+stops with an error that `.op-composition.json` is missing. That file is
+written when Workbench activates a provider for this Cog.
 
 ## Team
 

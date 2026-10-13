@@ -23,7 +23,7 @@ The Document Classification Cog serves as the "front door" for incoming document
    * The suite's local host (cog-workbench) and a model provider connect the model. The Cog never chooses its own model. The provider is **[TBD: decision 2]**.
 * **System Impact:**
    * The Cog is read-only: it never writes, sends or modifies anything outside its own result, and it declares these prohibitions in its manifest.
-   * Downstream workflows get a classification they can route on. Each result carries the model, its answers, the confidence and the document's sha256, so anyone can audit it.
+   * Downstream workflows get a classification they can route on. Each result carries the model, its answers and the confidence, and from Phase 2 the document's sha256, so anyone can audit it.
 
 **2. Guardrails & Governance Standards**
 
@@ -33,17 +33,18 @@ To ensure accountability and prevent misclassification:
    * When the confidence is below the threshold, or extraction was poor, the result is `needs_review` with stated reasons and no document type.
    * `other` is a real type for documents outside the taxonomy, not a fallback for uncertainty.
 * **Confidence Policy:** The model returns a confidence with its answer about the type. The Cog compares it with a threshold in its decision code, where the policy is readable and covered by tests.
-   * The starting threshold is 0.85, set separately for each model and tuned on the benchmark sets.
+   * The starting threshold is 0.85, to be tuned on the benchmark sets.
    * This confidence is not the top probability. With five types, a confidence of 0.85 means a top-type probability of 0.88.
    * Jev's confidence is trained for calibration; a local LLM's is not.
+   * Limitation: the suite does not yet tell the decision code which model answered, so one set of thresholds applies to every model for now. The taxonomy notes list the ways around this.
 * **Escalation:**
-   * Unclear documents are marked `needs_review` and reported as a warning in the result, so any workflow or consumer sees them. This covers a confidence below the threshold and poor or partial text extraction.
+   * Unclear documents are marked `needs_review` and reported as a warning in the result, so any workflow or consumer sees them. This covers a confidence below the threshold, poor or partial text extraction, and answers that contradict each other.
    * Documents with no extractable text are refused with a clear input error.
    * Whoever consumes the result routes `needs_review` documents to a person. Whether we also ship an Op with a human approval Gate is **[TBD: decision 6]**.
 * **Accountability:** Every result records:
    * which model answered, and whether it was Jev or an LLM;
    * every typed answer;
-   * the document's sha256.
+   * the document's sha256, from Phase 2.
 
    So any classification can be traced and replayed.
 * **Terminology:** We use the suite's terms:
@@ -60,7 +61,7 @@ To ensure accountability and prevent misclassification:
    * one yes/no question per tag, up to 63 tags.
 
    Keyword hints go into the option descriptions.
-* **Confidence Policy:** Define the thresholds for each model, the escalation triggers, and the reasons the Cog reports.
+* **Confidence Policy:** Define the thresholds, the escalation triggers, and the reasons the Cog reports. They live in `decide` in `src/task_logic.py`.
 * **Escalation Protocol:** Define how `needs_review` results reach a person: who reviews them, what they see, and how their decision is recorded.
 * **Quality Assurance:** Assemble benchmark sets: invoices, contracts, résumés, support tickets and other documents, plus edge cases such as scans, mixed documents and near-empty files.
    * Measure accuracy and calibration for each model, and tune the thresholds.
@@ -72,7 +73,6 @@ To ensure accountability and prevent misclassification:
 * **Specification & Contract:** Author `COG.md`, the human-readable contract, and the schemas in `context/`:
    * `input-schema.json`, the input bundle.
    * `output-schema.json`. Our fields (`document_id`, `status`, `document_type`, `confidence`, `tags`, `flags`, `reasons`, and metadata once decision 3 is settled) go in its `decision` section.
-   * `questions.json`, together with Precious.
 * **Package Manifest:** Maintain the `[tool.cog]` table in `pixi.toml`, the file Nebi publishes.
    * Include the extraction dependencies (for example pypdf, pypdfium2 and tesseract) and the declared prohibitions.
    * Commit `pixi.lock`. It pins exact versions for Linux x86-64 and Apple Silicon.
@@ -80,7 +80,7 @@ To ensure accountability and prevent misclassification:
    * Build the extraction module: text, OCR, and trimming the text to the model's limits.
    * Connect the model by admitting a provider in cog-workbench (Jev through cog-typesafe, or local Qwen through cog-system-one-adapter) and activating it for the Cog. No custom harness or model binding is needed.
 * **Build & Assembly:**
-   * Create the Cog with cog-smith.
+   * Create the Cog with cog-smith. *(Done 12 Oct 2026.)*
    * Run it offline with `prepare` and `replay`, and live with `ask-composed`.
    * Validate throughout by running `pixi run check -- ../cog-document-classification --tests` from cog-smith.
 
@@ -94,19 +94,19 @@ To ensure accountability and prevent misclassification:
    * Create the Cog with `smith new --class decision`. *(Done 12 Oct 2026.)*
    * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(Done 12 Oct 2026: the working assumptions and 16 tags are confirmed, and the questions are in `context/questions.json`.)*
    * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. The final versions wait on decisions 4 and 3. `COG.md` is not started.)*
-   * Smith validation passes from this phase onward. *(It passes on the scaffold, and CI is set up.)*
+   * Smith validation passes from this phase onward. *(It passes, and CI runs it on Linux and macOS for every push.)*
 * **Phase 2: Extraction & Provider**
    * Add the extraction dependencies to `pixi.toml` and commit `pixi.lock`.
    * Build the extraction module. Its limits:
       * up to 512 KiB of text per document, and about 8,000 tokens for local Qwen;
       * 240 seconds for each stage of our code.
    * Settle decision 2, then set up the provider in cog-workbench.
-* **Phase 3: Decision Policy & Review**
-   * Implement the confidence policy and escalation triggers in the decision code.
-   * Report `needs_review` as a warning, and refuse documents with no extractable text.
+* **Phase 3: Decision Policy & Review** *(started early)*
+   * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
+   * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
    * Settle decision 6, then implement the agreed review path.
 * **Phase 4: Benchmarks, Validation & Handoff**
-   * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds for each model.
+   * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
    * Save real answers as replay tests.
    * Run the final validation with cog-smith (`check --tests` and `card`).
    * Publish integration notes so downstream Cogs can consume the `decision` schema.

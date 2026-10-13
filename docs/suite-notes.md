@@ -5,7 +5,8 @@ the facts that shape this Cog's design. The suite is an experimental preview, so
 re-check before relying on any detail.
 
 **Checked against:** suite commit `71834ce` (pins as of 10 October 2026),
-cog-smith `c700f66` (decision machinery 0.1.4), and cog-workbench `fc9bb85`.
+cog-smith `c700f66` (decision machinery 0.1.4, Op machinery 0.9.3), and
+cog-workbench `fc9bb85`. Last re-checked on 13 October 2026.
 
 ## The suite in brief
 
@@ -147,6 +148,22 @@ From cog-smith:
 pixi run check -- ../cog-document-classification --tests
 pixi run card -- ../cog-document-classification
 ```
+
+From cog-workbench, after `pixi install`, to check that Workbench sees this Cog
+and which providers fit it:
+
+```bash
+pixi run suite -- catalog
+echo '{"capability": "system-one/decisions", "accepted_compositions": ["model+harness", "harness"]}' > /tmp/requirement.json
+pixi run suite -- select --requirement /tmp/requirement.json
+```
+
+On 13 October 2026, `select` matched two providers:
+- cog-typesafe (`model+harness`);
+- cog-system-one-adapter (`harness`).
+
+Both example bindings offer the `choice`, `noul` and `score` question types,
+which covers the `choice` and `noul` this Cog uses.
 
 Live, after admitting a provider in cog-workbench:
 
