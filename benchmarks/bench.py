@@ -20,6 +20,7 @@ COLUMNS = ["id", "file", "expected", "alternatives", "tags", "optional_tags",
 LIST_COLUMNS = ("alternatives", "tags", "optional_tags")
 SPLITS = ("tune", "test")
 MIN_PER_TYPE = 2        # clear examples per type now; the plan grows this to 10-12
+MIN_PER_TAG = 1         # documents where each tag is expected, so every tag gets scored
 
 # Every rule in the taxonomy Frame that a document can exercise. Update this
 # list and RULE_PHRASES when the Frame's rules change; the tests require at
@@ -205,6 +206,11 @@ def validate(header, rows, vocab, root=BENCH):
         clear = sum(1 for row in rows if row["frame_rule"] == f"type:{kind}")
         if clear < MIN_PER_TYPE:
             problems.append(f"type {kind!r} has {clear} clear example(s); at least {MIN_PER_TYPE} are needed")
+    for tag in vocab["tags"]:
+        expected = sum(1 for row in rows if tag in row["tags"])
+        if expected < MIN_PER_TAG:
+            problems.append(f"tag {tag!r} is expected in {expected} document(s); at least {MIN_PER_TAG} needed "
+                            "so its precision and recall can be measured")
     for split in SPLITS:
         if not any(row["split"] == split for row in rows):
             problems.append(f"no documents in the {split} split")

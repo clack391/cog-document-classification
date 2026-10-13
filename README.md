@@ -34,8 +34,8 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   agreement.
 - Guards that check every result independently, and a repository Guard. See
   [Guards](#guards).
-- The [benchmark set](benchmarks/README.md): 43 labeled synthetic documents
-  covering every Frame rule, with a runner, a scorer and a threshold sweep. It
+- The [benchmark set](benchmarks/README.md): 46 labeled synthetic documents
+  covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
   is checked offline today and runs live once a model is connected.
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
   the System One adapter) match its requirements. Neither is set up yet;

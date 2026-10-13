@@ -1,12 +1,15 @@
 id,file,expected,alternatives,tags,optional_tags,frame_rule,split,source,notes
 inv-standard,documents/inv-standard.txt,invoice,,contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,IT services invoice with a due date
 inv-utility-bill,documents/inv-utility-bill.txt,invoice,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:invoice,test,synthetic,Household electricity bill: a named account holder at a home address
+inv-reminder,documents/inv-reminder.txt,invoice,,invoice_reminder;contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,Overdue-payment reminder with a new pay-by date
 con-services,documents/con-services.txt,contract,,contains_financial_amounts;signed,time_sensitive,type:contract,tune,synthetic,Signed master services agreement with a monthly fee
 con-nda,documents/con-nda.txt,contract,,signed;contract_nda,,type:contract,test,synthetic,Signed mutual NDA
+con-amendment,documents/con-amendment.txt,contract,,contract_amendment;signed;contains_financial_amounts,,type:contract,test,synthetic,Signed amendment that changes the fee and extends the term
 res-cv,documents/res-cv.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,Engineer's CV with a home address and contact details
-res-academic-cv,documents/res-academic-cv.txt,resume,,contains_personal_data,contains_financial_amounts,type:resume,test,synthetic,Academic CV; mentions a grant amount
+res-academic-cv,documents/res-academic-cv.txt,resume,,contains_personal_data;contains_financial_amounts,,type:resume,test,synthetic,"Academic CV; states a grant of GBP 182,000"
 tkt-bug,documents/tkt-bug.txt,support_ticket,,ticket_bug_report,ticket_urgent;time_sensitive,type:support_ticket,tune,synthetic,Bug report from a customer
-tkt-access,documents/tkt-access.txt,support_ticket,,,contains_personal_data;time_sensitive,type:support_ticket,test,synthetic,"Access request by email, with work contact details"
+tkt-access,documents/tkt-access.txt,support_ticket,,contains_personal_data,time_sensitive,type:support_ticket,test,synthetic,Access request by email; named people with their email and phone
+tkt-urgent,documents/tkt-urgent.txt,support_ticket,,ticket_urgent;ticket_bug_report,ticket_billing;time_sensitive,type:support_ticket,tune,synthetic,"Urgent outage: customers can't pay, so money is being lost now"
 bank-current-account,documents/bank-current-account.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,tune,synthetic,Monthly current account statement
 bank-savings,documents/bank-savings.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,test,synthetic,Annual savings account statement
 oth-report,documents/oth-report.txt,other,,contains_financial_amounts,,type:other,tune,synthetic,Internal quarterly report
@@ -15,28 +18,28 @@ bill-complaint,documents/bill-complaint.txt,support_ticket,,ticket_complaint;tic
 invoice-under-contract,documents/invoice-under-contract.txt,invoice,,contains_financial_amounts;time_sensitive,,invoice-under-contract,test,synthetic,An invoice issued under a contract stays an invoice
 letter-about-contract,documents/letter-about-contract.txt,other,,contains_financial_amounts,time_sensitive;contains_personal_data,letter-about-contract,tune,synthetic,A letter about a contract's price review is classified by its own purpose
 quote,documents/quote.txt,other,,contains_financial_amounts,time_sensitive,quote,tune,synthetic,Quotation: nothing is owed yet
-purchase-order,documents/purchase-order.txt,other,,contains_financial_amounts,time_sensitive,purchase-order,test,synthetic,Purchase order: the buyer's order
+purchase-order,documents/purchase-order.txt,other,,contains_financial_amounts;time_sensitive,,purchase-order,test,synthetic,"Purchase order: the buyer's order, with a delivery deadline"
 policy,documents/policy.txt,other,,contains_financial_amounts,time_sensitive,policy,tune,synthetic,Company expenses policy
-job-description,documents/job-description.txt,other,,contains_financial_amounts,time_sensitive,job-description,tune,synthetic,Job advert with a salary range
+job-description,documents/job-description.txt,other,,contains_financial_amounts;time_sensitive,,job-description,tune,synthetic,Job advert with a salary range and a closing date
 incident-report,documents/incident-report.txt,other,,,,incident-report,tune,synthetic,Internal post-incident review
 pro-forma-invoice,documents/pro-forma-invoice.txt,invoice,,contains_financial_amounts;time_sensitive,,pro-forma-invoice,tune,synthetic,Pro-forma invoice asking for payment in advance
 credit-note,documents/credit-note.txt,invoice,,invoice_credit_note;contains_financial_amounts,,credit-note,tune,synthetic,Credit note
 receipt,documents/receipt.txt,other,,contains_financial_amounts,,receipt,tune,synthetic,Shop receipt: already paid
-offer-letter,documents/offer-letter.txt,contract,,contract_employment;contains_personal_data;contains_financial_amounts;time_sensitive,signed;draft_or_template,offer-letter,test,synthetic,Job offer letter that sets employment terms
+offer-letter,documents/offer-letter.txt,contract,,contract_employment;contains_personal_data;contains_financial_amounts;time_sensitive,draft_or_template,offer-letter,test,synthetic,Job offer letter that sets employment terms; not signed yet (the acceptance line is blank)
 contract-template,documents/contract-template.txt,contract,,draft_or_template,,contract-template,tune,synthetic,Unsigned contract template with placeholders
 terms-of-use,documents/terms-of-use.txt,other,,,,terms-of-use,tune,synthetic,Published website terms of use
 cover-letter,documents/cover-letter.txt,other,,contains_personal_data,,cover-letter,test,synthetic,A cover letter on its own
 exported-profile,documents/exported-profile.txt,resume,,contains_personal_data,,exported-profile,tune,synthetic,Profile exported from a professional networking site
-sales-enquiry,documents/sales-enquiry.txt,other,,,contains_personal_data,sales-enquiry,tune,synthetic,Sales enquiry asking for a quote
+sales-enquiry,documents/sales-enquiry.txt,other,,contains_personal_data,,sales-enquiry,tune,synthetic,Sales enquiry asking for a quote; the sender is named with their email
 support-reply,documents/support-reply.txt,support_ticket,,,ticket_bug_report;ticket_urgent;time_sensitive,support-reply,tune,synthetic,A support team's reply without the customer's message
 card-statement,documents/card-statement.txt,bank_statement,,contains_personal_data;contains_financial_amounts;time_sensitive,,card-statement,test,synthetic,Credit card statement with a payment due date
 transaction-export,documents/transaction-export.txt,bank_statement,,contains_financial_amounts,contains_personal_data,transaction-export,tune,synthetic,Transaction history exported from online banking
-bank-transaction-complaint,documents/bank-transaction-complaint.txt,support_ticket,,ticket_complaint;contains_financial_amounts,ticket_billing;ticket_urgent;contains_personal_data,bank-transaction-complaint,test,synthetic,A complaint about a bank transaction is a support ticket
+bank-transaction-complaint,documents/bank-transaction-complaint.txt,support_ticket,,ticket_complaint;contains_financial_amounts;ticket_billing,ticket_urgent;contains_personal_data,bank-transaction-complaint,test,synthetic,A complaint about a bank transaction is a support ticket; it asks for a refund
 supplier-statement,documents/supplier-statement.txt,other,,contains_financial_amounts,time_sensitive,supplier-statement,tune,synthetic,Supplier's statement of account listing invoices
 loan-statement,documents/loan-statement.txt,other,,contains_personal_data;contains_financial_amounts,,loan-statement,tune,synthetic,Annual mortgage statement
 payslip,documents/payslip.txt,other,,contains_personal_data;contains_financial_amounts,,payslip,tune,synthetic,Payslip
 multiple-documents,documents/multiple-documents.txt,invoice,,multiple_documents;contains_financial_amounts;time_sensitive,,multiple-documents,test,synthetic,Invoice followed by an unrelated newsletter; the invoice is the main document
-no-main-document,documents/no-main-document.txt,needs_review,,multiple_documents,contains_financial_amounts,no-main-document,tune,synthetic,Three unrelated scraps with no main document
+no-main-document,documents/no-main-document.txt,needs_review,,multiple_documents;contains_financial_amounts,,no-main-document,tune,synthetic,Three unrelated scraps with no main document; the rail receipt states a price
 garbled-text,documents/garbled-text.txt,needs_review,,,,garbled-text,tune,synthetic,OCR output that is mostly noise
 unclear-attachment-note,documents/unclear-attachment-note.txt,needs_review,,,,unclear-type,test,synthetic,A covering note whose attachment is missing
 unclear-near-empty,documents/unclear-near-empty.txt,needs_review,,,,unclear-type,tune,synthetic,A near-empty page

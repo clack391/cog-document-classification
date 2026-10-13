@@ -1,0 +1,38 @@
+AMENDMENT No. 1 TO THE MASTER SERVICES AGREEMENT
+
+This Amendment is made on 25 September 2026 between:
+
+(1) Brightline IT Services Ltd, a company registered in England and Wales under number 08841276 ("Supplier"); and
+(2) Harbour Lane Studio Ltd, a company registered in England and Wales under number 11902345 ("Customer").
+
+BACKGROUND
+(A) The Parties entered into a Master Services Agreement dated 2 June 2026 (the "Agreement").
+(B) The Parties wish to add a cloud backup service and extend the initial term of the Agreement.
+
+THE PARTIES AGREE as follows:
+
+1. Interpretation
+Words defined in the Agreement have the same meaning in this Amendment.
+
+2. Additional service
+2.1 With effect from 1 October 2026, Schedule 1 of the Agreement is amended to add "Cloud backup for up to 20 devices".
+2.2 Clause 3.1 of the Agreement is amended so that the monthly fee is GBP 970.00 plus VAT.
+
+3. Extension of term
+Clause 2.1 of the Agreement is amended so that the initial term is 36 months instead of 24 months.
+
+4. Everything else unchanged
+Except as set out in this Amendment, the Agreement remains in full force and effect.
+
+5. Governing law
+This Amendment is governed by the laws of England and Wales.
+
+Signed for and on behalf of Brightline IT Services Ltd
+Signature: /s/ Daniel Mercer
+Name: Daniel Mercer, Director
+Date: 25 September 2026
+
+Signed for and on behalf of Harbour Lane Studio Ltd
+Signature: /s/ Priya Raman
+Name: Priya Raman, Managing Director
+Date: 26 September 2026
