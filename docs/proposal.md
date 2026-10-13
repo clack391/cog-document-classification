@@ -47,6 +47,13 @@ To ensure accountability and prevent misclassification:
    * the document's sha256, from Phase 2.
 
    So any classification can be traced and replayed.
+* **Guards:** five independent checks run on every result. They're defined in the taxonomy Frame, with what happens when each fails:
+   * no document text and no personal identifiers in the output;
+   * only the Frame's types and tags;
+   * a result in review is reported as a warning;
+   * a warning when an uncalibrated LLM answered.
+
+   A repository Guard also blocks committed secrets and real personal data. CI runs both on every push. The Op layer can't run Guards yet, so for now they run as scripts.
 * **Terminology:** We use the suite's terms:
    * **contract checks** are the Cog's checks of its own output;
    * **Guards** are independent checkers run by the wider system;
@@ -66,6 +73,7 @@ To ensure accountability and prevent misclassification:
 * **Quality Assurance:** Assemble benchmark sets: invoices, contracts, résumés, support tickets and other documents, plus edge cases such as scans, mixed documents and near-empty files.
    * Measure accuracy and calibration for each model, and tune the thresholds.
    * Save real model answers as replay tests, so the policy stays tested without calling a model.
+* **Guards:** Define the Guards and their failure behaviour in the Frame, and keep `guards/` in step with them.
 * **Stakeholder Alignment:** Lead project updates with Trent, Inessa, and the broader team, including decisions 2, 3 and 6.
 
 **Francis: Lead for Package Engineering, Extraction & Work Contract**
@@ -105,6 +113,7 @@ To ensure accountability and prevent misclassification:
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
    * Settle decision 6, then implement the agreed review path.
+   * Add Guards to the Frame and run them on every result. *(Done 13 Oct 2026, after the 12 October sync.)*
 * **Phase 4: Benchmarks, Validation & Handoff**
    * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
    * Save real answers as replay tests.
@@ -125,7 +134,7 @@ To ensure accountability and prevent misclassification:
 * **The `résumé` type ID:** it becomes ASCII `resume`. "Résumé" stays as the label.
 * **Bank statements:** added as a sixth type, `bank_statement`, on 13 October 2026. At the 5 October sync, Francis described bank and transaction history as in scope.
 * **"Compute a classification confidence score":** the Cog now reports the model's confidence and applies a threshold.
-* **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog.
+* **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog. Real Guards were added separately on 13 October: they're defined in the Frame and check every result.
 * **Human Approval Gate, "immediately diverted":** the Cog now sets a `needs_review` flag and reports a warning, and the consumer routes on it. The suite's human Gate pauses every run and cannot route selectively. An Op with a human Gate is decision 6.
 * **`cog.md` with the schemas inside:** it becomes `COG.md`, with the schemas in `context/*.json` and the questions in `questions.json`.
 * **Harness development and model binding:** this becomes an extraction module plus provider setup. The suite's host connects the model.

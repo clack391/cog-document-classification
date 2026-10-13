@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.3.1
+version: 0.4.0
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -121,6 +121,20 @@ Review:
 
 Language:
 - The definitions apply in any language. Apply `non_english` when the main language is not English.
+
+## Guards
+
+Guards are checks on every classification result. They run independently of the system that produced the result, using this Frame as their reference. Each guard states what happens when it fails.
+
+| Guard | Passes when | On failure |
+|---|---|---|
+| `no-document-text` | The result repeats no passage of the document: no run of 30 or more characters of its text | Fail: block the result and send the document to a person |
+| `no-personal-identifiers` | The result contains no email addresses, phone numbers, payment card numbers, IBANs or US Social Security numbers | Fail: block the result and send the document to a person |
+| `known-vocabulary` | The type is one of this Frame's types, every tag is in the vocabulary, type tags appear only with their own type, and a result in review has no type and at least one reason | Fail: block the result and send the document to a person |
+| `review-is-visible` | A result in review is also reported as a warning, so no workflow can pass it as clean | Fail: block the result and send the document to a person |
+| `calibrated-answers` | The answers came from a System One model trained for calibration, not from an LLM asked for probabilities | Warn: keep the result, and note that its confidence is not calibrated |
+
+A failed guard is never repaired automatically. The result is held back, and the reason is recorded.
 
 ## Style
 

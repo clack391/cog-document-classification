@@ -32,6 +32,8 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   - review is also reported to workflows as a warning.
 - Tests that keep the Frame, the questions, the policy and the output schema in
   agreement.
+- Guards that check every result independently, and a repository Guard. See
+  [Guards](#guards).
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
   the System One adapter) match its requirements. Neither is set up yet;
   choosing one is decision 2.
@@ -56,6 +58,8 @@ decisions.
 | `context/questions.json` | The questions the model answers, built from the Frame | Precious |
 | `src/task_logic.py`: `decide` and the thresholds | The confidence and review policy | Precious |
 | `tests/test_policy.py`, `tests/test_frame_sync.py` | Tests for the policy and the taxonomy | Precious |
+| `guards/` | The output Guards and the repository Guard | Precious |
+| `tests/test_guards.py` | Tests for the Guards | Precious |
 | `benchmarks/` (coming next) | Labeled test documents and results | Precious |
 | `COG.md` | The human-readable contract | Francis |
 | `pixi.toml`, `pixi.lock` | Environment, `[tool.cog]` manifest and pinned dependencies for Linux x86-64 and Apple Silicon | Francis |
@@ -109,6 +113,35 @@ cloud, or local Qwen through the System One adapter. Which one we use is still
 open; see the proposal. Until a provider is activated, `pixi run ask-composed`
 stops with an error that `.op-composition.json` is missing. That file is
 written when Workbench activates a provider for this Cog.
+
+## Guards
+
+Guards check every result independently of the Cog. They read the
+[Frame](taxonomy/document-taxonomy.frame.md), the input and the result, and
+nothing from the Cog's own code. The Frame's Guards section lists each check
+and what happens when it fails:
+
+| Guard | Checks | On failure |
+|---|---|---|
+| `no-document-text` | The result repeats no passage of the document | Fail |
+| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers | Fail |
+| `known-vocabulary` | Types and tags come from the Frame, and a result in review has no type | Fail |
+| `review-is-visible` | A result in review is reported as a warning | Fail |
+| `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |
+
+A separate repository Guard checks that no credentials, keys or `.env` files
+are committed, and that sample and test data hold no personal identifiers.
+CI runs both on every push. The Op layer can't run Guards yet, so for now they
+run as scripts:
+
+```bash
+pixi run python guards/repo_guard.py
+pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample-result.json > envelope.json
+pixi run python guards/result_guard.py --bundle examples/sample-bundle.json --envelope envelope.json
+```
+
+Only synthetic or public documents go in this repo. Real documents stay out of
+the repo and out of AI tools.
 
 ## Team
 

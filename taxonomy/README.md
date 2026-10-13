@@ -8,13 +8,14 @@ Owner: Precious.
 Frame (Frame Spec v0.2): the types, boundary rules and tag vocabulary. It is the
 source of truth.
 
-The Cog uses it in three places:
+The Cog uses it in four places:
 
 | Where | What it holds |
 |---|---|
 | `context/questions.json` | The questions the model answers. Apart from the document text, they are all the model sees. |
 | `src/task_logic.py` | The decision policy: thresholds, review, contradictions, and which tags are reported |
 | `context/output-schema.json` | The types and tags a result may contain |
+| `guards/result_guard.py` | The Guards section; also reads the types and tags to check each result |
 
 `tests/test_frame_sync.py` fails whenever these disagree with the Frame on the
 types or the tags. Change the Frame first, then the rest, and run `pixi run test`.
@@ -69,6 +70,10 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
   are all `other`. No type tags for bank statements, and no extra review rule
   for a bank statement without amounts. The Frame is now v0.3.1, with no open
   working assumptions.
+- **13 Oct 2026:** Guards section added after the 12 October sync: five
+  output Guards, with what happens when each fails. `guards/result_guard.py`
+  implements them, and a test checks that the Frame and the code name the same
+  Guards. The Frame is now v0.4.0.
 
 ## Validation
 

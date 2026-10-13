@@ -127,7 +127,10 @@ probability. With our six types, a confidence of 0.85 means a top probability of
   - The `cog_core.problem()` helper defaults to `error`.
 - **Human Gates pause on every run.** Op steps have no conditions, so an Op
   cannot pause only for uncertain documents.
-- **Guards can't run in Ops yet:** `gate.guards` must be `[]`.
+- **Guards can't run in Ops yet:** `gate.guards` must be `[]`. Until the Hub
+  runs Guards, this Cog's Guards run as scripts in `guards/` and in CI. They're
+  defined in the Frame, which Travis described as where Guards and their
+  failure behaviour belong.
 
 ## Useful commands
 

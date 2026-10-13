@@ -42,3 +42,9 @@ jobs:
       - name: Run Smith's package check
         working-directory: workspace/cog-smith
         run: pixi run check -- ../cog-document-classification --tests
+      - name: Run the Guards
+        working-directory: workspace/cog-document-classification
+        run: |
+          pixi run python guards/repo_guard.py
+          pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample-result.json > "$RUNNER_TEMP/envelope.json"
+          pixi run python guards/result_guard.py --bundle examples/sample-bundle.json --envelope "$RUNNER_TEMP/envelope.json"
