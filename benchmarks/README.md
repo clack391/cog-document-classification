@@ -23,8 +23,12 @@ The benchmark set has three jobs:
   The repository Guard scans this folder and fails on anything else that
   looks like personal data.
 - **Public documents need a licence** that allows it, recorded in `source` as
-  `public:<licence>`. Keep them outside the repo, and add a download script
-  rather than the files.
+  `public:<licence>`. They go in `benchmarks/external/`, which Git ignores, and
+  labels point at them as `external/<file>`. Synthetic documents go in
+  `documents/`, and the label check enforces that split. When we adopt the
+  first public dataset, add a download script so others can fetch the same
+  files; a public file that hasn't been downloaded shows up as a label
+  problem.
 
 ## What's in it
 
@@ -58,7 +62,7 @@ One row per document:
 | Column | Meaning |
 |---|---|
 | `id` | Lowercase, with hyphens. Not `run`, and not starting with `report`. |
-| `file` | The path under `documents/` |
+| `file` | `documents/<file>` for synthetic documents, `external/<file>` for public ones |
 | `expected` | The type the Cog should assign, or `needs_review` |
 | `alternatives` | Other types that are also acceptable, separated by `;`. Only for honestly ambiguous documents. |
 | `tags` | Tags that clearly apply, separated by `;` |
@@ -67,6 +71,10 @@ One row per document:
 | `split` | `tune` (used to choose thresholds) or `test` (used only to report them) |
 | `source` | `synthetic`, or `public:<licence>` |
 | `notes` | Why the label is what it is |
+
+The sheet can be edited in a spreadsheet. Excel's "CSV UTF-8" format
+works, but keep it comma-separated: some regional settings save with
+semicolons, and the check says so. Documents must be UTF-8 text.
 
 Check the labels with:
 
@@ -80,7 +88,11 @@ The check enforces several rules:
 - an invoice must state amounts;
 - every file must exist.
 
-When the Frame's rules change, update `REQUIRED_RULES` in `bench.py`.
+When the Frame's rules change, update `REQUIRED_RULES` and `RULE_PHRASES` in
+`bench.py`. `RULE_PHRASES` links each rule to its wording in the Frame. A test
+fails if that wording disappears from the Frame, or if the Frame gains a rule
+bullet that no benchmark rule covers. Tagging and signal rules are covered by
+the policy tests instead.
 
 **Second labeler:** ideally Francis labels about 20 documents without looking
 at these labels first. Wherever you disagree, the Frame needs a clearer rule.
@@ -113,8 +125,12 @@ pixi run python benchmarks/score.py benchmarks/results/replay-1
 
 Each run writes `benchmarks/results/<name>/`, which Git ignores because it
 contains machine-specific details. It holds each document's result envelope,
-the Guards' report on it, and `run.json`. A run name is never reused. The
-scorer adds `report.md` and `report.json`.
+the Guards' report on it, and `run.json`. `run.json` records the Cog version
+and fingerprints of the labels, the decision code and the Frame. A run name is
+never reused. The scorer adds `report.md` and `report.json`.
+
+The live tests never call a model; they use a fake subprocess, so
+`pixi run test` stays free even after a provider is activated.
 
 ## What the report shows
 
@@ -135,4 +151,11 @@ scorer adds `report.md` and `report.json`.
 - **Results by model,** when a run mixes models.
 
 Every run's answers are also checked by the output Guards. A result a Guard
-blocks counts as going to a person, never as a silent error.
+blocks counts as going to a person, never as a silent error. If a Guard report
+is missing, the scorer runs the Guards again rather than trusting the result.
+
+The report starts with a warning when it may not describe the run as it
+happened:
+- the labels, the decision code or the Frame changed after the run;
+- the run has no fingerprints;
+- Guard reports had to be rerun.

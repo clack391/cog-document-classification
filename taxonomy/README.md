@@ -76,9 +76,12 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
   output Guards, with what happens when each fails. `guards/result_guard.py`
   implements them, and a test checks that the Frame and the code name the same
   Guards. The Frame is now v0.4.0.
+- **13 Oct 2026:** after a review, Guards no longer check the caller's own
+  document identifier, which is echoed back unchanged. Date-like IDs were
+  being mistaken for phone numbers. The Frame is now v0.4.1.
 
 ## Validation
 
 - **The Frame's frontmatter:** check it with `frame_validator.py` from the Frames toolkit.
 - **The questions, the policy and the sync with the Frame:** `pixi run test`.
-- **The content:** the [benchmark set](../benchmarks/README.md), which is step 8 of the Frame playbook. `REQUIRED_RULES` in `benchmarks/bench.py` lists the Frame's rules; every rule needs at least one labeled document.
+- **The content:** the [benchmark set](../benchmarks/README.md), which is step 8 of the Frame playbook. `REQUIRED_RULES` in `benchmarks/bench.py` lists the Frame's rules, and every rule needs at least one labeled document. `RULE_PHRASES` links each rule to its wording in the Frame, and a test fails when the two drift apart.

@@ -2,6 +2,7 @@
 Guard on this repo and on planted files. Secrets and personal data used here
 are built at run time and written only to temporary folders."""
 import copy
+import inspect
 import json
 import subprocess
 import sys
@@ -56,13 +57,26 @@ class OutputGuards(unittest.TestCase):
         for name, text in samples.items():
             with self.subTest(identifier=name):
                 env = envelope()
-                env["payload"]["decision"]["document_id"] = text
+                env["payload"]["decision"]["reasons"].append(text)
                 self.assertEqual(statuses(env)[1]["no-personal-identifiers"], "fail")
 
     def test_numbers_that_are_not_identifiers_pass(self):
         env = envelope()
-        env["payload"]["decision"]["document_id"] = "doc-2026-0142 batch 1234 5678 9012 3456"
+        env["payload"]["decision"]["reasons"].append("doc-2026-0142 batch 1234 5678 9012 3456")
         self.assertEqual(statuses(env)[1]["no-personal-identifiers"], "pass")
+
+    def test_the_callers_document_id_is_not_checked(self):
+        for doc_id in ("2026-10-13-000123", "INV 2026 1014 7788", "jo" + "@" + "mailhost.co.uk"):
+            with self.subTest(document_id=doc_id):
+                b = dict(bundle(), document_id=doc_id)
+                result = json.loads((ROOT / "examples" / "sample-result.json").read_text())
+                env = cog_core.finish(b, result, {"kind": "test"})
+                self.assertEqual(statuses(env, b)[0], "pass")
+
+    def test_a_number_next_to_another_number_is_still_found(self):
+        text = "call +44 20 " + "7123 4567 07700 " + "900123"
+        self.assertEqual(result_guard.personal_identifiers(text), ["phone number"])
+        self.assertEqual(result_guard.personal_identifiers("ref 2026 1014 " + "7788 1203 4455 6677"), [])
 
     def test_tags_and_types_outside_the_frame_fail(self):
         for change in ({"tags": ["not_a_tag"]}, {"document_type": "receipt"},
@@ -139,20 +153,34 @@ class RepositoryGuard(unittest.TestCase):
 
     def test_reserved_fictional_contacts_are_allowed_in_sample_data(self):
         allowed = ["a.person" + "@" + "example.com", "x" + "@" + "team.example.org", "+44 20 " + "7946 0123",
-                   "0161 " + "496 0721", "07700 " + "900341", "(312) " + "555-0142"]
-        flagged = ["a.person" + "@" + "realmail.co", "+44 20 " + "7123 4567", "(312) " + "555-7788"]
+                   "0161 " + "496 0721", "07700 " + "900341", "(312) " + "555-0142", "+44 (0)20 " + "7946 0123",
+                   "0114 " + "496 0555", "029 2018 " + "0123", "028 9649 " + "6001", "(440) " + "555-0123",
+                   "+1 312 " + "555 0142", "0044 20 " + "7946 0123", "+44 20 " + "7946 0123 07700 900123"]
+        flagged = ["a.person" + "@" + "realmail.co", "+44 20 " + "7123 4567", "(312) " + "555-7788",
+                   "+44 20 " + "7946 0123 07123 456789"]
         with tempfile.TemporaryDirectory() as tmp:
             (Path(tmp) / "benchmarks").mkdir()
             for i, text in enumerate(allowed + flagged):
                 (Path(tmp) / "benchmarks" / f"d{i}.txt").write_text(f"contact {text}\n")
             names = [f"benchmarks/d{i}.txt" for i in range(len(allowed) + len(flagged))]
             findings = repo_guard.scan(tmp, names)
-        flagged_files = sorted(f.split(":")[0] for f in findings)
+        flagged_files = sorted({f.split(":")[0] for f in findings})
         self.assertEqual(flagged_files, names[len(allowed):], findings)
 
     def test_the_output_guard_never_allows_fictional_contacts(self):
         self.assertEqual(result_guard.personal_identifiers("x" + "@" + "example.org"), ["email address"])
-        self.assertEqual(result_guard.personal_identifiers("x" + "@" + "example.org", allow_fictional=True), [])
+        self.assertEqual(result_guard.personal_identifiers("call 020 " + "7946 0123"), ["phone number"])
+        self.assertEqual(list(inspect.signature(result_guard.personal_identifiers).parameters), ["text"],
+                         "the output check must have no way to relax it")
+
+    def test_files_with_accented_names_are_scanned(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["git", "init", "-q", tmp], check=True)
+            (Path(tmp) / "benchmarks").mkdir()
+            (Path(tmp) / "benchmarks" / "r\u00e9sum\u00e9 cv.txt").write_text("mail jo" + "@" + "mailhost.co.uk\n")
+            findings = repo_guard.scan(tmp, repo_guard.tracked_files(tmp))
+        self.assertEqual(len(findings), 1, findings)
+        self.assertIn("r\u00e9sum\u00e9 cv.txt", findings[0])
 
     def test_new_files_are_scanned_before_they_are_committed(self):
         with tempfile.TemporaryDirectory() as tmp:

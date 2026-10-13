@@ -6,3 +6,6 @@ runs/
 
 # Benchmark runs (machine-specific provenance; export fixtures deliberately)
 benchmarks/results/
+
+# Public benchmark documents: downloaded, never committed
+benchmarks/external/

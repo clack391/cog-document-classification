@@ -22,8 +22,8 @@ SPLITS = ("tune", "test")
 MIN_PER_TYPE = 2        # clear examples per type now; the plan grows this to 10-12
 
 # Every rule in the taxonomy Frame that a document can exercise. Update this
-# list when the Frame's rules change; the tests require at least one labeled
-# document per rule.
+# list and RULE_PHRASES when the Frame's rules change; the tests require at
+# least one labeled document per rule, and check RULE_PHRASES against the Frame.
 REQUIRED_RULES = (
     # Type boundaries
     "bill-complaint", "invoice-under-contract", "letter-about-contract", "quote",
@@ -40,6 +40,59 @@ REQUIRED_RULES = (
     "ocr-noise",
 )
 
+# Where each rule comes from: a phrase that appears in the Frame. The tests
+# check both directions: every phrase is still in the Frame, and every rule
+# bullet in the Frame's rule sections is matched by a phrase here or exempted.
+RULE_PHRASES = {
+    "bill-complaint": "A complaint or question about a bill",
+    "invoice-under-contract": "An invoice issued under a contract",
+    "letter-about-contract": "A letter or email that discusses a contract",
+    "quote": "Quotes, estimates and purchase orders",
+    "purchase-order": "Quotes, estimates and purchase orders",
+    "policy": "company policies and handbooks",
+    "job-description": "Job descriptions, job adverts",
+    "incident-report": "Internal incident reports",
+    "pro-forma-invoice": "Pro-forma invoices are",
+    "credit-note": "Credit notes are",
+    "receipt": "Receipts and payment confirmations",
+    "offer-letter": "Offer letters are",
+    "contract-template": "Unsigned contract templates",
+    "terms-of-use": "Published website terms of use",
+    "cover-letter": "Cover letters on their own",
+    "exported-profile": "Profile pages exported",
+    "sales-enquiry": "Sales enquiries asking for a quote",
+    "support-reply": "A support team's reply",
+    "card-statement": "Bank and credit card statements",
+    "transaction-export": "transaction-history exports",
+    "bank-transaction-complaint": "A complaint or question about a bank transaction",
+    "supplier-statement": "A supplier's statement of account",
+    "loan-statement": "Investment, pension and loan statements",
+    "payslip": "Payslips are",
+    "multiple-documents": "classify the main one and apply `multiple_documents`",
+    "no-main-document": "If no document is clearly the main one",
+    "garbled-text": "When the text is mostly garbled",
+    "unclear-type": "When the type is unclear",
+    "non-english": "Apply `non_english`",
+    "ocr-noise": "may contain recognition errors",
+}
+# Frame rule bullets that need no benchmark document, and why.
+EXEMPT_RULE_PHRASES = {
+    "Every review outcome states its reasons": "a property of every result, covered by tests/test_policy.py",
+}
+# Frame rule sections that hold tagging or signal guidance rather than
+# document rules; tests/test_policy.py covers the tagging rules.
+NON_DOCUMENT_SECTIONS = ("Signals", "Tagging")
+
+
+def fingerprints(labels_path=LABELS):
+    """sha256 of the inputs a score depends on: the labels, the decision code
+    and the Frame. A run records them, so a later score can tell when any of
+    them changed since the run."""
+    import hashlib
+    files = {"labels": Path(labels_path), "task_logic": ROOT / "src" / "task_logic.py",
+             "frame": result_guard.FRAME}
+    return {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in files.items()}
+
 
 def vocabulary():
     """Types and tags exactly as the Frame states them."""
@@ -53,7 +106,8 @@ def split_cell(cell):
 
 
 def load_labels(path=LABELS):
-    with open(path, newline="", encoding="utf-8") as handle:
+    # utf-8-sig also reads the byte-order mark Excel adds to "CSV UTF-8" files.
+    with open(path, newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
         header = reader.fieldnames
         rows = [dict(row) for row in reader]
@@ -86,7 +140,8 @@ def validate(header, rows, vocab, root=BENCH):
     """Problems with the labels, as sentences. Empty means the set is usable."""
     problems = []
     if header != COLUMNS:
-        problems.append(f"labels.csv columns must be exactly: {', '.join(COLUMNS)}")
+        problems.append(f"labels.csv columns must be exactly: {', '.join(COLUMNS)} "
+                        "(comma-separated; some spreadsheet settings save with semicolons)")
         return problems
     types = vocab["types"]
     seen = set()
@@ -99,13 +154,22 @@ def validate(header, rows, vocab, root=BENCH):
         if row["id"] == "run" or row["id"].startswith("report"):
             problems.append(f"{where}: ids 'run' and 'report…' are reserved for a run's own files")
         seen.add(row["id"])
+        folder = row["file"].split("/", 1)[0]
         path = (root / row["file"]).resolve()
-        if not row["file"].startswith("documents/") or not path.is_relative_to((root / "documents").resolve()):
-            problems.append(f"{where}: file must be under documents/")
+        public = row["source"].startswith("public:")
+        if folder not in ("documents", "external") or not path.is_relative_to((root / folder).resolve()):
+            problems.append(f"{where}: file must be under documents/ (synthetic) or external/ (public)")
+        elif public != (folder == "external"):
+            problems.append(f"{where}: synthetic documents go in documents/, public ones in external/ (kept out of Git)")
         elif not path.is_file():
-            problems.append(f"{where}: file {row['file']} does not exist")
-        elif not path.read_text(encoding="utf-8").strip():
-            problems.append(f"{where}: document is empty")
+            problems.append(f"{where}: file {row['file']} does not exist"
+                            + (" (public documents must be downloaded first)" if public else ""))
+        else:
+            try:
+                if not path.read_text(encoding="utf-8").strip():
+                    problems.append(f"{where}: document is empty")
+            except UnicodeDecodeError:
+                problems.append(f"{where}: document is not UTF-8 text; re-save it as UTF-8")
         expected = row["expected"]
         if expected not in types and expected != REVIEW:
             problems.append(f"{where}: expected {expected!r} is not a Frame type or {REVIEW}")
