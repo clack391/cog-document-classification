@@ -44,11 +44,37 @@ def _iban_valid(text):
     return int("".join(str(int(c, 36)) for c in moved)) % 97 == 1
 
 
-def personal_identifiers(text):
+# Reserved for fiction and documentation, so they never reach a real person:
+# RFC 2606 / 6761 domains, UK Ofcom drama ranges and US 555-0100 to 555-0199.
+FICTIONAL_DOMAINS = ("example.com", "example.org", "example.net")
+FICTIONAL_TLDS = (".example", ".test", ".invalid")
+UK_DRAMA_PREFIXES = ("02079460", "01134960", "01174960", "01184960", "01214960", "01314960",
+                     "01414960", "01514960", "01614960", "01914980", "01632960", "07700900")
+
+
+def fictional_email(address):
+    domain = address.rsplit("@", 1)[-1].lower()
+    return domain in FICTIONAL_DOMAINS or domain.endswith(FICTIONAL_TLDS) or \
+        any(domain.endswith("." + d) for d in FICTIONAL_DOMAINS)
+
+
+def fictional_phone(digits):
+    if digits.startswith("44"):
+        digits = "0" + digits[2:]
+    if digits.startswith("0") and digits.startswith(UK_DRAMA_PREFIXES):
+        return True
+    if len(digits) == 11 and digits.startswith("1"):
+        digits = digits[1:]
+    return len(digits) == 10 and digits[3:6] == "555" and digits[6:8] == "01"
+
+
+def personal_identifiers(text, allow_fictional=False):
     """Names of the identifier kinds found in the text. Pattern-based: it
-    catches common formats, not every possible identifier."""
+    catches common formats, not every possible identifier. With
+    allow_fictional, reserved fictional emails and phone numbers are ignored
+    (for synthetic sample data, never for a Cog's output)."""
     found = []
-    if EMAIL.search(text):
+    if any(not (allow_fictional and fictional_email(m.group())) for m in EMAIL.finditer(text)):
         found.append("email address")
     if US_SSN.search(text):
         found.append("US Social Security number")
@@ -65,6 +91,8 @@ def personal_identifiers(text):
         candidate = m.group()
         digits = re.sub(r"\D", "", candidate)
         if 10 <= len(digits) <= 15 and (candidate.startswith("+") or re.search(r"[\s().-]", candidate)):
+            if allow_fictional and fictional_phone(digits):
+                continue
             found.append("phone number")
             break
     return found
