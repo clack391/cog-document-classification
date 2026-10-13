@@ -1,0 +1,22 @@
+Brightline IT Services Ltd
+Unit 4, Canal Wharf, Leeds LS11 5PZ
+accounts@brightline.example.com | 0113 496 0218
+
+12 October 2026
+
+Accounts Payable
+Harbour Lane Studio Ltd
+3 Quay Street, Bristol BS1 4DB
+
+PAYMENT REMINDER: INVOICE OVERDUE
+
+Our records show that the invoice below was due on 1 October 2026 and has not yet been paid.
+
+Invoice number   Invoice date        Due date           Amount due
+BIS-2026-0391    1 September 2026    1 October 2026     GBP 1,020.00
+
+Please pay the full amount by 19 October 2026, by bank transfer quoting BIS-2026-0391. If payment is not received by then, we may add late payment interest as allowed under the Late Payment of Commercial Debts (Interest) Act 1998.
+
+If you have already paid, please ignore this reminder and accept our thanks. If there's a problem with the invoice, contact our accounts team on the number above.
+
+Brightline IT Services Ltd, Accounts Team

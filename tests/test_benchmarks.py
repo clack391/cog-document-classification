@@ -186,6 +186,13 @@ class Validation(unittest.TestCase):
         rows = [r for r in copy.deepcopy(ROWS) if r["frame_rule"] != "payslip"]
         self.assertTrue(any("payslip" in p for p in bench.validate(HEADER, rows, VOCAB)))
 
+    def test_a_tag_no_document_expects_is_reported(self):
+        rows = copy.deepcopy(ROWS)
+        for row in rows:
+            if "contract_amendment" in row["tags"]:
+                row["tags"].remove("contract_amendment")
+        self.assertTrue(any("'contract_amendment' is expected in 0" in p for p in bench.validate(HEADER, rows, VOCAB)))
+
     def test_wrong_columns_are_reported(self):
         self.assertTrue(bench.validate(HEADER[:-1], ROWS, VOCAB))
 

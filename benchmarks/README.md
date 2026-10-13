@@ -32,12 +32,12 @@ The benchmark set has three jobs:
 
 ## What's in it
 
-The first batch has 43 synthetic text documents. They take the Cog's current
+The first batch has 46 synthetic text documents. They take the Cog's current
 input, plain text; file versions (PDF, DOCX, scans) come with extraction (#3).
 
 | Group | Documents | What it checks |
 |---|---|---|
-| Clear examples | 12 (2 per type) | The basic definitions of all six types |
+| Clear examples | 15: 2 per type, plus a payment reminder, a contract amendment and an urgent ticket | The basic definitions of all six types, and every type tag |
 | Frame rules | 31, covering all 30 rules (the unclear-type rule has two) | See below |
 
 The 31 rule documents include:
@@ -48,9 +48,10 @@ The 31 rule documents include:
 - **4 that should go to review:** no main document, garbled text, a note whose
   attachment is missing, and a near-empty page.
 
-In the 43 documents, the expected outcomes are 8 invoices, 4 contracts, 3
-résumés, 5 support tickets, 4 bank statements, 15 `other` and 4 reviews. The
-tune split has 28 documents and the test split 15.
+In the 46 documents, the expected outcomes are 9 invoices, 5 contracts, 3
+résumés, 6 support tickets, 4 bank statements, 15 `other` and 4 reviews. The
+tune split has 30 documents and the test split 16. Every tag in the Frame is
+expected in at least one document.
 
 **Target size:** about 100 documents. That means 10–12 clear examples per
 type, plus very long documents, which test trimming once extraction exists.
@@ -84,6 +85,7 @@ pixi run python benchmarks/bench.py
 
 The check enforces several rules:
 - every Frame rule has at least one document, and every type has at least two clear examples;
+- every tag is expected in at least one document, so its precision and recall can be measured;
 - tags must fit the expected type;
 - an invoice must state amounts;
 - every file must exist.

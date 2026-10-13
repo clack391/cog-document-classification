@@ -1,0 +1,13 @@
+Ticket #49102
+Subject: URGENT: customers can't pay our invoices, "Pay now" fails for everyone
+Status: Open
+Priority: Urgent
+Product: Ledgerly Pay
+Requester: Tom Whitfield (Harbour Lane Studio)
+
+Description:
+Since about 09:10 today, every customer who clicks "Pay now" on one of our Ledgerly invoices gets "Payment could not be processed. Please try again later." We've tried three different cards ourselves and all of them fail at the same step.
+
+None of our clients can pay us at the moment. We sent 40 invoices out this morning, and four clients have already phoned to say the payment page is broken.
+
+Please treat this as urgent and tell us when it will be fixed. We need a workaround today if it can't be fixed quickly.
