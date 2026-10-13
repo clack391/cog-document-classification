@@ -13,7 +13,7 @@ Items marked **[TBD: decision N]** depend on the open decisions in section 5.
 The Document Classification Cog serves as the "front door" for incoming documents. Before specialized Cogs can process an invoice, route a ticket, or evaluate a candidate, the system must first establish what the document is.
 
 * **Primary Function:** Take one document file and extract its text in our own code. Run OCR for scanned pages. Then ask a System One model a fixed set of typed questions about the text. Supported formats are PDF, scanned images and text-based files; the exact list and the maximum length are **[TBD: decision 4]**. Email attachments reach the Cog as files from whatever system receives the email. From the model's answers, the Cog:
-   * assigns one document type: `invoice`, `contract`, `resume` (résumé), `support_ticket` or `other`;
+   * assigns one document type: `invoice`, `contract`, `resume` (résumé), `support_ticket`, `bank_statement` (bank or transaction history) or `other`;
    * assigns tags from a fixed vocabulary of 16 tags;
    * reports the model's confidence in the type;
    * records file and extraction metadata: file type, page count, size, sha256, whether OCR was used **[TBD: decision 3]**;
@@ -34,7 +34,7 @@ To ensure accountability and prevent misclassification:
    * `other` is a real type for documents outside the taxonomy, not a fallback for uncertainty.
 * **Confidence Policy:** The model returns a confidence with its answer about the type. The Cog compares it with a threshold in its decision code, where the policy is readable and covered by tests.
    * The starting threshold is 0.85, to be tuned on the benchmark sets.
-   * This confidence is not the top probability. With five types, a confidence of 0.85 means a top-type probability of 0.88.
+   * This confidence is not the top probability. With six types, a confidence of 0.85 means a top-type probability of 0.875.
    * Jev's confidence is trained for calibration; a local LLM's is not.
    * Limitation: the suite does not yet tell the decision code which model answered, so one set of thresholds applies to every model for now. The taxonomy notes list the ways around this.
 * **Escalation:**
@@ -123,6 +123,7 @@ To ensure accountability and prevent misclassification:
 **6. What Changed from v1**
 
 * **The `résumé` type ID:** it becomes ASCII `resume`. "Résumé" stays as the label.
+* **Bank statements:** added as a sixth type, `bank_statement`, on 13 October 2026. At the 5 October sync, Francis described bank and transaction history as in scope.
 * **"Compute a classification confidence score":** the Cog now reports the model's confidence and applies a threshold.
 * **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog.
 * **Human Approval Gate, "immediately diverted":** the Cog now sets a `needs_review` flag and reports a warning, and the consumer routes on it. The suite's human Gate pauses every run and cannot route selectively. An Op with a human Gate is decision 6.

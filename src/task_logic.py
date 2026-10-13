@@ -1,7 +1,7 @@
 """Document Classification task logic: the only file in src/ this Cog owns.
 
 A System One model answers the typed questions in context/questions.json about
-one document's text: which of five types it is, whether the text is legible,
+one document's text: which of six types it is, whether the text is legible,
 and one yes/no question per tag. This code turns those answers into the
 classification, applying the policy in taxonomy/document-taxonomy.frame.md:
 
@@ -34,6 +34,7 @@ TYPE_TAGS = {
     "contract": ("contract_nda", "contract_employment", "contract_amendment"),
     "resume": (),
     "support_ticket": ("ticket_urgent", "ticket_complaint", "ticket_billing", "ticket_bug_report"),
+    "bank_statement": (),
     "other": (),
 }
 

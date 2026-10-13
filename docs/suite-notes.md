@@ -112,8 +112,8 @@ Avoid PyMuPDF: its license is AGPL.
 **Confidence**
 
 A choice answer's `confidence` is `(p_top − 1/n) / (1 − 1/n)`, not the top
-probability. With five types, a confidence of 0.85 means a top probability of
-0.88.
+probability. With our six types, a confidence of 0.85 means a top probability of
+0.875.
 
 ## Input checks and review
 

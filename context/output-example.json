@@ -22,7 +22,8 @@
         "contract": 0.01,
         "resume": 0.0,
         "support_ticket": 0.02,
-        "other": 0.03
+        "bank_statement": 0.01,
+        "other": 0.02
       },
       "confidence": 0.93
     },

@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.2.0
+version: 0.3.0
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -28,7 +28,8 @@ maintainer: Document Classification Cog team
 - **`contract`**: an agreement that sets out obligations between two or more named parties, signed or meant to be signed. Includes service and supply agreements, statements of work, non-disclosure agreements, employment contracts, job offer letters, leases, licences, amendments or renewals of an agreement, and unsigned contract templates.
 - **`resume`**: a person's own summary of their work history, education and skills, written to apply for jobs. Also called a CV. Includes profiles exported from professional networking sites. The ID is always ASCII `resume`; "Résumé" is only a display label.
 - **`support_ticket`**: a request for help, or a report of a problem, sent by a customer or user to the team behind a product or service. Includes helpdesk tickets, support emails, bug reports, complaints, access requests, billing disputes raised with support, and the support team's replies within a ticket.
-- **`other`**: any document that is not one of the four types above. It is a real type, not a holding place for uncertainty.
+- **`bank_statement`**: a statement or transaction history for a bank, credit card or payment account, issued by the bank, card issuer or payment provider: the account holder, the account, a period, opening and closing balances, and dated transactions. Includes bank and credit card statements, and transaction-history exports from online banking or payment providers.
+- **`other`**: any document that is not one of the five types above. It is a real type, not a holding place for uncertainty.
 - **Tag**: a yes/no label from the vocabulary below. General tags can apply to any type. Type tags are reported only with their own type.
 - **Review**: the outcome when no type can be assigned reliably. It carries no type, and it states its reasons.
 
@@ -76,7 +77,7 @@ Type boundaries:
 Borderline cases (confirmed 12 October 2026):
 - Pro-forma invoices are `invoice`: they request payment, even in advance.
 - Credit notes are `invoice`, tagged `invoice_credit_note`.
-- Receipts, payment confirmations and account statements are `other`.
+- Receipts and payment confirmations are `other`: each records one payment, not an account's history.
 - Offer letters are `contract`, tagged `contract_employment`.
 - Unsigned contract templates are `contract`, tagged `draft_or_template`.
 - Published website terms of use are `other`.
@@ -84,6 +85,15 @@ Borderline cases (confirmed 12 October 2026):
 - Profile pages exported from professional networks are `resume`.
 - Sales enquiries asking for a quote are `other`: they ask to buy, not for help.
 - A support team's reply without the customer's request is a `support_ticket`.
+
+Bank statements (added 13 October 2026):
+- Bank and credit card statements, and transaction-history exports, are `bank_statement`.
+- A complaint or question about a bank transaction is a `support_ticket`.
+
+Working assumptions *(confirm before relying on them)*:
+- A supplier's statement of account, listing invoices owed to that supplier, is `other`.
+- Investment, pension and loan statements are `other`.
+- Payslips are `other`.
 
 More than one document:
 - If the text holds several documents, classify the main one and apply `multiple_documents`.
@@ -94,6 +104,7 @@ Signals (evidence, never the decision on their own):
 - `contract`: "Agreement", named Parties, recitals ("Whereas"), a definitions section, numbered clauses, term and termination, governing law, signature blocks.
 - `resume`: Experience, Education and Skills sections; a person's name and contact details at the top; dated roles with employers; "Curriculum Vitae".
 - `support_ticket`: a ticket number, a subject line, status or priority fields, a user describing a problem, steps to reproduce, a refund request.
+- `bank_statement`: a statement period, opening and closing balances, an account number, sort code or IBAN, and a table of dated transactions with debit, credit and balance columns.
 
 Tagging:
 - Apply a tag only when its statement clearly holds. Leave it off when unsure.

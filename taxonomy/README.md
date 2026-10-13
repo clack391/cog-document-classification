@@ -61,6 +61,23 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
   type, for example "a support request about billing" rather than "about
   billing". An invoice would otherwise answer yes to the billing tag and trip
   the contradiction rule.
+- **13 Oct 2026:** `bank_statement` added as a sixth type: bank and credit
+  card statements and transaction-history exports. It has no type tags. The
+  Frame is now v0.3.0.
+
+## Working assumptions to confirm
+
+Added with `bank_statement` and marked in the Frame:
+
+1. A supplier's statement of account, listing invoices owed to that supplier,
+   is `other`.
+2. Investment, pension and loan statements are `other`.
+3. Payslips are `other`.
+
+Other possible additions, not yet decided:
+- type tags for bank statements;
+- a rule that a bank statement with no amounts goes to review, like an
+  invoice with no amounts.
 
 ## Validation
 

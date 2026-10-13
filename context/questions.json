@@ -3,14 +3,15 @@
     "type": "choice",
     "instructions": {
       "question": "What kind of document is `text`? Classify it by its purpose, not by the topics it mentions.",
-      "note": "If `text` holds several documents, classify the main one. `other` covers every document that is not one of the four business types."
+      "note": "If `text` holds several documents, classify the main one. `other` covers every document that is not one of the five business types."
     },
     "criteria": {
       "invoice": "A request for payment from a seller to a buyer, stating what is owed: typically an invoice number and date, line items, amounts, a total or balance due, a due date, tax lines and payment details. Includes bills, pro-forma invoices, credit notes and overdue payment reminders. Not quotes, estimates, purchase orders, receipts, payment confirmations or account statements.",
       "contract": "An agreement setting out obligations between named parties, signed or meant to be signed: typically the parties, recitals, definitions, numbered clauses, term and termination, governing law and signature blocks. Includes NDAs, statements of work, employment contracts, job offer letters, leases, licences, amendments and unsigned contract templates. Not quotes, proposals, general policies or published website terms of use.",
       "resume": "A person's own summary of their work history, education and skills, written to apply for jobs (a resume or CV), including profiles exported from professional networking sites: typically a name and contact details, then sections such as Experience, Education and Skills with dated roles. Not cover letters on their own, job descriptions or reference letters.",
       "support_ticket": "A request for help, or a report of a problem, sent by a customer or user to the team behind a product or service, or the support team's reply within such a ticket: typically a description of the issue, and often a ticket number, subject, priority or steps to reproduce. Includes complaints, bug reports and billing disputes raised with support. Not sales enquiries asking for a quote, and not internal incident reports.",
-      "other": "Any other document, including quotes, estimates, purchase orders, receipts, payment confirmations, account statements, proposals, policies, website terms of use, sales enquiries, cover letters, job descriptions, reports, letters, forms and marketing material."
+      "bank_statement": "A statement or transaction history for a bank, credit card or payment account, issued by the bank, card issuer or payment provider: typically the account holder, an account number, a statement period, opening and closing balances, and a table of dated transactions with debits, credits and a running balance. Includes bank and credit card statements and transaction-history exports. Not receipts or payment confirmations for a single payment, supplier statements listing invoices, or investment, pension or loan statements.",
+      "other": "Any other document, including quotes, estimates, purchase orders, receipts, payment confirmations, supplier statements of account, investment, pension or loan statements, payslips, proposals, policies, website terms of use, sales enquiries, cover letters, job descriptions, reports, letters, forms and marketing material."
     }
   },
   "text_legible": {

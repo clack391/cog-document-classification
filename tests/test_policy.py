@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT / "src"))
 import cog_core      # noqa: E402
 import task_logic    # noqa: E402
 
-TYPES = ("invoice", "contract", "resume", "support_ticket", "other")
+TYPES = ("invoice", "contract", "resume", "support_ticket", "bank_statement", "other")
 
 
 def bundle():
@@ -25,7 +25,8 @@ def result(top=None, confidence=None, **nouls):
     answer = value["answers"]["document_type"]
     if top:
         answer["choice"] = top
-        answer["probabilities"] = {t: (0.8 if t == top else 0.05) for t in TYPES}
+        rest = round(0.2 / (len(TYPES) - 1), 6)
+        answer["probabilities"] = {t: (0.8 if t == top else rest) for t in TYPES}
     if confidence is not None:
         answer["confidence"] = confidence
     for qid, probability in nouls.items():
@@ -56,6 +57,13 @@ class Classified(unittest.TestCase):
                                  tag_invoice_reminder=0.8, tag_contains_financial_amounts=0.1))
         self.assertIn("ticket_urgent", decision["tags"])
         self.assertNotIn("invoice_reminder", decision["tags"])
+
+    def test_a_bank_statement_is_classified_with_general_tags_only(self):
+        decision, problems = run(result(top="bank_statement", tag_contains_personal_data=0.9,
+                                        tag_time_sensitive=0.1))
+        self.assertEqual(problems, [])
+        self.assertEqual((decision["status"], decision["document_type"]), ("classified", "bank_statement"))
+        self.assertEqual(decision["tags"], ["contains_personal_data", "contains_financial_amounts"])
 
     def test_a_tag_needs_the_tag_threshold(self):
         decision, _ = run(result(tag_signed=task_logic.TAG_THRESHOLD - 0.01))

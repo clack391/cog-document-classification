@@ -5,7 +5,7 @@ A Cog that classifies one incoming business document, built on the
 
 A System One model answers a fixed set of typed questions about the document's
 text. The Cog's own code then assigns one type (`invoice`, `contract`,
-`resume`, `support_ticket` or `other`), adds tags from a fixed vocabulary, and
+`resume`, `support_ticket`, `bank_statement` or `other`), adds tags from a fixed vocabulary, and
 reports the model's confidence. Any document it cannot classify reliably is
 marked `needs_review`, with reasons.
 

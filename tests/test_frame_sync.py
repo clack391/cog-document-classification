@@ -29,7 +29,8 @@ FRAME_TYPE_TAGS = dict(re.findall(r"^\| `([a-z_]+)` \| `([a-z_]+)` \|", section(
 
 class FrameSync(unittest.TestCase):
     def test_the_frame_lists_types_and_tags(self):
-        self.assertEqual(len(FRAME_TYPES), 5)
+        self.assertEqual(len(FRAME_TYPES), 6)
+        self.assertEqual(FRAME_TYPES[-1], "other")
         self.assertTrue(FRAME_TAGS)
 
     def test_questions_offer_exactly_the_frame_types(self):

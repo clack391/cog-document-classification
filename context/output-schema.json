@@ -50,6 +50,7 @@
             "contract",
             "resume",
             "support_ticket",
+            "bank_statement",
             "other",
             null
           ],
@@ -169,6 +170,7 @@
                 "contract",
                 "resume",
                 "support_ticket",
+                "bank_statement",
                 "other"
               ]
             },
@@ -180,6 +182,7 @@
                 "contract",
                 "resume",
                 "support_ticket",
+                "bank_statement",
                 "other"
               ],
               "properties": {
@@ -199,6 +202,11 @@
                   "maximum": 1
                 },
                 "support_ticket": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "bank_statement": {
                   "type": "number",
                   "minimum": 0,
                   "maximum": 1
