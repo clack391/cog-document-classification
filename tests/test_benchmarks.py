@@ -71,7 +71,7 @@ class Workspace(unittest.TestCase):
         answers = self.tmp / f"answers-{name}"
         answers.mkdir()
         for row in ROWS:
-            (answers / f"{row['id']}.json").write_text(json.dumps(results[row["id"]]))
+            (answers / f"{row['id']}.json").write_text(json.dumps(results[row["id"]]), encoding="utf-8")
         out = self.tmp / name
         bench_run.run(ROWS, bench_run.replay_invoker(answers), out, "replay", name)
         return out
@@ -140,7 +140,7 @@ class Validation(unittest.TestCase):
                 self.assertTrue(any(expected in p for p in bench.validate(HEADER, rows, VOCAB)), name)
 
     def test_required_rules_stay_in_step_with_the_frame(self):
-        frame = bench.result_guard.FRAME.read_text()
+        frame = bench.result_guard.FRAME.read_text(encoding="utf-8")
         self.assertEqual(sorted(bench.RULE_PHRASES), sorted(bench.REQUIRED_RULES))
         for rule, phrase in {**bench.RULE_PHRASES, **{p: p for p in bench.EXEMPT_RULE_PHRASES}}.items():
             with self.subTest(rule=rule):
@@ -212,7 +212,7 @@ class Scoring(Workspace):
         self.assertTrue(overall["meets_silent_error_target"] and overall["meets_review_rate_target"])
         self.assertEqual((report["tags"]["overall"]["precision"], report["tags"]["overall"]["recall"]), (1.0, 1.0))
         self.assertEqual(report["threshold_sweep"]["recommended"], 0.85)
-        run_summary = json.loads((out / "run.json").read_text())
+        run_summary = json.loads((out / "run.json").read_text(encoding="utf-8"))
         self.assertEqual((run_summary["failed"], run_summary["guard_failures"]), ([], []))
 
     def test_confident_wrong_answers_are_silent_errors(self):
@@ -266,7 +266,7 @@ class Scoring(Workspace):
         answers = self.tmp / "answers"
         answers.mkdir()
         for row in ROWS:
-            (answers / f"{row['id']}.json").write_text(json.dumps(results[row["id"]]))
+            (answers / f"{row['id']}.json").write_text(json.dumps(results[row["id"]]), encoding="utf-8")
         out = self.tmp / "run"
         summary = bench_run.run(ROWS, invoke, out, "replay", "run")
         self.assertEqual((summary["failed"], summary["guard_failures"]), (["receipt"], ["payslip"]))
@@ -290,13 +290,31 @@ class Scoring(Workspace):
     def test_the_report_is_written_and_readable(self):
         out = self.run_with({r["id"]: oracle_result(r) for r in ROWS})
         self.assertEqual(quietly(score.main, [str(out)]), 0)
-        text = (out / "report.md").read_text()
+        text = (out / "report.md").read_text(encoding="utf-8")
         self.assertIn("Silent error rate", text)
         self.assertIn("Recommended on this split: **0.85**", text)
-        self.assertEqual(json.loads((out / "report.json").read_text())["overall"]["documents"], len(ROWS))
+        self.assertEqual(json.loads((out / "report.json").read_text(encoding="utf-8"))["overall"]["documents"], len(ROWS))
         self.assertEqual(quietly(score.main, [str(out), "--split", "tune"]), 0)
         self.assertTrue((out / "report-tune.md").exists())
         self.assertEqual(score.score(out)["overall"]["documents"], len(ROWS), "reports must not be read as results")
+
+
+    def test_the_sweep_runs_the_guards_on_newly_classified_results(self):
+        results = {r["id"]: oracle_result(r) for r in ROWS}
+        quote = next(r for r in ROWS if r["id"] == "quote")
+        results["quote"] = oracle_result(quote, top="invoice", probability=0.75)   # confidence 0.70
+        out = self.run_with(results)                     # in review at 0.85, classified below 0.70
+        real_run = bench.result_guard.run
+
+        def blocks_classified_quotes(document, envelope, frame_text=None):
+            report = real_run(document, envelope, frame_text)
+            if document["document_id"] == "quote" and envelope["payload"]["decision"]["status"] == "classified":
+                report = dict(report, status="fail")
+            return report
+        with mock.patch.object(bench.result_guard, "run", blocks_classified_quotes):
+            points = {p["threshold"]: p for p in score.score(out)["threshold_sweep"]["points"]}
+        self.assertEqual(points[0.6]["silent_errors"], 0, "a result the Guards block is never a silent error")
+        self.assertEqual(points[0.6]["review_rate"], points[0.85]["review_rate"])
 
 
 class Robustness(Workspace):
@@ -304,9 +322,9 @@ class Robustness(Workspace):
         out = self.run_with({r["id"]: oracle_result(r) for r in ROWS})
         for guard in out.glob("*.guard.json"):
             guard.unlink()
-        envelope = json.loads((out / "payslip.json").read_text())
+        envelope = json.loads((out / "payslip.json").read_text(encoding="utf-8"))
         envelope["payload"]["decision"]["tags"].append("not_a_tag")
-        (out / "payslip.json").write_text(json.dumps(envelope))
+        (out / "payslip.json").write_text(json.dumps(envelope), encoding="utf-8")
         report = score.score(out)
         self.assertEqual(report["by_document"]["payslip"]["outcome"], "blocked")
         self.assertTrue(any("were run now" in w for w in report["warnings"]))
@@ -318,14 +336,23 @@ class Robustness(Workspace):
         edited.write_text(bench.LABELS.read_text(encoding="utf-8").replace("Payslip", "Payslip, edited"),
                           encoding="utf-8")
         self.assertTrue(any("labels changed" in w for w in score.score(out, labels_path=edited)["warnings"]))
-        recorded = json.loads((out / "run.json").read_text())
+        recorded = json.loads((out / "run.json").read_text(encoding="utf-8"))
         recorded["fingerprints"]["task_logic"] = "0" * 64
-        (out / "run.json").write_text(json.dumps(recorded))
+        (out / "run.json").write_text(json.dumps(recorded), encoding="utf-8")
         report = score.score(out)
         self.assertTrue(any("decision code changed" in w for w in report["warnings"]))
         self.assertIn("**Warning:**", score.markdown(report))
+        recorded["fingerprints"]["guards"] = "0" * 64
+        (out / "run.json").write_text(json.dumps(recorded), encoding="utf-8")
+        self.assertTrue(any("Guards changed" in w for w in score.score(out)["warnings"]))
         (out / "run.json").unlink()
         self.assertTrue(any("no fingerprints" in w for w in score.score(out)["warnings"]))
+
+    def test_fingerprints_ignore_line_endings(self):
+        crlf = self.tmp / "labels.csv"
+        crlf.write_bytes(bench.LABELS.read_bytes().replace(b"\n", b"\r\n"))
+        self.assertEqual(bench.fingerprints(crlf), bench.fingerprints())
+        self.assertEqual(set(bench.fingerprints()), {"labels", "task_logic", "frame", "guards"})
 
 
 class Statistics(unittest.TestCase):
@@ -371,7 +398,7 @@ class Runner(Workspace):
         answers = self.tmp / "answers"
         answers.mkdir()
         for row in ROWS:
-            (answers / f"{row['id']}.json").write_text(json.dumps(oracle_result(row)))
+            (answers / f"{row['id']}.json").write_text(json.dumps(oracle_result(row)), encoding="utf-8")
         args = ["replay", "--answers", str(answers), "--name", "cli", "--results", str(self.tmp)]
         self.assertEqual(quietly(bench_run.main, args), 0)
         self.assertEqual(quietly(bench_run.main, args), 2, "an existing run name is refused")
@@ -421,13 +448,13 @@ class Runner(Workspace):
                                side_effect=subprocess.TimeoutExpired(["ask-composed"], 1)):
             summary = bench_run.run(ROWS[:2], bench_run.live_invoke, self.tmp / "timeouts", "live", "timeouts")
         self.assertEqual(summary["failed"], [ROWS[0]["id"], ROWS[1]["id"]])
-        envelope = json.loads((self.tmp / "timeouts" / f"{ROWS[0]['id']}.json").read_text())
+        envelope = json.loads((self.tmp / "timeouts" / f"{ROWS[0]['id']}.json").read_text(encoding="utf-8"))
         self.assertEqual((envelope["envelope"], envelope["cog"], envelope["ok"], envelope["error"]["code"]),
                          (1, cog_core.SELF_ID, False, "invocation-failed"))
 
     def test_a_run_records_what_it_was_built_from(self):
         out = self.run_with({r["id"]: oracle_result(r) for r in ROWS})
-        recorded = json.loads((out / "run.json").read_text())
+        recorded = json.loads((out / "run.json").read_text(encoding="utf-8"))
         self.assertEqual(recorded["cog"], cog_core.SELF_ID)
         self.assertEqual(recorded["fingerprints"], bench.fingerprints())
 

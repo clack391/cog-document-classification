@@ -15,13 +15,13 @@ TYPES = ("invoice", "contract", "resume", "support_ticket", "bank_statement", "o
 
 
 def bundle():
-    return json.loads((ROOT / "examples" / "sample-bundle.json").read_text())
+    return json.loads((ROOT / "examples" / "sample-bundle.json").read_text(encoding="utf-8"))
 
 
 def result(top=None, confidence=None, **nouls):
     """The saved sample answers, with the top type, its confidence and any
     yes/no answers (by question id) replaced."""
-    value = json.loads((ROOT / "examples" / "sample-result.json").read_text())
+    value = json.loads((ROOT / "examples" / "sample-result.json").read_text(encoding="utf-8"))
     answer = value["answers"]["document_type"]
     if top:
         answer["choice"] = top

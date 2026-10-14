@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 import cog_core      # noqa: E402
 import task_logic    # noqa: E402
 
-FRAME = (ROOT / "taxonomy" / "document-taxonomy.frame.md").read_text()
+FRAME = (ROOT / "taxonomy" / "document-taxonomy.frame.md").read_text(encoding="utf-8")
 
 
 def section(title):

@@ -1,17 +1,29 @@
 --- Page 1 ---
-CITY RAIL
-Ticket receipt
-Off-peak return, Bristol Temple Meads to London Paddington
-Date of travel: 12 September 2026
-Price: GBP 64.20
-Paid by card ending 4821
+INVOICE
+Tidewater Audio Supplies Ltd
+Invoice number: TAS-2026-1152    Invoice date: 20 October 2026
+Bill to: Harbour Lane Studio Ltd
+
+XLR cables, 10 m, pack of 4                 GBP 84.00
+VAT at 20%                                  GBP 16.80
+Total due                                  GBP 100.80
+Due date: 19 November 2026
 
 --- Page 2 ---
-Note from reception
-Parcel for Priya left in the post room. The courier said a second box arrives on Thursday.
+MERIDIAN BANK
+Business Current Account
+Account holder: Harbour Lane Studio Ltd    Account number: 30481176
+Statement period: 1 September 2026 to 30 September 2026
+
+Date      Description                      Paid out     Paid in      Balance
+01 Sep    Balance brought forward                                  12,406.10
+08 Sep    Card payment CITY RAIL              64.20                12,341.90
+15 Sep    Payment from client                            2,400.00  14,741.90
+30 Sep    Balance carried forward                                  14,741.90
 
 --- Page 3 ---
-SHIPPING LABEL
-From: Greenfold Office Interiors, Bath BA2 3DX
-To: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
-Parcel 2 of 2    Weight: 14 kg
+Ticket #49311
+Subject: Sign-in code never arrives
+Requester: Tom Whitfield (Harbour Lane Studio)
+
+I've asked for a sign-in code three times this morning and none of the emails have arrived. Can you check what's wrong?

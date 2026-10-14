@@ -24,7 +24,7 @@
   },
   "tag_contains_personal_data": {
     "type": "noul",
-    "instructions": "`text` names an identifiable person together with personal details such as contact details, a home address, a date of birth or an ID number.",
+    "instructions": "`text` names an identifiable person together with personal details such as contact details (work or personal), a home address, a date of birth or an ID number.",
     "criteria": {
       "true": "An identifiable person with personal details",
       "false": "No identifiable person, or only names with no personal details"

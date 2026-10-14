@@ -27,8 +27,10 @@ US_SSN = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 CARD = re.compile(r"\b\d(?:[ -]?\d){12,18}\b")
 IBAN = re.compile(r"\b[A-Z]{2}\d{2}(?: ?[A-Z0-9]){11,30}\b")
 PHONE = re.compile(r"\+?\(?\d[\d\s().-]{8,18}\d")
-# Where a phone number can start: not straight after a letter, digit or phone punctuation.
-PHONE_START = re.compile(r"(?<![\w+(.-])[+(]?\d")
+# Where a phone number can start: not inside another number, so not straight after
+# a digit or +, or after a digit followed by - or . ("2026-0142"). After a letter
+# or other punctuation is fine: "Tel.020 7946 0123", "Call(020) 7946 0123".
+PHONE_START = re.compile(r"(?<![\d+])(?<!\d[.-])[+(]?\d")
 
 
 def _luhn(digits):
@@ -142,18 +144,21 @@ def _squash(text):
     return " ".join(text.split())
 
 
-def _output_strings(envelope):
+def _output_strings(bundle, envelope):
     """Everything the Cog produced: every string in the payload except the
-    caller's own document_id, which is input echoed back, not model output."""
+    caller's own document_id, which is input echoed back, not model output.
+    It is left out only when it equals the input's, so an altered one is checked."""
     payload = copy.deepcopy(envelope.get("payload")) or {}
-    if isinstance(payload.get("decision"), dict):
-        payload["decision"].pop("document_id", None)
+    decision = payload.get("decision")
+    if isinstance(decision, dict) and "document_id" in decision \
+            and decision["document_id"] == bundle.get("document_id"):
+        del decision["document_id"]
     return "\n".join(_strings(payload))
 
 
 def no_document_text(bundle, envelope, vocab):
     document = _squash(str(bundle.get("text", "")))
-    output = _squash(_output_strings(envelope))
+    output = _squash(_output_strings(bundle, envelope))
     if len(document) < QUOTE_WINDOW:
         copied = len(document) >= 12 and document in output
     else:
@@ -166,7 +171,7 @@ def no_document_text(bundle, envelope, vocab):
 
 
 def no_personal_identifiers(bundle, envelope, vocab):
-    found = personal_identifiers(_output_strings(envelope))
+    found = personal_identifiers(_output_strings(bundle, envelope))
     if found:
         return "fail", "the result contains: " + ", ".join(found)
     return "pass", "no personal identifiers in the result"
@@ -221,7 +226,7 @@ GUARDS = {
 
 
 def run(bundle, envelope, frame_text=None):
-    frame_text = FRAME.read_text() if frame_text is None else frame_text
+    frame_text = FRAME.read_text(encoding="utf-8") if frame_text is None else frame_text
     if not isinstance(envelope, dict) or envelope.get("ok") is not True or not envelope.get("payload"):
         results = [{"guard": "result-present", "status": "fail", "detail": "there is no successful result to check"}]
     else:
@@ -245,9 +250,9 @@ def main(argv=None):
     parser.add_argument("--envelope", required=True, help="the result envelope to check")
     parser.add_argument("--frame", default=str(FRAME), help="the taxonomy Frame (default: this repo's)")
     args = parser.parse_args(argv)
-    report = run(json.loads(Path(args.bundle).read_text()),
-                 json.loads(Path(args.envelope).read_text()),
-                 Path(args.frame).read_text())
+    report = run(json.loads(Path(args.bundle).read_text(encoding="utf-8")),
+                 json.loads(Path(args.envelope).read_text(encoding="utf-8")),
+                 Path(args.frame).read_text(encoding="utf-8"))
     print(json.dumps(report, indent=2))
     return 1 if report["status"] == "fail" else 0
 

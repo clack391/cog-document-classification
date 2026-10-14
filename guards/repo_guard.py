@@ -59,17 +59,23 @@ def fictional_email(address):
 
 
 def fictional_phone(number):
-    """True for a number reserved for fiction. Understands +44 and 0044,
-    including the '+44 (0)20' style, and US numbers with or without +1."""
+    """True for a number reserved for fiction:
+    - a UK drama number, exactly 11 digits, also written +44, 0044 or '+44 (0)20';
+    - a US 555-01xx number with a US-style area code (first digit 2-9), written
+      with +1 or with no country code at all."""
     text = number.strip()
     digits = re.sub(r"\D", "", text)
     if text.startswith(("+44", "0044")):
         digits = "0" + digits[4 if text.startswith("0044") else 2:].lstrip("0")
-    if digits.startswith(UK_DRAMA_PREFIXES):
+    if len(digits) == 11 and digits.startswith(UK_DRAMA_PREFIXES):
         return True
-    if text.startswith("+1") or (len(digits) == 11 and digits.startswith("1")):
+    if text.startswith("+"):
+        if not text.startswith("+1"):
+            return False          # another country's number
         digits = digits[1:]
-    return len(digits) == 10 and digits[3:6] == "555" and digits[6:8] == "01"
+    elif len(digits) == 11 and digits.startswith("1"):
+        digits = digits[1:]
+    return len(digits) == 10 and digits[0] in "23456789" and digits[3:8] == "55501"
 
 
 def fictional(kind, value):
@@ -80,15 +86,23 @@ def fictional(kind, value):
     return False
 
 
+def _git_files(root, *options):
+    # NUL-separated and decoded as UTF-8 on every platform (Windows would
+    # otherwise use its locale), so names with accents or spaces arrive exactly
+    # as they are on disk.
+    out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", *options], capture_output=True,
+                         text=True, encoding="utf-8", errors="surrogateescape", check=True).stdout
+    return [f for f in out.split("\0") if f]
+
+
 def tracked_files(root):
-    """Every file Git doesn't ignore, tracked or new. NUL-separated, so names
-    with accents or spaces arrive exactly as they are on disk."""
+    """Every file Git doesn't ignore, tracked or new, except tracked files
+    already deleted from the working tree. Paths always use forward slashes."""
     try:
-        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others",
-                              "--exclude-standard"], capture_output=True, text=True, check=True).stdout
-        return [f for f in out.split("\0") if f]
+        deleted = set(_git_files(root, "--deleted"))
+        return [f for f in _git_files(root, "--cached", "--others", "--exclude-standard") if f not in deleted]
     except (OSError, subprocess.CalledProcessError):
-        return [str(p.relative_to(root)) for p in Path(root).rglob("*")
+        return [p.relative_to(root).as_posix() for p in Path(root).rglob("*")
                 if p.is_file() and not {".git", ".pixi"} & set(p.relative_to(root).parts)]
 
 
@@ -104,11 +118,16 @@ def scan(root, files):
         if Path(name).name == ".env" or Path(name).name.startswith(".env."):
             findings.append(f"{name}: an environment file is committed")
             continue
+        is_data = name.startswith(DATA_DIRS) or name in DATA_FILES
         try:
             text = (Path(root) / name).read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
+        except OSError as exc:
+            findings.append(f"{name}: can't be read, so it wasn't checked ({type(exc).__name__})")
             continue
-        is_data = name.startswith(DATA_DIRS) or name in DATA_FILES
+        except UnicodeDecodeError:
+            if is_data:
+                findings.append(f"{name}: not UTF-8 text, so it can't be checked for personal data")
+            continue  # any other binary file has no text to scan
         for number, line in enumerate(text.splitlines(), 1):
             for kind, pattern in SECRETS.items():
                 match = pattern.search(line)

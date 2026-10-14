@@ -1,6 +1,6 @@
 DANIEL ADEYEMI
 Software Engineer
-14 Rowan Terrace, Leeds LS6 2QB  |  07700 900341  |  daniel.adeyemi@example.com
+14 Rowan Terrace, Leeds XL6 2QB  |  07700 900341  |  daniel.adeyemi@example.com
 
 PROFILE
 Backend engineer with six years' experience building payment and data platforms in Python and Go.
