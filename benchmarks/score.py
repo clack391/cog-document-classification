@@ -18,6 +18,7 @@ would do. Pick thresholds on the tune split and report them on the test split.
 """
 import argparse
 import bisect
+import copy
 import json
 import math
 import sys
@@ -28,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import bench  # noqa: E402
 
 sys.path.insert(0, str(bench.ROOT / "src"))
+import cog_core    # noqa: E402  (builds each re-decided result, as a real run does)
 import task_logic  # noqa: E402  (the Cog's real policy, for the threshold sweep)
 
 SWEEP = [round(0.50 + 0.05 * i, 2) for i in range(10)]          # 0.50 .. 0.95
@@ -52,9 +54,9 @@ def load_run(run_dir):
     for path in run_dir.glob("*.json"):
         if path.name == "run.json" or path.name.startswith("report") or path.name.endswith(".guard.json"):
             continue
-        envelopes[path.stem] = json.loads(path.read_text())
+        envelopes[path.stem] = json.loads(path.read_text(encoding="utf-8"))
         guard = run_dir / f"{path.stem}.guard.json"
-        guards[path.stem] = json.loads(guard.read_text()) if guard.exists() else None
+        guards[path.stem] = json.loads(guard.read_text(encoding="utf-8")) if guard.exists() else None
     return envelopes, guards
 
 
@@ -193,22 +195,37 @@ def threshold(value):
         task_logic.MIN_TYPE_CONFIDENCE = saved
 
 
+def redecide(document, envelope, kept):
+    """The outcome this document would get at the current threshold. Only the
+    decision depends on the threshold. If it is unchanged, the run's own outcome
+    stands (`kept`). Otherwise the result gets the new decision and the Cog's
+    own output checks, as cog_core.finish builds them, and the output Guards
+    are run on it. The answers were already validated during the run."""
+    payload = dict(envelope["payload"])
+    payload["decision"] = task_logic.decide(document, copy.deepcopy(payload["answers"]))
+    if payload["decision"] == envelope["payload"]["decision"]:
+        return kept
+    rebuilt = dict(envelope, payload=payload,
+                   problems=cog_core.validate_input(document) + task_logic.check_output(payload, document))
+    return outcome(rebuilt, bench.result_guard.run(document, rebuilt))
+
+
 def sweep(rows, envelopes, outcomes, target):
     """Silent error and review rates if MIN_TYPE_CONFIDENCE were each value.
-    Blocked and failed documents stay with a person at every threshold."""
+    Blocked and failed documents stay with a person at every threshold; every
+    other document's new decision is checked by the Guards again."""
     points = []
     values = sorted(set(SWEEP + [task_logic.MIN_TYPE_CONFIDENCE]))
+    documents = {row["id"]: bench.bundle(row) for row in rows}
     for value in values:
         redone = {}
         with threshold(value):
             for row in rows:
-                kind, kind_type = outcomes[row["id"]]
+                kind, _ = outcomes[row["id"]]
                 if kind in ("blocked", "failed"):
                     redone[row["id"]] = (kind, None)
                     continue
-                decision = task_logic.decide({"document_id": row["id"]}, envelopes[row["id"]]["payload"]["answers"])
-                redone[row["id"]] = (("review", None) if decision["status"] == "needs_review"
-                                     else ("classified", decision["document_type"]))
+                redone[row["id"]] = redecide(documents[row["id"]], envelopes[row["id"]], outcomes[row["id"]])
         s = summarise(rows, redone, target)
         points.append({"threshold": value, "silent_error_rate": s["silent_error_rate"], "review_rate": s["review_rate"],
                        "silent_errors": len(s["silent_errors"]), "meets_both_targets":
@@ -225,14 +242,15 @@ def provenance_warnings(run_dir, labels_path, recomputed):
     """Say when the report may not describe the run as it happened."""
     warnings = []
     run_json = Path(run_dir) / "run.json"
-    recorded = (json.loads(run_json.read_text()).get("fingerprints") or {}) if run_json.exists() else {}
+    recorded = (json.loads(run_json.read_text(encoding="utf-8")).get("fingerprints") or {}) if run_json.exists() else {}
     if not recorded:
         warnings.append("This run recorded no fingerprints, so changes since the run can't be detected.")
     current = bench.fingerprints(labels_path)
     messages = {"labels": "The labels changed after this run; results are judged against the current labels.",
                 "task_logic": "The decision code changed after this run; the threshold sweep uses the current code, "
                               "so its rows may not match the saved decisions.",
-                "frame": "The Frame changed after this run; types and tags are checked against the current Frame."}
+                "frame": "The Frame changed after this run; types and tags are checked against the current Frame.",
+                "guards": "The output Guards changed after this run; the saved Guard reports came from the old code."}
     for name, message in messages.items():
         if recorded.get(name) and recorded[name] != current[name]:
             warnings.append(message)
@@ -348,9 +366,9 @@ def main(argv=None):
     report = score(args.run_dir, args.split)
     run_dir = Path(args.run_dir)
     suffix = "" if args.split == "all" else f"-{args.split}"
-    (run_dir / f"report{suffix}.json").write_text(json.dumps(report, indent=2))
+    (run_dir / f"report{suffix}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     text = markdown(report)
-    (run_dir / f"report{suffix}.md").write_text(text)
+    (run_dir / f"report{suffix}.md").write_text(text, encoding="utf-8")
     print(text)
     return 0
 

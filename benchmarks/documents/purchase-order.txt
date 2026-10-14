@@ -3,8 +3,8 @@ PURCHASE ORDER
 PO number: 77214
 Order date: 8 October 2026
 
-Buyer: Harbour Lane Studio Ltd, 3 Quay Street, Bristol BS1 4DB
-Supplier: Greenfold Office Interiors, 18 Mill Lane, Bath BA2 3DX
+Buyer: Harbour Lane Studio Ltd, 3 Quay Street, Bristol XB1 4DB
+Supplier: Greenfold Office Interiors, 18 Mill Lane, Bath XB2 3DX
 Your quote reference: Q-2026-0912
 
 Line  Description                              Qty    Unit price    Line total
@@ -14,7 +14,7 @@ Line  Description                              Qty    Unit price    Line total
 
 Order total (excluding VAT): GBP 3,870.00
 
-Deliver to: 3 Quay Street, Bristol BS1 4DB, by 30 October 2026.
+Deliver to: 3 Quay Street, Bristol XB1 4DB, by 30 October 2026.
 Please quote PO 77214 on your invoice.
 
 Authorised by: Priya Raman, Managing Director

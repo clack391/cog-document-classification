@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.4.1
+version: 0.4.2
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -39,7 +39,7 @@ General tags:
 
 | Tag | Applies when |
 |---|---|
-| `contains_personal_data` | An identifiable person is named together with personal details such as contact details, home address, date of birth or an ID number |
+| `contains_personal_data` | An identifiable person is named together with personal details such as contact details (work or personal), home address, date of birth or an ID number |
 | `contains_financial_amounts` | Specific monetary amounts are stated |
 | `time_sensitive` | A deadline, due date or required response time is stated |
 | `signed` | There is evidence of completed signatures: filled signature blocks, "signed by", dated signatures, an e-signature certificate |
@@ -136,7 +136,7 @@ Guards are checks on every classification result. They run independently of the 
 
 A failed guard is never repaired automatically. The result is held back, and the reason is recorded.
 
-Guards check what the system produced. The caller's own document identifier is echoed back in the result unchanged, so it is not checked.
+Guards check what the system produced. The caller's own document identifier is echoed back in the result unchanged, so it is not checked, as long as it matches the identifier in the input.
 
 ## Style
 

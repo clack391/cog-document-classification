@@ -2,8 +2,8 @@ AMENDMENT No. 1 TO THE MASTER SERVICES AGREEMENT
 
 This Amendment is made on 25 September 2026 between:
 
-(1) Brightline IT Services Ltd, a company registered in England and Wales under number 08841276 ("Supplier"); and
-(2) Harbour Lane Studio Ltd, a company registered in England and Wales under number 11902345 ("Customer").
+(1) Brightline IT Services Ltd, a company registered in England and Wales ("Supplier"); and
+(2) Harbour Lane Studio Ltd, a company registered in England and Wales ("Customer").
 
 BACKGROUND
 (A) The Parties entered into a Master Services Agreement dated 2 June 2026 (the "Agreement").

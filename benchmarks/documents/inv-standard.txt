@@ -1,7 +1,7 @@
 INVOICE
 
 Brightline IT Services Ltd
-Unit 4, Canal Wharf, Leeds LS11 5PZ
+Unit 4, Canal Wharf, Leeds XL11 5PZ
 VAT reg. GB 284 1937 66
 accounts@brightline.example.com
 
@@ -12,7 +12,7 @@ Customer reference: PO 77120
 
 Bill to:
 Harbour Lane Studio Ltd
-3 Quay Street, Bristol BS1 4DB
+3 Quay Street, Bristol XB1 4DB
 
 Description                                   Qty   Unit price      Amount
 Managed IT support, October 2026                1   GBP 850.00   GBP 850.00

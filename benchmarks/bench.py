@@ -86,18 +86,20 @@ NON_DOCUMENT_SECTIONS = ("Signals", "Tagging")
 
 
 def fingerprints(labels_path=LABELS):
-    """sha256 of the inputs a score depends on: the labels, the decision code
-    and the Frame. A run records them, so a later score can tell when any of
-    them changed since the run."""
+    """sha256 of the inputs a score depends on: the labels, the decision code,
+    the Frame and the output Guards. A run records them, so a later score can
+    tell when any of them changed since the run. Line endings are ignored, so a
+    Windows checkout (CRLF) matches a Linux one."""
     import hashlib
     files = {"labels": Path(labels_path), "task_logic": ROOT / "src" / "task_logic.py",
-             "frame": result_guard.FRAME}
-    return {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in files.items()}
+             "frame": result_guard.FRAME, "guards": Path(result_guard.__file__)}
+    return {name: hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+            for name, path in files.items()}
 
 
 def vocabulary():
     """Types and tags exactly as the Frame states them."""
-    vocab = result_guard.frame_vocabulary(result_guard.FRAME.read_text())
+    vocab = result_guard.frame_vocabulary(result_guard.FRAME.read_text(encoding="utf-8"))
     vocab["general_tags"] = [t for t in vocab["tags"] if t not in vocab["type_tags"]]
     return vocab
 
@@ -128,7 +130,7 @@ def bundle(row, root=BENCH):
 
 
 def targets(path=TARGETS):
-    return json.loads(Path(path).read_text())
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def reportable_tags(vocab, document_type):

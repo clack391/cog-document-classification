@@ -79,6 +79,12 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
 - **13 Oct 2026:** after a review, Guards no longer check the caller's own
   document identifier, which is echoed back unchanged. Date-like IDs were
   being mistaken for phone numbers. The Frame is now v0.4.1.
+- **14 Oct 2026:** after Francis's review of the benchmark set, both leads
+  agreed that a named person's work contact details count for
+  `contains_personal_data`, just like personal ones; the Frame and the
+  question now say "contact details (work or personal)". The document
+  identifier is skipped only when it matches the input's, so an altered one is
+  still checked. The Frame is now v0.4.2.
 
 ## Validation
 

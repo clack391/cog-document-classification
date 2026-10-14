@@ -22,6 +22,10 @@ The benchmark set has three jobs:
 
   The repository Guard scans this folder and fails on anything else that
   looks like personal data.
+- **Other details must not be real either.** UK postcodes start with `X`,
+  which no real postcode does, so no address exists. German postcodes start
+  with `00`, which none does. There are no company registration numbers or
+  sort codes, and the VAT numbers fail their check digits.
 - **Public documents need a licence** that allows it, recorded in `source` as
   `public:<licence>`. They go in `benchmarks/external/`, which Git ignores, and
   labels point at them as `external/<file>`. Synthetic documents go in
@@ -32,25 +36,29 @@ The benchmark set has three jobs:
 
 ## What's in it
 
-The first batch has 46 synthetic text documents. They take the Cog's current
+The first batch has 47 synthetic text documents. They take the Cog's current
 input, plain text; file versions (PDF, DOCX, scans) come with extraction (#3).
 
 | Group | Documents | What it checks |
 |---|---|---|
 | Clear examples | 15: 2 per type, plus a payment reminder, a contract amendment and an urgent ticket | The basic definitions of all six types, and every type tag |
-| Frame rules | 31, covering all 30 rules (the unclear-type rule has two) | See below |
+| Frame rules | 32, covering all 30 rules (the unclear-type and garbled-text rules have two each) | See below |
 
-The 31 rule documents include:
+The 32 rule documents include:
 - every boundary and borderline case in the Frame, such as a pro-forma
   invoice, offer letter, sales enquiry, supplier statement and payslip;
 - hard cases: OCR noise, German text, and an invoice with an unrelated page
   attached;
-- **4 that should go to review:** no main document, garbled text, a note whose
-  attachment is missing, and a near-empty page.
+- **5 that should go to review:**
+  - an invoice, a bank statement page and a support ticket in one file, none
+    of them the main one;
+  - garbled text, and a near-empty page;
+  - a note whose attachment is missing;
+  - a page that reads half invoice, half bank statement.
 
-In the 46 documents, the expected outcomes are 9 invoices, 5 contracts, 3
-résumés, 6 support tickets, 4 bank statements, 15 `other` and 4 reviews. The
-tune split has 30 documents and the test split 16. Every tag in the Frame is
+In the 47 documents, the expected outcomes are 9 invoices, 5 contracts, 3
+résumés, 6 support tickets, 4 bank statements, 15 `other` and 5 reviews. The
+tune split has 30 documents and the test split 17. Every tag in the Frame is
 expected in at least one document.
 
 **Target size:** about 100 documents. That means 10–12 clear examples per
@@ -128,7 +136,8 @@ pixi run python benchmarks/score.py benchmarks/results/replay-1
 Each run writes `benchmarks/results/<name>/`, which Git ignores because it
 contains machine-specific details. It holds each document's result envelope,
 the Guards' report on it, and `run.json`. `run.json` records the Cog version
-and fingerprints of the labels, the decision code and the Frame. A run name is
+and fingerprints of the labels, the decision code, the Frame and the output
+Guards. Line endings don't count, so a Windows checkout matches. A run name is
 never reused. The scorer adds `report.md` and `report.json`.
 
 The live tests never call a model; they use a fake subprocess, so
@@ -147,8 +156,9 @@ The live tests never call a model; they use a fake subprocess, so
 - **Calibration:** at each confidence level, how often the model's top type was
   right.
 - **A threshold sweep.** It re-runs the Cog's own decision code on the saved
-  answers at each threshold from 0.50 to 0.95, and recommends the lowest
-  review rate that meets the silent error target. Choose on the **tune** split,
+  answers at each threshold from 0.50 to 0.95, and checks every changed
+  decision with the Guards again. It recommends the lowest review rate that
+  meets the silent error target. Choose on the **tune** split,
   then confirm on the **test** split.
 - **Results by model,** when a run mixes models.
 
@@ -158,6 +168,6 @@ is missing, the scorer runs the Guards again rather than trusting the result.
 
 The report starts with a warning when it may not describe the run as it
 happened:
-- the labels, the decision code or the Frame changed after the run;
+- the labels, the decision code, the Frame or the output Guards changed after the run;
 - the run has no fingerprints;
 - Guard reports had to be rerun.

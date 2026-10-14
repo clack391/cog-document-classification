@@ -40,7 +40,7 @@ def live_invoke(row, document):
     """One live call through the same entry point a user runs."""
     with tempfile.TemporaryDirectory() as tmp:
         request = Path(tmp) / "bundle.json"
-        request.write_text(json.dumps(document))
+        request.write_text(json.dumps(document), encoding="utf-8")
         call = subprocess.run([sys.executable, str(bench.ROOT / "scripts" / "composed_usage.py"),
                                "--request", str(request)], cwd=bench.ROOT, capture_output=True,
                               text=True, timeout=LIVE_TIMEOUT_S)
@@ -57,7 +57,7 @@ def replay_invoker(answers_dir):
     answers_dir = Path(answers_dir)
 
     def invoke(row, document):
-        saved = json.loads((answers_dir / f"{row['id']}.json").read_text())
+        saved = json.loads((answers_dir / f"{row['id']}.json").read_text(encoding="utf-8"))
         return cog_core.finish(document, cog_cli.saved_result(saved), cog_cli.replay_binding())
     return invoke
 
@@ -76,8 +76,8 @@ def run(rows, invoke, out_dir, mode, name):
         except Exception as exc:  # noqa: BLE001 - a failed document must not stop the run
             envelope = failed_envelope(f"{type(exc).__name__}: {exc}")
         report = result_guard.run(document, envelope)
-        (out_dir / f"{row['id']}.json").write_text(json.dumps(envelope, indent=2))
-        (out_dir / f"{row['id']}.guard.json").write_text(json.dumps(report, indent=2))
+        (out_dir / f"{row['id']}.json").write_text(json.dumps(envelope, indent=2), encoding="utf-8")
+        (out_dir / f"{row['id']}.guard.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
         summary["documents"] += 1
         if envelope.get("ok") is not True:
             summary["failed"].append(row["id"])
@@ -90,7 +90,7 @@ def run(rows, invoke, out_dir, mode, name):
             key = f"{answered.get('answer_source')}:{answered.get('model')}"
             summary["models"][key] = summary["models"].get(key, 0) + 1
     summary["finished_at"] = datetime.now(timezone.utc).isoformat()
-    (out_dir / "run.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "run.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return summary
 
 

@@ -34,7 +34,7 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   agreement.
 - Guards that check every result independently, and a repository Guard. See
   [Guards](#guards).
-- The [benchmark set](benchmarks/README.md): 46 labeled synthetic documents
+- The [benchmark set](benchmarks/README.md): 47 labeled synthetic documents
   covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
   is checked offline today and runs live once a model is connected.
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
@@ -134,7 +134,7 @@ and what happens when it fails:
 | Guard | Checks | On failure |
 |---|---|---|
 | `no-document-text` | The result repeats no passage of the document | Fail |
-| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers. The caller's own document ID isn't checked. | Fail |
+| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers. The caller's own document ID isn't checked, as long as it matches the input. | Fail |
 | `known-vocabulary` | Types and tags come from the Frame, and a result in review has no type | Fail |
 | `review-is-visible` | A result in review is reported as a warning | Fail |
 | `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |

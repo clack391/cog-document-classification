@@ -20,11 +20,11 @@ import task_logic                        # noqa: E402
 
 
 def sample_bundle():
-    return json.loads((ROOT / "examples" / "sample-bundle.json").read_text())
+    return json.loads((ROOT / "examples" / "sample-bundle.json").read_text(encoding="utf-8"))
 
 
 def sample_result():
-    return json.loads((ROOT / "examples" / "sample-result.json").read_text())
+    return json.loads((ROOT / "examples" / "sample-result.json").read_text(encoding="utf-8"))
 
 
 class TestPackage(unittest.TestCase):

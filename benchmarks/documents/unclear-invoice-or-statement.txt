@@ -1,0 +1,13 @@
+Account activity and charges
+Account: 4471 0093
+Period: 1 September 2026 to 30 September 2026
+
+Date      Details                               Debit      Credit     Balance
+01 Sep    Opening balance                                              0.00
+03 Sep    Monthly account fee                   49.00                 49.00
+10 Sep    Card transaction fees (212 items)     31.80                 80.80
+17 Sep    Payment received, thank you                      49.00      31.80
+30 Sep    Closing balance                                             31.80
+
+Amount due: GBP 31.80
+We will collect this from your nominated account on 14 October 2026.
