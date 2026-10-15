@@ -35,7 +35,8 @@ Where this file and the Frame disagree, the Frame is right.
 extracted text (`context/input-schema.json`). The `document_id` is echoed in
 the result and never sent to the model. The filename is not part of the input,
 because filenames are often wrong and can contain personal data. Text that is
-empty or only whitespace is refused with an input error.
+empty or only whitespace is refused with an input error, and so is text over
+100,000 characters or a `document_id` over 200 characters.
 
 **Questions.** A System One model answers 18 questions about the text,
 declared in `context/questions.json`:
@@ -77,8 +78,9 @@ A tag applies when its answer is at or above `TAG_THRESHOLD` = 0.7. A
 classified document gets the general tags and its own type's tags that pass.
 A document in review gets only the general tags that pass.
 
-These thresholds are provisional starting values. The benchmark sets will tune
-them in Phase 4.
+These thresholds are provisional starting values. They'll be tuned on the
+[benchmark set](benchmarks/README.md) (#8), against the targets in
+`benchmarks/targets.json`.
 
 **Output.** The result's `decision` holds:
 
@@ -104,21 +106,22 @@ Who reviews is still to be named.
 `other` is a real type for documents outside the taxonomy. It is never used
 as a fallback when the Cog is unsure. An unsure result goes to review instead.
 
-**Guards.** The Frame's Guards section defines five checks. They run on every
-result, independently of this Cog's code:
+**Guards.** The Frame's Guards section defines five checks that every result
+should pass. They're independent of this Cog's code:
 
 | Guard | Checks | On failure |
 |---|---|---|
 | `no-document-text` | The result repeats no passage of the document | Fail |
-| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers | Fail |
-| `known-vocabulary` | Types and tags come from the Frame, and a result in review has no type | Fail |
+| `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers. The caller's own document ID isn't checked, as long as it matches the input. | Fail |
+| `known-vocabulary` | Types and tags come from the Frame, type tags appear only with their own type, and a result in review has no type and at least one reason | Fail |
 | `review-is-visible` | A result in review is reported as a warning | Fail |
 | `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |
 
 A failed Guard holds the result back and sends the document to a person. It
-never repairs the result. The Op layer can't run Guards yet, so for now
-`guards/result_guard.py` runs them as a script, and CI runs them on every
-push.
+never repairs the result. The Op layer can't run Guards yet, and
+`ask-composed` doesn't run them either, so a live result is checked only when
+the caller runs `guards/result_guard.py` on it. CI runs them on the sample
+result for every push, and every benchmark run checks every document.
 
 ## Unsupported work
 
@@ -138,7 +141,9 @@ push.
   `needs_review`, and the workflow and a person decide what happens next.
 - **No more than one type.** A file holding several documents is classified
   by its main one and tagged `multiple_documents`. If no document is clearly
-  the main one, it goes to review.
+  the main one, it should go to review. No rule enforces this yet: it relies on
+  the model being unsure of the type, so that the confidence falls below
+  `MIN_TYPE_CONFIDENCE` (#19).
 - **No new types or tags.** Only the Frame's six types and 16 tags are used.
 - **No inferences about people.** It doesn't infer age, gender, ethnicity,
   religion, health, disability or any other protected characteristic.
@@ -173,7 +178,7 @@ pixi install
 pixi run check                                            # self-check, model-free
 pixi run prepare -- --bundle examples/sample-bundle.json  # the turn, no call
 pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample-result.json
-pixi run export-fixtures -- --run /path/to/run --step triage --name thresholds
+pixi run export-fixtures -- --run /path/to/run --step STEP_ID --name thresholds  # STEP_ID: the Op step that ran this Cog
 pixi run test                                             # model-free suite
 ```
 
