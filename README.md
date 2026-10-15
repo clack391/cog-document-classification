@@ -41,8 +41,8 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
   is checked offline today and runs live once a model is connected.
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
-  the System One adapter) match its requirements. Neither is set up yet;
-  choosing one is decision 2.
+  the System One adapter) match its requirements. Decision 2 chose local Qwen
+  through the System One adapter; connecting it is #6.
 
 **What is provisional**
 - The input is the document's extracted text. File input and extraction come
@@ -54,7 +54,9 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
 
 **Review works by flagging (decision 6):** a document the Cog is unsure of is
 marked `needs_review` with its reasons and a warning, and whichever workflow
-uses the result sends it to a person. Who reviews is still to be named.
+uses the result sends it to a person. Who reviews will be configurable:
+whoever deploys the Cog maps each document group to a reviewer queue, with a
+default (#5).
 
 See the [proposal](docs/proposal.md) for the plan, the phases and the open
 decisions.
@@ -118,9 +120,9 @@ pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample
 `prepare` shows what would be sent to the model. `replay` decides from saved
 answers.
 
-Live runs need a model provider admitted in cog-workbench: TypeSafe's Jev in the
-cloud, or local Qwen through the System One adapter. Which one we use is still
-open; see the proposal. Until a provider is activated, `pixi run ask-composed`
+Live runs need a model provider admitted in cog-workbench. We use local Qwen
+through the System One adapter (decision 2), and TypeSafe's Jev in the cloud is
+the fallback; see the proposal. Until a provider is activated, `pixi run ask-composed`
 stops with an error that `.op-composition.json` is missing. That file is
 written when Workbench activates a provider for this Cog.
 

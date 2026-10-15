@@ -101,7 +101,8 @@ result.
 reports it as a `needs-review` warning, so no workflow or Gate can pass it as
 clean. Whichever workflow uses the result sends it to a person. The Cog itself
 never pauses for a person, and there is no Op with a human approval Gate.
-Who reviews is still to be named.
+Who reviews will be configurable by whoever deploys the Cog, per document
+group (#5).
 
 `other` is a real type for documents outside the taxonomy. It is never used
 as a fallback when the Cog is unsure. An unsure result goes to review instead.
@@ -168,8 +169,9 @@ the envelope binding carries the host's full composition provenance.
 
 `decide` isn't told which model answered, so the same thresholds apply to
 every provider for now. Treat answers from the adapter as weaker evidence.
-The `calibrated-answers` Guard warns when an LLM answered. Which provider we
-use is decision 2.
+The `calibrated-answers` Guard warns when an LLM answered. We use local Qwen
+through the adapter (decision 2), so the thresholds will be tuned for its
+answers on the benchmark set (#8).
 
 ## Using it
 
