@@ -101,7 +101,7 @@ To ensure accountability and prevent misclassification:
 * **Phase 1: Setup, Contract & Questions** *(in progress)*
    * Create the Cog with `smith new --class decision`. *(Done 12 Oct 2026.)*
    * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(Done 12 Oct 2026: the working assumptions and 16 tags are confirmed, and the questions are in `context/questions.json`.)*
-   * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. Decision 3 has settled what the metadata is, and its fields arrive with file input in Phase 2. The final input schema waits on decision 4. `COG.md` is not started.)*
+   * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. Decision 3 has settled what the metadata is, and its fields arrive with file input in Phase 2. The final input schema waits on decision 4. `COG.md` is written, from the proposal and the taxonomy Frame.)*
    * Smith validation passes from this phase onward. *(It passes, and CI runs it on Linux and macOS for every push.)*
 * **Phase 2: Extraction & Provider**
    * Add the extraction dependencies to `pixi.toml` and commit `pixi.lock`.

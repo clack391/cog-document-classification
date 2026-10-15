@@ -23,6 +23,9 @@ Phase 1, in progress. The package passes Smith's checks and its offline tests
 on the suite's current pins, and CI runs both on Linux and macOS for every push.
 
 **What works**
+- [`COG.md`](COG.md), the human-readable contract: what the Cog decides, its
+  questions and thresholds, the review rules, the Guards, and what it doesn't
+  do.
 - The confirmed taxonomy: the [Frame](taxonomy/document-taxonomy.frame.md) and
   the 18 questions in `context/questions.json` built from it.
 - A first decision policy in `src/task_logic.py`:
@@ -48,9 +51,6 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   are (file type, page count, size, sha256, and whether OCR was used), and they
   arrive with file input in Phase 2.
 - The thresholds are placeholders until the benchmark sets tune them.
-
-**What is not started**
-- `COG.md` still has the starter's placeholder sections.
 
 **Review works by flagging (decision 6):** a document the Cog is unsure of is
 marked `needs_review` with its reasons and a warning, and whichever workflow
