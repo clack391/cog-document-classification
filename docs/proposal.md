@@ -20,7 +20,7 @@ The Document Classification Cog serves as the "front door" for incoming document
    * marks any document it cannot classify reliably as `needs_review`, with reasons.
 * **How It Works:**
    * The model answers narrow questions with probabilities. The Cog's own code turns those answers into the classification and applies our thresholds.
-   * The suite's local host (cog-workbench) and a model provider connect the model. The Cog never chooses its own model. The provider is **[TBD: decision 2]**.
+   * The suite's local host (cog-workbench) and a model provider connect the model. The Cog never chooses its own model. The provider is local Qwen through the System One adapter (decision 2), with Jev or Kev as the fallback.
 * **System Impact:**
    * The Cog is read-only: it never writes, sends or modifies anything outside its own result, and it declares these prohibitions in its manifest.
    * Downstream workflows get a classification they can route on. Each result carries the model, its answers and the confidence, and from Phase 2 the document's sha256, so anyone can audit it.
@@ -40,20 +40,21 @@ To ensure accountability and prevent misclassification:
 * **Escalation:**
    * Unclear documents are marked `needs_review` and reported as a warning in the result, so any workflow or consumer sees them. This covers a confidence below the threshold, poor or partial text extraction, and answers that contradict each other.
    * Documents with no extractable text are refused with a clear input error.
-   * Whoever consumes the result routes `needs_review` documents to a person. We don't ship an Op with a human approval Gate (decision 6). Who reviews is still to be named.
+   * Whoever consumes the result routes `needs_review` documents to a person. We don't ship an Op with a human approval Gate (decision 6). Who reviews is configurable: whoever deploys the Cog maps each document group to a reviewer queue, with a default (#5).
 * **Accountability:** Every result records:
    * which model answered, and whether it was Jev or an LLM;
    * every typed answer;
    * the document's sha256, from Phase 2.
 
    So any classification can be traced and replayed.
-* **Guards:** five independent checks run on every result. They're defined in the taxonomy Frame, with what happens when each fails:
-   * no document text and no personal identifiers in the output;
+* **Guards:** five independent checks that every result must pass. They're defined in the taxonomy Frame, with what happens when each fails:
+   * no document text in the output;
+   * no personal identifiers in the output;
    * only the Frame's types and tags;
    * a result in review is reported as a warning;
    * a warning when an uncalibrated LLM answered.
 
-   A repository Guard also blocks committed secrets and real personal data. CI runs both on every push. The Op layer can't run Guards yet, so for now they run as scripts.
+   A repository Guard also blocks committed secrets and real personal data. CI runs both on every push; the output Guards check a sample result. The Op layer can't run Guards yet, and `ask-composed` doesn't run them either, so for now they run as scripts: in CI, and on every document in a benchmark run. Live results will need the same check before we go live.
 * **Terminology:** We use the suite's terms:
    * **contract checks** are the Cog's checks of its own output;
    * **Guards** are independent checkers run by the wider system;
@@ -74,7 +75,7 @@ To ensure accountability and prevent misclassification:
    * Measure accuracy and calibration for each model, and tune the thresholds.
    * Save real model answers as replay tests, so the policy stays tested without calling a model.
 * **Guards:** Define the Guards and their failure behaviour in the Frame, and keep `guards/` in step with them.
-* **Stakeholder Alignment:** Lead project updates with Trent, Inessa, and the broader team, including decision 2 and naming who reviews.
+* **Stakeholder Alignment:** Lead project updates with Trent, Inessa, and the broader team, including decisions 2 and 6.
 
 **Francis: Lead for Package Engineering, Extraction & Work Contract**
 
@@ -108,12 +109,12 @@ To ensure accountability and prevent misclassification:
    * Build the extraction module. Its limits:
       * up to 512 KiB of text per document, and about 8,000 tokens for local Qwen;
       * 240 seconds for each stage of our code.
-   * Settle decision 2, then set up the provider in cog-workbench.
+   * Settle decision 2, then set up the provider in cog-workbench. *(Decision 2 settled 15 Oct 2026: local Qwen. Setting it up is #6.)*
 * **Phase 3: Decision Policy & Review** *(started early)*
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
-   * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Naming who reviews is with Trent and Inessa.)*
-   * Add Guards to the Frame and run them on every result. *(Done 13 Oct 2026, after the 12 October sync.)*
+   * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Who reviews is configurable per document group, as Trent advised on 15 Oct; the design is in #5.)*
+   * Add Guards to the Frame and run them on every result. *(Defined 13 Oct 2026, after the 12 October sync. They run in CI and in benchmark runs; running them on live results is still to do, in #20.)*
 * **Phase 4: Benchmarks, Validation & Handoff** *(benchmark set started early)*
    * Build the benchmark set. *(Started 13 Oct 2026: 47 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Growing to about 100.)*
    * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
@@ -124,18 +125,18 @@ To ensure accountability and prevent misclassification:
 **5. Open Decisions**
 
 1. **Which cog-smith version:** *settled 12 Oct 2026.* The suite's pins moved on 10 October to include the newer cog-smith, with input warnings and test-fixture export (decision machinery 0.1.4). We build on the suite's current pins.
-2. **Cloud Jev or local Qwen:** Jev sends the extracted text to TypeSafe. Contracts and résumés hold personal data. Owners: Trent & Inessa. Needed before Phase 2.
+2. **Cloud Jev or local Qwen:** *settled 15 Oct 2026: local Qwen.* Trent has no company TypeSafe key, and a Jev key needs prepaid credit, so we chose local Qwen as a team. It's free, needs no key, and documents never leave our machines. Its confidence isn't calibrated, so the review threshold is tuned on the benchmark set (#8). The fallbacks are Jev, and Kev, an open-weight Jev-like model with Jev's API. Trent was told on 15 Oct and can still object.
 3. **What "metadata" covers:** *settled 13 Oct 2026 by Precious and Francis.* File and extraction facts only: file type, page count, size, sha256, and whether OCR was used. Content fields such as invoice numbers need a model that writes text, so they're left to the specialised Cogs downstream. Shared with Trent & Inessa, who can still object.
 4. **How documents arrive:** a file path with its sha256 recorded, or the file embedded in the input; plus the supported formats and maximum length. Owner: Francis. Needed before the input schema is fixed.
 5. **Tag vocabulary:** *settled 12 Oct 2026.* 16 tags, confirmed by Precious, are listed in the taxonomy Frame.
-6. **What review looks like:** *settled 13 Oct 2026 by Precious and Francis.* Flag and route: the Cog marks uncertain documents `needs_review`, with reasons and a warning, and whichever workflow uses the result sends them to a person. There's no Op with a human approval Gate, which would pause for every document. Shared with Trent & Inessa, who can still object. **Still open:** who reviews, which we've asked Trent & Inessa.
+6. **What review looks like:** *settled 13 Oct 2026 by Precious and Francis.* Flag and route: the Cog marks uncertain documents `needs_review`, with reasons and a warning, and whichever workflow uses the result sends them to a person. There's no Op with a human approval Gate, which would pause for every document. Shared with Trent & Inessa, who can still object. Who reviews is configurable per document group, as Trent advised on 15 Oct; the design is in #5.
 
 **6. What Changed from v1**
 
 * **The `résumé` type ID:** it becomes ASCII `resume`. "Résumé" stays as the label.
 * **Bank statements:** added as a sixth type, `bank_statement`, on 13 October 2026. At the 5 October sync, Francis described bank and transaction history as in scope.
 * **"Compute a classification confidence score":** the Cog now reports the model's confidence and applies a threshold.
-* **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog. Real Guards were added separately on 13 October: they're defined in the Frame and check every result.
+* **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog. Real Guards were added separately on 13 October: they're defined in the Frame, and every result must pass them.
 * **Human Approval Gate, "immediately diverted":** the Cog now sets a `needs_review` flag and reports a warning, and the consumer routes on it. The suite's human Gate pauses every run and cannot route selectively. Decision 6 settled it: no Op with a human Gate.
 * **`cog.md` with the schemas inside:** it becomes `COG.md`, with the schemas in `context/*.json` and the questions in `questions.json`.
 * **Harness development and model binding:** this becomes an extraction module plus provider setup. The suite's host connects the model.

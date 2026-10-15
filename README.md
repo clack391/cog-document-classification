@@ -35,14 +35,14 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   - review is also reported to workflows as a warning.
 - Tests that keep the Frame, the questions, the policy and the output schema in
   agreement.
-- Guards that check every result independently, and a repository Guard. See
+- Guards that check results independently of the Cog, and a repository Guard. See
   [Guards](#guards).
 - The [benchmark set](benchmarks/README.md): 47 labeled synthetic documents
   covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
   is checked offline today and runs live once a model is connected.
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
-  the System One adapter) match its requirements. Neither is set up yet;
-  choosing one is decision 2.
+  the System One adapter) match its requirements. Decision 2 chose local Qwen
+  through the System One adapter; connecting it is #6.
 
 **What is provisional**
 - The input is the document's extracted text. File input and extraction come
@@ -54,7 +54,9 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
 
 **Review works by flagging (decision 6):** a document the Cog is unsure of is
 marked `needs_review` with its reasons and a warning, and whichever workflow
-uses the result sends it to a person. Who reviews is still to be named.
+uses the result sends it to a person. Who reviews will be configurable:
+whoever deploys the Cog maps each document group to a reviewer queue, with a
+default (#5).
 
 See the [proposal](docs/proposal.md) for the plan, the phases and the open
 decisions.
@@ -118,15 +120,15 @@ pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample
 `prepare` shows what would be sent to the model. `replay` decides from saved
 answers.
 
-Live runs need a model provider admitted in cog-workbench: TypeSafe's Jev in the
-cloud, or local Qwen through the System One adapter. Which one we use is still
-open; see the proposal. Until a provider is activated, `pixi run ask-composed`
+Live runs need a model provider admitted in cog-workbench. We use local Qwen
+through the System One adapter (decision 2). The fallbacks are TypeSafe's Jev in
+the cloud, and Kev, an open-weight Jev-like model; see the proposal. Until a provider is activated, `pixi run ask-composed`
 stops with an error that `.op-composition.json` is missing. That file is
 written when Workbench activates a provider for this Cog.
 
 ## Guards
 
-Guards check every result independently of the Cog. They read the
+Guards check the Cog's results independently of the Cog. They read the
 [Frame](taxonomy/document-taxonomy.frame.md), the input and the result, and
 nothing from the Cog's own code. The Frame's Guards section lists each check
 and what happens when it fails:
@@ -135,7 +137,7 @@ and what happens when it fails:
 |---|---|---|
 | `no-document-text` | The result repeats no passage of the document | Fail |
 | `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers. The caller's own document ID isn't checked, as long as it matches the input. | Fail |
-| `known-vocabulary` | Types and tags come from the Frame, and a result in review has no type | Fail |
+| `known-vocabulary` | Types and tags come from the Frame, type tags appear only with their own type, and a result in review has no type and at least one reason | Fail |
 | `review-is-visible` | A result in review is reported as a warning | Fail |
 | `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |
 
@@ -144,8 +146,10 @@ ones before they're committed. It looks for credentials, keys and `.env` files,
 and for personal identifiers in sample, test and benchmark data. Reserved
 fictional contact details (`example.com` emails, UK drama numbers, US
 555-01xx) are allowed in that data.
-CI runs both on every push. The Op layer can't run Guards yet, so for now they
-run as scripts:
+CI runs both on every push; the output Guards check the sample result, and
+every benchmark run checks every document. The Op layer can't run Guards yet,
+and `ask-composed` doesn't run them either, so a live result is checked only
+when you run the output Guards on it:
 
 ```bash
 pixi run python guards/repo_guard.py
@@ -161,6 +165,20 @@ the repo and out of AI tools.
 - **Precious:** taxonomy, quality criteria, the confidence policy and
   escalation, and benchmarks.
 - **Francis:** package engineering, the work contract, and extraction.
+
+## How we work
+
+`main` is protected, and the rules apply to both of us:
+- Work on a branch, then open a pull request.
+- The other person reviews and approves it. A new commit clears the approval,
+  so it needs approving again.
+- Both CI checks, on Linux and macOS, must pass before merging.
+- No direct pushes or force-pushes to `main`.
+- Squash and merge when a pull request has review-fix commits, so `main` gets
+  one clear commit. Rebase and merge when each commit stands on its own.
+- Only synthetic or public documents go in the repo. See [Guards](#guards) and
+  the [benchmark rules](benchmarks/README.md#rules).
+- No Claude co-author lines in commits or pull requests.
 
 ## Documents
 
