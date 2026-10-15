@@ -19,8 +19,11 @@ read and test.
 
 ## Status
 
-Phase 1, in progress. The package passes Smith's checks and its offline tests
-on the suite's current pins, and CI runs both on Linux and macOS for every push.
+Phase 1 is done apart from the final input format (decision 4, #2). Phase 2,
+extraction and connecting the model, is next. Much of Phases 3 and 4 is done
+early: the decision policy, the Guards and the benchmark set. The package
+passes Smith's checks and its offline tests on the suite's current pins, and
+CI runs both on Linux and macOS for every push.
 
 **What works**
 - [`COG.md`](COG.md), the human-readable contract: what the Cog decides, its
