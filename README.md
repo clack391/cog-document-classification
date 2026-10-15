@@ -146,9 +146,10 @@ ones before they're committed. It looks for credentials, keys and `.env` files,
 and for personal identifiers in sample, test and benchmark data. Reserved
 fictional contact details (`example.com` emails, UK drama numbers, US
 555-01xx) are allowed in that data.
-CI runs both on every push; the output Guards check the sample result. The
-Op layer can't run Guards yet, and `ask-composed` doesn't run them either, so
-a live result is checked only when you run the output Guards on it:
+CI runs both on every push; the output Guards check the sample result, and
+every benchmark run checks every document. The Op layer can't run Guards yet,
+and `ask-composed` doesn't run them either, so a live result is checked only
+when you run the output Guards on it:
 
 ```bash
 pixi run python guards/repo_guard.py

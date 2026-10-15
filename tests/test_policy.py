@@ -120,14 +120,15 @@ class Inputs(unittest.TestCase):
             cog_core.prepare({"document_id": "doc-1", "text": "   \n "})
 
 
-
 class ContractDocument(unittest.TestCase):
     def test_cog_md_states_the_thresholds_decide_uses(self):
         text = (ROOT / "COG.md").read_text(encoding="utf-8")
         stated = {name: float(value) for name, value in re.findall(r"`([A-Z_]+)` = ([0-9]+(?:\.[0-9]+)?)", text)}
-        used = {name: getattr(task_logic, name) for name in
-                ("MIN_TYPE_CONFIDENCE", "TAG_THRESHOLD", "MIN_LEGIBLE", "CONTRADICTION", "INVOICE_MIN_AMOUNTS")}
-        self.assertEqual(stated, used, "update COG.md when a threshold changes")
+        # Every threshold in the decision code, so one added only to the code fails too.
+        used = {name: value for name, value in vars(task_logic).items()
+                if name.isupper() and isinstance(value, float)}
+        self.assertEqual(stated, used, "COG.md must state every threshold in src/task_logic.py, with its value")
+
 
 if __name__ == "__main__":
     unittest.main()

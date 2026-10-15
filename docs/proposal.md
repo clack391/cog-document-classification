@@ -48,7 +48,8 @@ To ensure accountability and prevent misclassification:
 
    So any classification can be traced and replayed.
 * **Guards:** five independent checks that every result must pass. They're defined in the taxonomy Frame, with what happens when each fails:
-   * no document text and no personal identifiers in the output;
+   * no document text in the output;
+   * no personal identifiers in the output;
    * only the Frame's types and tags;
    * a result in review is reported as a warning;
    * a warning when an uncalibrated LLM answered.
