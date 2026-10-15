@@ -32,7 +32,7 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   - review is also reported to workflows as a warning.
 - Tests that keep the Frame, the questions, the policy and the output schema in
   agreement.
-- Guards that check every result independently, and a repository Guard. See
+- Guards that check results independently of the Cog, and a repository Guard. See
   [Guards](#guards).
 - The [benchmark set](benchmarks/README.md): 47 labeled synthetic documents
   covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
@@ -126,7 +126,7 @@ written when Workbench activates a provider for this Cog.
 
 ## Guards
 
-Guards check every result independently of the Cog. They read the
+Guards check the Cog's results independently of the Cog. They read the
 [Frame](taxonomy/document-taxonomy.frame.md), the input and the result, and
 nothing from the Cog's own code. The Frame's Guards section lists each check
 and what happens when it fails:
@@ -135,7 +135,7 @@ and what happens when it fails:
 |---|---|---|
 | `no-document-text` | The result repeats no passage of the document | Fail |
 | `no-personal-identifiers` | The result holds no email addresses, phone, card or IBAN numbers, or US Social Security numbers. The caller's own document ID isn't checked, as long as it matches the input. | Fail |
-| `known-vocabulary` | Types and tags come from the Frame, and a result in review has no type | Fail |
+| `known-vocabulary` | Types and tags come from the Frame, type tags appear only with their own type, and a result in review has no type and at least one reason | Fail |
 | `review-is-visible` | A result in review is reported as a warning | Fail |
 | `calibrated-answers` | The answers came from a calibrated System One model, not an LLM | Warn |
 
@@ -144,8 +144,9 @@ ones before they're committed. It looks for credentials, keys and `.env` files,
 and for personal identifiers in sample, test and benchmark data. Reserved
 fictional contact details (`example.com` emails, UK drama numbers, US
 555-01xx) are allowed in that data.
-CI runs both on every push. The Op layer can't run Guards yet, so for now they
-run as scripts:
+CI runs both on every push; the output Guards check the sample result. The
+Op layer can't run Guards yet, and `ask-composed` doesn't run them either, so
+a live result is checked only when you run the output Guards on it:
 
 ```bash
 pixi run python guards/repo_guard.py

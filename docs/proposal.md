@@ -47,13 +47,13 @@ To ensure accountability and prevent misclassification:
    * the document's sha256, from Phase 2.
 
    So any classification can be traced and replayed.
-* **Guards:** five independent checks run on every result. They're defined in the taxonomy Frame, with what happens when each fails:
+* **Guards:** five independent checks that every result must pass. They're defined in the taxonomy Frame, with what happens when each fails:
    * no document text and no personal identifiers in the output;
    * only the Frame's types and tags;
    * a result in review is reported as a warning;
    * a warning when an uncalibrated LLM answered.
 
-   A repository Guard also blocks committed secrets and real personal data. CI runs both on every push. The Op layer can't run Guards yet, so for now they run as scripts.
+   A repository Guard also blocks committed secrets and real personal data. CI runs both on every push; the output Guards check a sample result. The Op layer can't run Guards yet, and `ask-composed` doesn't run them either, so for now they run as scripts: in CI, and on every document in a benchmark run. Live results will need the same check before we go live.
 * **Terminology:** We use the suite's terms:
    * **contract checks** are the Cog's checks of its own output;
    * **Guards** are independent checkers run by the wider system;
@@ -113,7 +113,7 @@ To ensure accountability and prevent misclassification:
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
    * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Naming who reviews is with Trent and Inessa.)*
-   * Add Guards to the Frame and run them on every result. *(Done 13 Oct 2026, after the 12 October sync.)*
+   * Add Guards to the Frame and run them on every result. *(Defined 13 Oct 2026, after the 12 October sync. They run in CI and in benchmark runs; running them on live results is still to do, in #20.)*
 * **Phase 4: Benchmarks, Validation & Handoff** *(benchmark set started early)*
    * Build the benchmark set. *(Started 13 Oct 2026: 47 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Growing to about 100.)*
    * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
@@ -135,7 +135,7 @@ To ensure accountability and prevent misclassification:
 * **The `résumé` type ID:** it becomes ASCII `resume`. "Résumé" stays as the label.
 * **Bank statements:** added as a sixth type, `bank_statement`, on 13 October 2026. At the 5 October sync, Francis described bank and transaction history as in scope.
 * **"Compute a classification confidence score":** the Cog now reports the model's confidence and applies a threshold.
-* **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog. Real Guards were added separately on 13 October: they're defined in the Frame and check every result.
+* **Confidence Guard:** it becomes the Confidence Policy, because in the suite a "Guard" is an independent checker outside the Cog. Real Guards were added separately on 13 October: they're defined in the Frame, and every result must pass them.
 * **Human Approval Gate, "immediately diverted":** the Cog now sets a `needs_review` flag and reports a warning, and the consumer routes on it. The suite's human Gate pauses every run and cannot route selectively. Decision 6 settled it: no Op with a human Gate.
 * **`cog.md` with the schemas inside:** it becomes `COG.md`, with the schemas in `context/*.json` and the questions in `questions.json`.
 * **Harness development and model binding:** this becomes an extraction module plus provider setup. The suite's host connects the model.
