@@ -20,7 +20,7 @@ The Document Classification Cog serves as the "front door" for incoming document
    * marks any document it cannot classify reliably as `needs_review`, with reasons.
 * **How It Works:**
    * The model answers narrow questions with probabilities. The Cog's own code turns those answers into the classification and applies our thresholds.
-   * The suite's local host (cog-workbench) and a model provider connect the model. The Cog never chooses its own model. The provider is local Qwen through the System One adapter (decision 2), with Jev as the fallback.
+   * The suite's local host (cog-workbench) and a model provider connect the model. The Cog never chooses its own model. The provider is local Qwen through the System One adapter (decision 2), with Jev or Kev as the fallback.
 * **System Impact:**
    * The Cog is read-only: it never writes, sends or modifies anything outside its own result, and it declares these prohibitions in its manifest.
    * Downstream workflows get a classification they can route on. Each result carries the model, its answers and the confidence, and from Phase 2 the document's sha256, so anyone can audit it.

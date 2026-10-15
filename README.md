@@ -121,8 +121,8 @@ pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample
 answers.
 
 Live runs need a model provider admitted in cog-workbench. We use local Qwen
-through the System One adapter (decision 2), and TypeSafe's Jev in the cloud is
-the fallback; see the proposal. Until a provider is activated, `pixi run ask-composed`
+through the System One adapter (decision 2). The fallbacks are TypeSafe's Jev in
+the cloud, and Kev, an open-weight Jev-like model; see the proposal. Until a provider is activated, `pixi run ask-composed`
 stops with an error that `.op-composition.json` is missing. That file is
 written when Workbench activates a provider for this Cog.
 

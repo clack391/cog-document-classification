@@ -171,7 +171,8 @@ the envelope binding carries the host's full composition provenance.
 every provider for now. Treat answers from the adapter as weaker evidence.
 The `calibrated-answers` Guard warns when an LLM answered. We use local Qwen
 through the adapter (decision 2), so the thresholds will be tuned for its
-answers on the benchmark set (#8).
+answers on the benchmark set (#8). While we use Qwen, every live result
+carries the `calibrated-answers` warning. That's expected, not a fault.
 
 ## Using it
 
