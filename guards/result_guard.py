@@ -31,6 +31,10 @@ PHONE = re.compile(r"\+?\(?\d[\d\s().-]{8,18}\d")
 # a digit or +, or after a digit followed by - or . ("2026-0142"). After a letter
 # or other punctuation is fine: "Tel.020 7946 0123", "Call(020) 7946 0123".
 PHONE_START = re.compile(r"(?<![\d+])(?<!\d[.-])[+(]?\d")
+# A money amount ("350.00", "1,020.00", "1020.00", "0.84"): digits, then exactly two
+# decimals. Amounts never start with 0 except "0.xx", while phone numbers do
+# ("06.12 34 56 78"); "312.555.0164" has more digits after its dot. Neither is an amount.
+MONEY = re.compile(r"(?<![\w.,])(?:0|[1-9]\d{0,2}(?:,\d{3})+|[1-9]\d*)\.\d{2}(?![\w.])")
 
 
 def _luhn(digits):
@@ -84,17 +88,24 @@ def _phone_candidates(text):
             pos = begin + len(span)
 
 
+def _without_amounts(text):
+    """The text with every money amount blanked out, keeping its length, so
+    columns of amounts are never read as phone or card numbers."""
+    return MONEY.sub(lambda m: "#" * len(m.group()), text)
+
+
 def identifier_matches(text):
     """(kind, matched text) for every personal identifier found. Pattern-based:
     it catches common formats, not every possible identifier."""
     found = [("email address", m.group()) for m in EMAIL.finditer(text)]
     found += [("US Social Security number", m.group()) for m in US_SSN.finditer(text)]
-    for m in CARD.finditer(text):
+    numbers = _without_amounts(text)
+    for m in CARD.finditer(numbers):
         digits = re.sub(r"\D", "", m.group())
         if 13 <= len(digits) <= 19 and _luhn(digits):
             found.append(("payment card number", m.group()))
     found += [("IBAN", m.group()) for m in IBAN.finditer(text) if _iban_valid(m.group())]
-    found += [("phone number", c) for c in _phone_candidates(text)]
+    found += [("phone number", c) for c in _phone_candidates(numbers)]
     return found
 
 

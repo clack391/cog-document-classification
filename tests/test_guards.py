@@ -89,6 +89,26 @@ class OutputGuards(unittest.TestCase):
         env["payload"]["decision"]["document_id"] = "jo" + "@" + "mailhost.co.uk"
         self.assertEqual(statuses(env, b)[1]["no-personal-identifiers"], "fail")
 
+    def test_amounts_in_a_table_are_not_a_phone_or_card_number(self):
+        for text in ("350.00       128.20", "1,020.00       718.15", "1020.00       718.15",
+                     "GBP 99.50 12.40 7.25", "Laptop setup   3   65.00   195.00", "2   185.00   370.00"):
+            with self.subTest(text=text):
+                self.assertEqual(result_guard.identifier_matches(text), [])
+
+    def test_a_phone_number_next_to_amounts_is_still_found_exactly(self):
+        cases = {"Total 35.00 07700 " + "900123": "07700 900123",
+                 "Total 35.00 020 " + "7946 0123": "020 7946 0123",
+                 "Paid 1234.50 020 " + "7946 0123": "020 7946 0123",
+                 "128.20 1020.00 07700 " + "900123": "07700 900123"}
+        for text, phone in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(result_guard.identifier_matches(text), [("phone number", phone)])
+
+    def test_phone_numbers_that_contain_dots_are_still_found(self):
+        for text in ("call 312." + "555.0164", "appelez le 06.12 " + "34 56 78"):
+            with self.subTest(text=text):
+                self.assertIn("phone number", result_guard.personal_identifiers(text))
+
     def test_numbers_right_after_a_letter_or_punctuation_are_found(self):
         for text in ("Tel.020 " + "7946 0123", "Call(020) " + "7946 0123",
                      "ph-07911 " + "123456", "tel_07911 " + "123456"):
