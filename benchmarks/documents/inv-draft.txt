@@ -1,0 +1,20 @@
+DRAFT: NOT FOR PAYMENT
+This invoice has not been issued. Please check it and tell us of any changes.
+
+Greenfold Office Interiors
+18 Mill Lane, Bath XB2 3DX
+
+INVOICE
+
+Invoice number: (assigned when issued)
+Customer: Harbour Lane Studio Ltd, 3 Quay Street, Bristol XB1 4DB
+Your purchase order: 77214
+
+Description                                   Qty    Unit price        Amount
+Height-adjustable desk, 160 cm                   6    GBP 420.00   GBP 2,520.00
+Task chair, mesh back                            6    GBP 185.00   GBP 1,110.00
+Delivery and installation                        1    GBP 240.00     GBP 240.00
+
+Subtotal                                                          GBP 3,870.00
+VAT at 20%                                                          GBP 774.00
+Total                                                             GBP 4,644.00

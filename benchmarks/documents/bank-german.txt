@@ -1,0 +1,20 @@
+DOMSTADT BANK eG
+Kontoauszug Nr. 9/2026
+
+Kontoinhaber: Jonas Weber
+Lindenallee 8, 00809 München
+Konto: Girokonto, Kontonummer 6620194
+Zeitraum: 01.09.2026 bis 30.09.2026
+
+Datum   Buchungstext                                  Betrag (EUR)   Saldo (EUR)
+        Alter Kontostand                                               1.532,10
+01.09.  Gehalt LINDENHOF DRUCKEREI GMBH            +2.840,00    4.372,10
+01.09.  Dauerauftrag Miete                           -890,00    3.482,10
+03.09.  Lastschrift Stadtwerke Strom                  -74,50    3.407,60
+08.09.  Kartenzahlung Supermarkt                      -63,18    3.344,42
+15.09.  Kartenzahlung Fotobedarf München             -129,90    3.214,52
+22.09.  Überweisung an J. Weber Sparkonto            -300,00    2.914,52
+28.09.  Kartenzahlung Supermarkt                      -48,77    2.865,75
+        Neuer Kontostand                                               2.865,75
+
+Bitte prüfen Sie Ihren Kontoauszug. Einwendungen müssen innerhalb von sechs Wochen erhoben werden.

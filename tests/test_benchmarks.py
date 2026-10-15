@@ -234,13 +234,22 @@ class Scoring(Workspace):
         self.assertEqual(report["by_document"]["inv-standard"]["judged"], "unnecessary_review")
 
     def test_the_sweep_finds_the_threshold_that_removes_silent_errors(self):
+        # Enough wrong answers to break the silent error target at any set
+        # size: one more than 2% of the documents. Each states amounts, or the
+        # invoice-without-amounts rule would send it to review instead.
+        target = bench.targets()["silent_error_rate_max"]
+        count = int(target * len(ROWS)) + 1
+        wrong = [r for r in ROWS if r["expected"] == "other" and "invoice" not in r["alternatives"]
+                 and "contains_financial_amounts" in r["tags"]][:count]
+        self.assertEqual(len(wrong), count, "not enough `other` documents with amounts to plant")
         results = {r["id"]: oracle_result(r) for r in ROWS}
-        wrong = next(r for r in ROWS if r["id"] == "quote")
-        results["quote"] = oracle_result(wrong, top="invoice", probability=0.75)   # confidence 0.70
+        for row in wrong:
+            results[row["id"]] = oracle_result(row, top="invoice", probability=0.75)   # confidence 0.70
         report = score.score(self.run_with(results))
         self.assertEqual(report["overall"]["silent_errors"], [])                # 0.70 < 0.85 already
         points = {p["threshold"]: p for p in report["threshold_sweep"]["points"]}
-        self.assertEqual(points[0.6]["silent_errors"], 1)
+        self.assertEqual(points[0.6]["silent_errors"], count)
+        self.assertGreater(points[0.6]["silent_error_rate"], target)
         self.assertEqual(points[0.75]["silent_errors"], 0)
         rates = [p["review_rate"] for p in report["threshold_sweep"]["points"]]
         self.assertEqual(rates, sorted(rates), "review rate must not fall as the threshold rises")

@@ -1,0 +1,17 @@
+De : Camille Roux <camille.roux@example.net>
+À : support@ledgerly.example.com
+Objet : Impossible d'importer mon relevé bancaire
+
+Bonjour,
+
+Depuis la mise à jour de lundi, l'import de mon relevé bancaire au format CSV ne fonctionne plus. Après avoir choisi le fichier, j'obtiens le message « Erreur 422 : format non reconnu », alors que j'utilise le même export de ma banque depuis deux ans.
+
+Étapes pour reproduire :
+1. Aller dans Banque > Importer un relevé.
+2. Choisir le fichier CSV exporté depuis ma banque.
+3. Cliquer sur « Importer ».
+
+Pouvez-vous corriger ce problème ?
+
+Merci d'avance,
+Camille Roux

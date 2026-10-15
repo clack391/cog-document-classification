@@ -1,0 +1,28 @@
+DATA PROCESSING AGREEMENT
+Version for signature, 12 October 2026
+
+This Agreement is between Harbour Lane Studio Ltd (the "Controller") and Ledgerly Software Ltd (the "Processor"). It forms part of the Ledgerly Plus subscription between them.
+
+1. Subject matter
+The Processor processes personal data only to provide the Ledgerly Plus service, and only on the Controller's documented instructions.
+
+2. Types of data
+Names and contact details of the Controller's customers and suppliers, and payroll details of the Controller's staff.
+
+3. Security
+The Processor shall keep appropriate technical and organisational measures in place, including encryption of data at rest and in transit.
+
+4. Sub-processors
+The Processor shall not appoint a new sub-processor without giving the Controller 30 days' notice and a chance to object.
+
+5. Personal data breaches
+The Processor shall notify the Controller of a personal data breach without undue delay, and in any case within 48 hours of becoming aware of it.
+
+6. End of processing
+When the subscription ends, the Processor shall delete or return all personal data, as the Controller chooses.
+
+7. Governing law
+This Agreement is governed by the laws of England and Wales.
+
+Signed for Harbour Lane Studio Ltd: ____________________   Name: Priya Raman, Managing Director   Date: ____________
+Signed for Ledgerly Software Ltd:   ____________________   Name: Rachel Doyle, Commercial Director   Date: ____________

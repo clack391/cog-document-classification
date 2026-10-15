@@ -1,0 +1,31 @@
+SUPPLY AGREEMENT
+
+Supplier: Tidewater Audio Supplies Ltd, 22 Harbour Road, Plymouth XP1 3TP
+Customer: Harbour Lane Studio Ltd, 3 Quay Street, Bristol XB1 4DB
+
+1. Term
+This Agreement starts on 1 September 2026 and runs for 12 months.
+
+2. Products and prices
+2.1 The Supplier will supply audio equipment and accessories from its current price list.
+2.2 The Customer gets a discount of 8% on list prices on every order over GBP 250.
+
+3. Orders and delivery
+3.1 The Customer orders by email. Each accepted order is a separate contract on these terms.
+3.2 The Supplier will deliver in-stock items within 5 working days of accepting an order.
+
+4. Payment
+The Supplier will invoice on delivery. Invoices are payable within 30 days.
+
+5. Returns
+Faulty items may be returned within 30 days of delivery for repair, replacement or a refund.
+
+6. Governing law
+This Agreement is governed by the laws of England and Wales.
+
+ELECTRONIC SIGNATURE CERTIFICATE
+Document: Supply Agreement, Tidewater Audio Supplies Ltd and Harbour Lane Studio Ltd
+Envelope ID: TAS-SA-2026-07
+Signed by Owen Pryce, Sales Director (owen.pryce@tidewater.example.com) on 3 September 2026 at 10:42 BST
+Signed by Priya Raman, Managing Director (priya.raman@harbourlane.example.com) on 4 September 2026 at 16:05 BST
+Status: completed. Both signers verified their email address before signing.

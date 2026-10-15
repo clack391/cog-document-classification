@@ -1,0 +1,59 @@
+FELLSIDE BANK
+Current Account Statement
+
+Mr Rhys Morgan
+12 Pen-y-lan Terrace, Cardiff XC23 5QL
+
+Account number: 60228417
+Statement period: 1 September 2026 to 30 September 2026
+
+Page 1 of 3
+Date      Description                               Paid out     Paid in      Balance
+01 Sep    Opening balance                                                       318.92
+01 Sep    Salary CARDIFF FOOD SHARE                             1,420.00     1,738.92
+01 Sep    Faster payment from BRIGHTSPARK DIGITAL                  650.00     2,388.92
+01 Sep    Standing order RENT                         725.00                 1,663.92
+02 Sep    Direct debit NORTHGATE ENERGY                68.20                 1,595.72
+03 Sep    Direct debit PHONE CONTRACT                  18.00                 1,577.72
+05 Sep    Direct debit COUNCIL TAX                    131.00                 1,446.72
+05 Sep    Card payment GREENWAY GROCERS                31.40                 1,415.32
+06 Sep    Card payment CITY RAIL                       12.40                 1,402.92
+07 Sep    Card payment CAFE ON QUEEN ST                 4.20                 1,398.72
+08 Sep    Contactless BUS CARDIFF                       2.00                 1,396.72
+09 Sep    Card payment GREENWAY GROCERS                18.75                 1,377.97
+10 Sep    Card payment CITY RAIL                        8.90                 1,369.07
+11 Sep    Card payment CAFE ON QUEEN ST                 3.90                 1,365.17
+12 Sep    Contactless BUS CARDIFF                       2.00                 1,363.17
+12 Sep    Cash withdrawal                              30.00                 1,333.17
+13 Sep    Card payment GREENWAY GROCERS                42.10                 1,291.07
+
+Page 2 of 3
+Mr Rhys Morgan, account number 60228417, statement period September 2026 (continued)
+Date      Description                               Paid out     Paid in      Balance
+14 Sep    Card payment CITY RAIL                       12.40                 1,278.67
+15 Sep    Card payment CAFE ON QUEEN ST                 6.75                 1,271.92
+16 Sep    Contactless BUS CARDIFF                       2.00                 1,269.92
+17 Sep    Card payment GREENWAY GROCERS                27.85                 1,242.07
+18 Sep    Card payment CITY RAIL                       15.20                 1,226.87
+19 Sep    Card payment CAFE ON QUEEN ST                 4.20                 1,222.67
+19 Sep    Cash withdrawal                              30.00                 1,192.67
+20 Sep    Contactless BUS CARDIFF                       2.00                 1,190.67
+21 Sep    Card payment GREENWAY GROCERS                35.60                 1,155.07
+22 Sep    Card payment CAFE ON QUEEN ST                 5.10                 1,149.97
+23 Sep    Contactless BUS CARDIFF                       2.00                 1,147.97
+24 Sep    Card payment GREENWAY GROCERS                22.30                 1,125.67
+25 Sep    Contactless BUS CARDIFF                       2.00                 1,123.67
+26 Sep    Card payment GREENWAY GROCERS                31.40                 1,092.27
+26 Sep    Cash withdrawal                              30.00                 1,062.27
+27 Sep    Card payment CITY RAIL                       12.40                 1,049.87
+
+Page 3 of 3
+Mr Rhys Morgan, account number 60228417, statement period September 2026 (continued)
+Date      Description                               Paid out     Paid in      Balance
+28 Sep    Card payment CAFE ON QUEEN ST                 4.20                 1,045.67
+29 Sep    Contactless BUS CARDIFF                       2.00                 1,043.67
+29 Sep    Faster payment from R MORGAN SAVINGS                    200.00     1,243.67
+30 Sep    Card payment GREENWAY GROCERS                18.75                 1,224.92
+30 Sep    Closing balance                                                     1,224.92
+
+Money in: 2,270.00   Money out: 1,364.00

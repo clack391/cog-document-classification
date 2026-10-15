@@ -1,0 +1,28 @@
+SOFTWARE LICENCE AND SUPPORT AGREEMENT
+
+This Agreement is made on 1 August 2026 between Ledgerly Software Ltd ("Ledgerly") and Westgate Events Ltd (the "Customer").
+
+1. Definitions
+"Software" means Ledgerly Server, version 7, installed on the Customer's own systems.
+"Users" means the Customer's named staff who may use the Software.
+
+2. Licence
+2.1 Ledgerly grants the Customer a non-exclusive, non-transferable licence to use the Software for up to 25 Users for its internal business.
+2.2 The Customer shall not copy, modify or resell the Software.
+
+3. Fees
+3.1 The licence fee is GBP 6,000 a year, plus VAT, invoiced annually in advance.
+3.2 Support is included: Ledgerly will respond to critical faults within 4 working hours.
+
+4. Term and termination
+4.1 This Agreement runs for 3 years from 1 August 2026.
+4.2 Either party may terminate it if the other commits a material breach and doesn't remedy it within 30 days of notice.
+
+5. Liability
+Each party's total liability under this Agreement is limited to the fees paid in the previous 12 months.
+
+6. Governing law
+This Agreement is governed by the laws of England and Wales.
+
+Signed for Ledgerly Software Ltd: /s/ Rachel Doyle, Commercial Director    Date: 1 August 2026
+Signed for Westgate Events Ltd: /s/ Tom Ashby, Operations Director    Date: 1 August 2026

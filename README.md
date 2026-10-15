@@ -19,8 +19,11 @@ read and test.
 
 ## Status
 
-Phase 1, in progress. The package passes Smith's checks and its offline tests
-on the suite's current pins, and CI runs both on Linux and macOS for every push.
+Phase 1 is done apart from the final input format (decision 4, #2). Phase 2,
+extraction and connecting the model, is next. Much of Phases 3 and 4 is done
+early: the decision policy, the Guards and the benchmark set. The package
+passes Smith's checks and its offline tests on the suite's current pins, and
+CI runs both on Linux and macOS for every push.
 
 **What works**
 - [`COG.md`](COG.md), the human-readable contract: what the Cog decides, its
@@ -37,7 +40,7 @@ on the suite's current pins, and CI runs both on Linux and macOS for every push.
   agreement.
 - Guards that check results independently of the Cog, and a repository Guard. See
   [Guards](#guards).
-- The [benchmark set](benchmarks/README.md): 47 labeled synthetic documents
+- The [benchmark set](benchmarks/README.md): 94 labeled synthetic documents
   covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
   is checked offline today and runs live once a model is connected.
 - cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and

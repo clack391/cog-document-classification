@@ -1,0 +1,12 @@
+From: Elena Rossi <elena.rossi@vintravel.example.com>
+To: support@ledgerly.example.com
+Subject: URGENT: locked out of our account, payroll due today
+
+Hello,
+
+Our only admin user, our former finance manager, left the company last week, and nobody else has admin rights on our Ledgerly account. The rest of us can log in, but we can't approve this month's payroll.
+
+Payroll has to be submitted by 3 pm today or our 14 staff won't be paid on time. Please can you make me an admin, or tell me what you need from me to verify I'm a company director? I can send any documents you need straight away.
+
+Elena Rossi
+Finance Director, Vin Travel

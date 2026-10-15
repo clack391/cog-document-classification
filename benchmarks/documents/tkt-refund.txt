@@ -1,0 +1,12 @@
+From: Samuel Adebayo <sam.adebayo@example.net>
+To: help@streamflix.example.com
+Subject: Refund for a charge after I cancelled
+
+Hello,
+
+I cancelled my Streamflix subscription on 28 September, and I have the confirmation email. But I was still charged GBP 10.99 on 5 October for another month.
+
+Please refund the GBP 10.99 to the same card. My account email is the one I'm writing from.
+
+Thanks,
+Samuel Adebayo

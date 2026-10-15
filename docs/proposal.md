@@ -99,24 +99,24 @@ To ensure accountability and prevent misclassification:
 [ Phase 1: Contract & Questions ] ➔ [ Phase 2: Extraction & Provider ] ➔ [ Phase 3: Decision Policy & Review ] ➔ [ Phase 4: Benchmarks & Handoff ]
 ```
 
-* **Phase 1: Setup, Contract & Questions** *(in progress)*
+* **Phase 1: Setup, Contract & Questions** *(done apart from the final input schema, which waits on decision 4: #2)*
    * Create the Cog with `smith new --class decision`. *(Done 12 Oct 2026.)*
    * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(Done 12 Oct 2026: the working assumptions and 16 tags are confirmed, and the questions are in `context/questions.json`.)*
    * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. Decision 3 has settled what the metadata is, and its fields arrive with file input in Phase 2. The final input schema waits on decision 4. `COG.md` is written, from the proposal and the taxonomy Frame.)*
    * Smith validation passes from this phase onward. *(It passes, and CI runs it on Linux and macOS for every push.)*
-* **Phase 2: Extraction & Provider**
+* **Phase 2: Extraction & Provider** *(next: decision 2 is settled, connecting local Qwen is #6, and the extraction prototype is #3)*
    * Add the extraction dependencies to `pixi.toml` and commit `pixi.lock`.
    * Build the extraction module. Its limits:
       * up to 512 KiB of text per document, and about 8,000 tokens for local Qwen;
       * 240 seconds for each stage of our code.
    * Settle decision 2, then set up the provider in cog-workbench. *(Decision 2 settled 15 Oct 2026: local Qwen. Setting it up is #6.)*
-* **Phase 3: Decision Policy & Review** *(started early)*
+* **Phase 3: Decision Policy & Review** *(mostly done early: the policy, the review warning and the Guards are in place; the no-main-document rule (#19) and review routing (#5) are designed and agreed)*
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
    * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Who reviews is configurable per document group, as Trent advised on 15 Oct; the design is in #5.)*
    * Add Guards to the Frame and run them on every result. *(Defined 13 Oct 2026, after the 12 October sync. They run in CI and in benchmark runs; running them on live results is still to do, in #20.)*
 * **Phase 4: Benchmarks, Validation & Handoff** *(benchmark set started early)*
-   * Build the benchmark set. *(Started 13 Oct 2026: 47 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Growing to about 100.)*
+   * Build the benchmark set. *(Started 13 Oct 2026: 94 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Long documents, to test trimming, come with extraction.)*
    * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
    * Save real answers as replay tests.
    * Run the final validation with cog-smith (`check --tests` and `card`).

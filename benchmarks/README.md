@@ -25,7 +25,10 @@ The benchmark set has three jobs:
 - **Other details must not be real either.** UK postcodes start with `X`,
   which no real postcode does, so no address exists. German postcodes start
   with `00`, which none does. There are no company registration numbers or
-  sort codes, and the VAT numbers fail their check digits.
+  sort codes, and the VAT numbers fail their check digits. Organisation names
+  are invented too: before using a name for a bank, credit union, building
+  society or payment provider, search for it, so that no made-up statement
+  appears under a real institution's name.
 - **Public documents need a licence** that allows it, recorded in `source` as
   `public:<licence>`. They go in `benchmarks/external/`, which Git ignores, and
   labels point at them as `external/<file>`. Synthetic documents go in
@@ -36,19 +39,19 @@ The benchmark set has three jobs:
 
 ## What's in it
 
-The first batch has 47 synthetic text documents. They take the Cog's current
+The set has 94 synthetic text documents. They take the Cog's current
 input, plain text; file versions (PDF, DOCX, scans) come with extraction (#3).
 
 | Group | Documents | What it checks |
 |---|---|---|
-| Clear examples | 15: 2 per type, plus a payment reminder, a contract amendment and an urgent ticket | The basic definitions of all six types, and every type tag |
-| Frame rules | 32, covering all 30 rules (the unclear-type and garbled-text rules have two each) | See below |
+| Clear examples | 61: 11 or 12 for each of the five business types, and 2 for `other` | The basic definitions of all six types, and every type tag, across many formats and languages |
+| Frame rules | 33, covering all 30 rules (the unclear-type, garbled-text and multiple-documents rules have two each) | See below |
 
-The 32 rule documents include:
+The 33 rule documents include:
 - every boundary and borderline case in the Frame, such as a pro-forma
   invoice, offer letter, sales enquiry, supplier statement and payslip;
-- hard cases: OCR noise, German text, and an invoice with an unrelated page
-  attached;
+- hard cases: OCR noise, German text, an invoice with an unrelated page
+  attached, and a CV followed by its cover letter, which is still a résumé;
 - **5 that should go to review:**
   - an invoice, a bank statement page and a support ticket in one file, none
     of them the main one;
@@ -56,13 +59,24 @@ The 32 rule documents include:
   - a note whose attachment is missing;
   - a page that reads half invoice, half bank statement.
 
-In the 47 documents, the expected outcomes are 9 invoices, 5 contracts, 3
-résumés, 6 support tickets, 4 bank statements, 15 `other` and 5 reviews. The
-tune split has 30 documents and the test split 17. Every tag in the Frame is
-expected in at least one document.
+In the 94 documents, the expected outcomes are 18 invoices, 14 contracts, 13
+résumés, 15 support tickets, 14 bank statements, 15 `other` and 5 reviews, so
+`other` is 16% of the set. The tune split has 61 documents and the test split
+33. Every tag in the Frame is expected in at least one document.
 
-**Target size:** about 100 documents. That means 10–12 clear examples per
-type, plus very long documents, which test trimming once extraction exists.
+The clear examples cover different formats and situations, for example:
+- **invoices:** freelance, subscription, final notice, draft, French;
+- **contracts:** employment, lease and extension, loan, e-signed, Spanish, not yet signed;
+- **résumés:** graduate, career changer, anonymised, German, US;
+- **tickets:** chat transcript, phone log, email thread, French;
+- **bank statements:** business, joint, payment provider, ATM mini statement,
+  German, US, and a three-page statement.
+
+The people and companies recur across documents, and their details agree:
+the same address, account and payments wherever they appear.
+
+**Still to add:** very long documents, which test trimming once extraction
+exists (#3).
 
 ## Labeling: `labels.csv`
 
@@ -106,6 +120,12 @@ the policy tests instead.
 
 **Second labeler:** ideally Francis labels about 20 documents without looking
 at these labels first. Wherever you disagree, the Frame needs a clearer rule.
+The 46 clear examples added on 15 October were labeled blind a second time,
+from the Frame alone. The types agreed on all 46, and no tag was expected by
+one labeler and missing for the other. Each of the 6 borderline points it raised
+was reviewed: one tag became optional, one document got `other` as an
+alternative type, one document was made clearer, and three labels stayed as
+they were.
 
 ## Targets
 

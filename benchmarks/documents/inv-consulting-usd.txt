@@ -1,0 +1,27 @@
+LARKSPUR ANALYTICS INC.
+New York, NY, United States
+billing@larkspur.example.com | (212) 555-0147
+
+INVOICE
+
+Invoice number: LA-26-1193
+Invoice date: September 30, 2026
+Payment terms: Net 30
+Due date: October 30, 2026
+
+Bill to:
+Fernhill Biotech Ltd
+Accounts Payable, Cambridge, United Kingdom
+
+Project: Laboratory data analysis pilot (September 2026)
+
+Description                                      Quantity     Rate        Amount
+Data pipeline setup                                   1    $4,800.00    $4,800.00
+Statistical analysis, senior analyst (hours)         22      $185.00    $4,070.00
+Weekly results report                                 4      $350.00    $1,400.00
+
+Subtotal                                                               $10,270.00
+Sales tax (export of services)                                              $0.00
+Total due (USD)                                                        $10,270.00
+
+Please pay by international wire transfer. Include the invoice number with your payment.
