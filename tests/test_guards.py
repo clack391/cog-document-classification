@@ -4,6 +4,7 @@ are built at run time and written only to temporary folders."""
 import copy
 import inspect
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -39,6 +40,13 @@ def statuses(env, b=None):
 class OutputGuards(unittest.TestCase):
     def test_the_frame_and_the_code_name_the_same_guards(self):
         self.assertEqual(result_guard.frame_guards(FRAME_TEXT), list(result_guard.GUARDS))
+
+    def test_cog_md_and_the_readme_list_the_frames_guards(self):
+        for name in ("COG.md", "README.md"):
+            with self.subTest(file=name):
+                text = (ROOT / name).read_text(encoding="utf-8")
+                listed = re.findall(r"^\| `([a-z]+(?:-[a-z]+)+)` \|", text, re.M)
+                self.assertEqual(listed, result_guard.frame_guards(FRAME_TEXT))
 
     def test_the_sample_result_passes_every_guard(self):
         overall, each = statuses(envelope())

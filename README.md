@@ -163,6 +163,20 @@ the repo and out of AI tools.
   escalation, and benchmarks.
 - **Francis:** package engineering, the work contract, and extraction.
 
+## How we work
+
+`main` is protected, and the rules apply to both of us:
+- Work on a branch, then open a pull request.
+- The other person reviews and approves it. A new commit clears the approval,
+  so it needs approving again.
+- Both CI checks, on Linux and macOS, must pass before merging.
+- No direct pushes or force-pushes to `main`.
+- Squash and merge when a pull request has review-fix commits, so `main` gets
+  one clear commit. Rebase and merge when each commit stands on its own.
+- Only synthetic or public documents go in the repo. See [Guards](#guards) and
+  the [benchmark rules](benchmarks/README.md#rules).
+- No Claude co-author lines in commits or pull requests.
+
 ## Documents
 
 - [Proposal (v2)](docs/proposal.md)

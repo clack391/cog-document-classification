@@ -1,6 +1,7 @@
 """Decision policy, model-free: each case edits the saved answers and checks
 the decision code, not a model."""
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -118,6 +119,15 @@ class Inputs(unittest.TestCase):
         with self.assertRaises(ValueError):
             cog_core.prepare({"document_id": "doc-1", "text": "   \n "})
 
+
+
+class ContractDocument(unittest.TestCase):
+    def test_cog_md_states_the_thresholds_decide_uses(self):
+        text = (ROOT / "COG.md").read_text(encoding="utf-8")
+        stated = {name: float(value) for name, value in re.findall(r"`([A-Z_]+)` = ([0-9]+(?:\.[0-9]+)?)", text)}
+        used = {name: getattr(task_logic, name) for name in
+                ("MIN_TYPE_CONFIDENCE", "TAG_THRESHOLD", "MIN_LEGIBLE", "CONTRADICTION", "INVOICE_MIN_AMOUNTS")}
+        self.assertEqual(stated, used, "update COG.md when a threshold changes")
 
 if __name__ == "__main__":
     unittest.main()
