@@ -31,10 +31,11 @@ PHONE = re.compile(r"\+?\(?\d[\d\s().-]{8,18}\d")
 # a digit or +, or after a digit followed by - or . ("2026-0142"). After a letter
 # or other punctuation is fine: "Tel.020 7946 0123", "Call(020) 7946 0123".
 PHONE_START = re.compile(r"(?<![\d+])(?<!\d[.-])[+(]?\d")
-# A money amount ("350.00", "1,020.00", "1020.00", "0.84"): digits, then exactly two
-# decimals. Amounts never start with 0 except "0.xx", while phone numbers do
-# ("06.12 34 56 78"); "312.555.0164" has more digits after its dot. Neither is an amount.
-MONEY = re.compile(r"(?<![\w.,])(?:0|[1-9]\d{0,2}(?:,\d{3})+|[1-9]\d*)\.\d{2}(?![\w.])")
+# A money amount ("350.00", "-128.20", "1,020.00", "1020.00", "0.84"): digits, then
+# exactly two decimals. Amounts never start with 0 except "0.xx", while phone numbers
+# do ("06.12 34 56 78"); "312.555.0164" has more digits after its dot; and a group
+# straight after a digit and a hyphen is part of a number ("06-12.34 56 78").
+MONEY = re.compile(r"(?<![\w.,])(?<!\d-)(?:0|[1-9]\d{0,2}(?:,\d{3})+|[1-9]\d*)\.\d{2}(?![\w.])")
 
 
 def _luhn(digits):
