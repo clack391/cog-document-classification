@@ -1,0 +1,22 @@
+Ledgerly Software Ltd
+billing@ledgerly.example.com
+
+Invoice for your Ledgerly Plus subscription
+
+Invoice number: LP-2026-41877
+Invoice date: 18 October 2026
+Billing period: 1 November 2026 to 31 October 2027
+
+Billed to: Harbour Lane Studio Ltd, 3 Quay Street, Bristol XB1 4DB
+Account: harbourlane
+
+Plan                                    Users   Price per user    Amount
+Ledgerly Plus, annual                       5      GBP 120.00   GBP 600.00
+Payroll add-on, annual                      1      GBP 180.00   GBP 180.00
+
+Subtotal                                                        GBP 780.00
+VAT at 20%                                                      GBP 156.00
+Total                                                           GBP 936.00
+
+Payment due: 1 November 2026. We'll take this from your card ending 6150 on that date.
+To change your plan or payment method, go to Settings > Billing before then.

@@ -1,0 +1,13 @@
+City Rail - live chat transcript
+Chat ID: CR-CHAT-30917
+Date: 12 October 2026
+
+Visitor: Hi, the City Rail app keeps closing when I try to pay for a ticket.
+Agent (Sam): Sorry about that. Which phone and app version are you using?
+Visitor: Android 15, app version 6.4.1. I updated it this morning.
+Agent (Sam): Thanks. What happens exactly?
+Visitor: I pick the journey, choose the off-peak return, tap "Pay with card" and the app shuts straight away. It's happened five times now.
+Agent (Sam): Thank you. That looks like a fault in today's update. I've logged it with our app team as a bug, reference APP-2291. In the meantime you can buy the same ticket on our website.
+Visitor: OK, thanks.
+Agent (Sam): Anything else I can help with?
+Visitor: No, that's all.

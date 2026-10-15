@@ -116,7 +116,7 @@ To ensure accountability and prevent misclassification:
    * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Who reviews is configurable per document group, as Trent advised on 15 Oct; the design is in #5.)*
    * Add Guards to the Frame and run them on every result. *(Defined 13 Oct 2026, after the 12 October sync. They run in CI and in benchmark runs; running them on live results is still to do, in #20.)*
 * **Phase 4: Benchmarks, Validation & Handoff** *(benchmark set started early)*
-   * Build the benchmark set. *(Started 13 Oct 2026: 47 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Growing to about 100.)*
+   * Build the benchmark set. *(Started 13 Oct 2026: 94 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Long documents, to test trimming, come with extraction.)*
    * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
    * Save real answers as replay tests.
    * Run the final validation with cog-smith (`check --tests` and `card`).

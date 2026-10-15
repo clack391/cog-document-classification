@@ -1,0 +1,23 @@
+FELLSIDE BANK
+Joint Current Account
+
+Mr Tomasz Nowak and Mrs Hannah Nowak
+31 Larch Close, York XY1 5RP
+
+Account number: 51770362
+Statement period: 1 September 2026 to 30 September 2026
+
+Date      Description                               Paid out     Paid in      Balance
+01 Sep    Opening balance                                                     1,206.48
+01 Sep    Salary FELLSIDE COUNCIL                               2,184.60     3,391.08
+01 Sep    Standing order MORTGAGE                     865.00                 2,526.08
+03 Sep    Direct debit NORTHGATE ENERGY               112.30                 2,413.78
+06 Sep    Card payment GREENWAY GROCERS                94.17                 2,319.61
+12 Sep    Card payment YORK SWIM CENTRE                36.00                 2,283.61
+15 Sep    Salary YORK DENTAL CARE                               1,730.25     4,013.86
+19 Sep    Card payment CITY RAIL                       58.40                 3,955.46
+24 Sep    Direct debit COUNCIL TAX                    164.00                 3,791.46
+27 Sep    Card payment GREENWAY GROCERS                81.66                 3,709.80
+30 Sep    Closing balance                                                     3,709.80
+
+Money in: 3,914.85   Money out: 1,411.53

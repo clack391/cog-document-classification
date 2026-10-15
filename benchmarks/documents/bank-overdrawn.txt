@@ -1,0 +1,23 @@
+MERIDIAN BANK
+Current Account Statement
+
+Mr Kieran Walsh
+9 Laira Close, Plymouth XP4 7RW
+
+Account number: 74419026
+Statement period: 1 September 2026 to 30 September 2026
+Arranged overdraft limit: GBP 250.00
+
+Date      Description                               Paid out     Paid in      Balance
+01 Sep    Balance brought forward                                               480.00
+01 Sep    Card payment TRADE ELECTRICAL SUPPLIES      412.80                    67.20
+04 Sep    Direct debit VAN FINANCE                    289.00                  -221.80
+10 Sep    Faster payment from M CARTER                            350.00       128.20
+14 Sep    Card payment FUEL STATION A38                88.65                    39.55
+18 Sep    Card payment TRADE ELECTRICAL SUPPLIES      326.40                  -286.85
+18 Sep    Unarranged overdraft fee                     15.00                  -301.85
+25 Sep    Faster payment from TAMAR ELECTRICAL                  1,020.00       718.15
+30 Sep    Balance carried forward                                               718.15
+
+Important: on 18 September your account went past its arranged overdraft limit, and we charged an unarranged overdraft fee of GBP 15.00. Your balance is now back within the limit.
+Your arranged overdraft is due for its annual review. To keep it, please confirm in Meridian Online by 31 October 2026.

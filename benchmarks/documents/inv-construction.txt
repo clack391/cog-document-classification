@@ -1,0 +1,21 @@
+KESTREL BUILD LTD
+Unit 2, Ferry Road Yard, Bristol XB2 8LS
+accounts@kestrelbuild.example.com | 0117 496 0245
+
+INVOICE: INTERIM PAYMENT No. 2
+
+Invoice number: KB-2026-0214
+Date: 20 October 2026
+Client: Harbour Lane Studio Ltd, 3 Quay Street, Bristol XB1 4DB
+Project: Refurbishment of the first-floor podcast suite
+
+Contract sum                                              GBP 48,000.00
+Value of work completed to 15 October 2026                GBP 30,000.00
+Less retention at 5%                                      -GBP 1,500.00
+Less interim payment No. 1                               -GBP 14,250.00
+Amount due this invoice, before VAT                       GBP 14,250.00
+VAT at 20%                                                 GBP 2,850.00
+Total due                                                 GBP 17,100.00
+
+Payment is due within 21 days, by 10 November 2026.
+The retention will be invoiced separately when the work is complete.

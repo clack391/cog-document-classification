@@ -2,16 +2,62 @@ id,file,expected,alternatives,tags,optional_tags,frame_rule,split,source,notes
 inv-standard,documents/inv-standard.txt,invoice,,contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,IT services invoice with a due date
 inv-utility-bill,documents/inv-utility-bill.txt,invoice,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:invoice,test,synthetic,Household electricity bill: a named account holder at a home address
 inv-reminder,documents/inv-reminder.txt,invoice,,invoice_reminder;contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,Overdue-payment reminder with a new pay-by date
+inv-freelance,documents/inv-freelance.txt,invoice,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,Sole trader's invoice; the designer is named with their own contact details
+inv-consulting-usd,documents/inv-consulting-usd.txt,invoice,,contains_financial_amounts;time_sensitive,,type:invoice,test,synthetic,"US consultancy invoice in dollars, net 30; billing contacts are roles, not people"
+inv-saas-subscription,documents/inv-saas-subscription.txt,invoice,,contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,Annual software subscription bill with a payment date
+inv-legal-fees,documents/inv-legal-fees.txt,invoice,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,"Solicitor's fee invoice to a named private client at their home address, payable within 14 days"
+inv-final-notice,documents/inv-final-notice.txt,invoice,,invoice_reminder;contains_personal_data;contains_financial_amounts;time_sensitive,,type:invoice,test,synthetic,Final notice for an overdue household energy bill
+inv-construction,documents/inv-construction.txt,invoice,,contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,Builder's interim payment invoice with retention
+inv-draft,documents/inv-draft.txt,invoice,,draft_or_template;contains_financial_amounts,,type:invoice,tune,synthetic,"Draft invoice sent for checking, no due date; by analogy with the contract-template rule it stays an invoice"
+inv-vet,documents/inv-vet.txt,invoice,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:invoice,tune,synthetic,"Vet's invoice to a named pet owner at their home address, due within 7 days"
+inv-french,documents/inv-french.txt,invoice,,non_english;contains_financial_amounts;time_sensitive,,type:invoice,test,synthetic,French invoice in euros with a due date
 con-services,documents/con-services.txt,contract,,contains_financial_amounts;signed,time_sensitive,type:contract,tune,synthetic,Signed master services agreement with a monthly fee
 con-nda,documents/con-nda.txt,contract,,signed;contract_nda,,type:contract,test,synthetic,Signed mutual NDA
 con-amendment,documents/con-amendment.txt,contract,,contract_amendment;signed;contains_financial_amounts,,type:contract,test,synthetic,Signed amendment that changes the fee and extends the term
+con-employment,documents/con-employment.txt,contract,,contract_employment;contains_personal_data;contains_financial_amounts;signed,time_sensitive,type:contract,tune,synthetic,Signed employment contract; the employee is named with their home address
+con-lease,documents/con-lease.txt,contract,,contains_financial_amounts;signed,time_sensitive,type:contract,test,synthetic,Signed commercial lease of studio premises
+con-lease-extension,documents/con-lease-extension.txt,contract,,contract_amendment;contains_financial_amounts;signed,time_sensitive,type:contract,tune,synthetic,Deed extending an earlier lease and changing the rent
+con-nda-oneway,documents/con-nda-oneway.txt,contract,,contract_nda;contains_personal_data;signed,,type:contract,tune,synthetic,"One-way confidentiality agreement with a sole trader, named with their address"
+con-software-licence,documents/con-software-licence.txt,contract,,contains_financial_amounts;signed,time_sensitive,type:contract,tune,synthetic,"Negotiated, signed software licence: a contract, unlike published terms of use"
+con-loan-facility,documents/con-loan-facility.txt,contract,,contains_financial_amounts;signed,time_sensitive,type:contract,test,synthetic,"Signed business loan agreement: a contract, unlike a loan statement"
+con-supply-esign,documents/con-supply-esign.txt,contract,,signed;contains_personal_data;contains_financial_amounts,time_sensitive,type:contract,tune,synthetic,Supply agreement signed by e-signature; the certificate names each signer with their work email
+con-spanish,documents/con-spanish.txt,contract,,non_english;contains_financial_amounts;signed,time_sensitive,type:contract,test,synthetic,Signed services contract in Spanish
+con-dpa-unsigned,documents/con-dpa-unsigned.txt,contract,,,draft_or_template;time_sensitive,type:contract,tune,synthetic,"Data processing agreement ready for signature but not signed; no person's details, only categories of data"
 res-cv,documents/res-cv.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,Engineer's CV with a home address and contact details
 res-academic-cv,documents/res-academic-cv.txt,resume,,contains_personal_data;contains_financial_amounts,,type:resume,test,synthetic,"Academic CV; states a grant of GBP 182,000"
+res-graduate,documents/res-graduate.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,"Graduate CV: education first, one internship"
+res-career-changer,documents/res-career-changer.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,Skills-based CV from a teacher retraining in UX design
+res-executive,documents/res-executive.txt,resume,,contains_personal_data;contains_financial_amounts,,type:resume,test,synthetic,Finance director's CV that states budgets and savings
+res-electrician,documents/res-electrician.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,Tradesperson's CV built around qualifications
+res-anonymised,documents/res-anonymised.txt,resume,,,,type:resume,test,synthetic,"The candidate's own CV with name and contact details removed by an agency: still a resume, with no identifiable person"
+res-german,documents/res-german.txt,resume,,non_english;contains_personal_data,,type:resume,test,synthetic,German Lebenslauf with a date of birth
+res-us,documents/res-us.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,One-page US resume
+res-photographer,documents/res-photographer.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,Freelance creative's CV with a portfolio link and clients
+res-nurse,documents/res-nurse.txt,resume,,contains_personal_data,,type:resume,tune,synthetic,Nursing CV with registration and training
 tkt-bug,documents/tkt-bug.txt,support_ticket,,ticket_bug_report,ticket_urgent;time_sensitive,type:support_ticket,tune,synthetic,Bug report from a customer
 tkt-access,documents/tkt-access.txt,support_ticket,,contains_personal_data,time_sensitive,type:support_ticket,test,synthetic,Access request by email; named people with their email and phone
 tkt-urgent,documents/tkt-urgent.txt,support_ticket,,ticket_urgent;ticket_bug_report;time_sensitive,ticket_billing,type:support_ticket,tune,synthetic,"Urgent outage: customers can't pay, so money is being lost now; it needs a workaround today"
+tkt-howto-export,documents/tkt-howto-export.txt,support_ticket,,contains_personal_data,,type:support_ticket,tune,synthetic,How-to question by email; the requester is named with their email
+tkt-locked-out,documents/tkt-locked-out.txt,support_ticket,,ticket_urgent;time_sensitive;contains_personal_data,,type:support_ticket,tune,synthetic,"Account lock-out blocking payroll due today: urgent, but not a defect"
+tkt-refund,documents/tkt-refund.txt,support_ticket,,ticket_billing;contains_financial_amounts;contains_personal_data,ticket_complaint,type:support_ticket,test,synthetic,Polite refund request for a charge after cancelling
+tkt-complaint-thread,documents/tkt-complaint-thread.txt,support_ticket,,ticket_complaint;time_sensitive;contains_personal_data,ticket_urgent,type:support_ticket,tune,synthetic,"Email thread with a support reply inside; the customer asks for a manager before a shoot deadline. One conversation, not multiple documents"
+tkt-chat-crash,documents/tkt-chat-crash.txt,support_ticket,,ticket_bug_report,ticket_urgent,type:support_ticket,tune,synthetic,"Live-chat transcript reporting an app crash; it blocks paying in the app, but a workaround is given"
+tkt-phone-outage,documents/tkt-phone-outage.txt,support_ticket,,ticket_urgent;ticket_bug_report;time_sensitive;contains_personal_data,,type:support_ticket,test,synthetic,Agent's log of a phone call about an outage; the caller is named with a callback number
+tkt-card-update,documents/tkt-card-update.txt,support_ticket,,ticket_billing;contains_financial_amounts;time_sensitive,,type:support_ticket,tune,synthetic,Portal request to change direct debit details after a failed payment; the customer is named without contact details
+tkt-french-bug,documents/tkt-french-bug.txt,support_ticket,,ticket_bug_report;non_english;contains_personal_data,,type:support_ticket,test,synthetic,Bug report in French by email
+tkt-faulty-mic,documents/tkt-faulty-mic.txt,support_ticket,,ticket_bug_report;ticket_complaint;contains_financial_amounts,ticket_billing,type:support_ticket,tune,synthetic,"Faulty product return; disappointed, and asks for the hire cost to be refunded as compensation"
 bank-current-account,documents/bank-current-account.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,tune,synthetic,Monthly current account statement
 bank-savings,documents/bank-savings.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,test,synthetic,Annual savings account statement
+bank-business-current,documents/bank-business-current.txt,bank_statement,,contains_financial_amounts,,type:bank_statement,tune,synthetic,"Business current account; the holder is a company, so no personal data. Continues the September page in no-main-document"
+bank-joint-account,documents/bank-joint-account.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,tune,synthetic,Joint current account for two named people at their home address
+bank-credit-card-2,documents/bank-credit-card-2.txt,bank_statement,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:bank_statement,test,synthetic,Credit card statement with a payment due date
+bank-payment-provider,documents/bank-payment-provider.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,tune,synthetic,"Payment provider account statement for a sole trader, named with their email"
+bank-mini-statement,documents/bank-mini-statement.txt,bank_statement,other,contains_financial_amounts,,type:bank_statement,test,synthetic,"ATM mini statement: a short transaction history with no holder, period or opening balance, so other is also acceptable"
+bank-overdrawn,documents/bank-overdrawn.txt,bank_statement,,contains_personal_data;contains_financial_amounts;time_sensitive,,type:bank_statement,tune,synthetic,Statement showing an unarranged overdraft and a deadline to confirm the overdraft
+bank-german,documents/bank-german.txt,bank_statement,,non_english;contains_personal_data;contains_financial_amounts,time_sensitive,type:bank_statement,test,synthetic,German Kontoauszug
+bank-long-statement,documents/bank-long-statement.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,tune,synthetic,Three-page statement with 36 transactions and repeated page headers
+bank-cash-isa,documents/bank-cash-isa.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,tune,synthetic,"Cash ISA statement: a savings account, not an investment, so bank_statement"
+bank-us-credit-union,documents/bank-us-credit-union.txt,bank_statement,,contains_personal_data;contains_financial_amounts,,type:bank_statement,test,synthetic,US credit union statement in dollars; the member is named with a home address and member number
 oth-report,documents/oth-report.txt,other,,contains_financial_amounts,,type:other,tune,synthetic,Internal quarterly report
 oth-meeting-minutes,documents/oth-meeting-minutes.txt,other,,,time_sensitive,type:other,test,synthetic,Committee minutes
 bill-complaint,documents/bill-complaint.txt,support_ticket,,ticket_complaint;ticket_billing;contains_financial_amounts,ticket_urgent;contains_personal_data,bill-complaint,tune,synthetic,"A complaint about a bill is a support ticket, not an invoice"
@@ -39,6 +85,7 @@ supplier-statement,documents/supplier-statement.txt,other,,contains_financial_am
 loan-statement,documents/loan-statement.txt,other,,contains_personal_data;contains_financial_amounts,,loan-statement,tune,synthetic,Annual mortgage statement
 payslip,documents/payslip.txt,other,,contains_personal_data;contains_financial_amounts,,payslip,tune,synthetic,Payslip
 multiple-documents,documents/multiple-documents.txt,invoice,,multiple_documents;contains_financial_amounts;time_sensitive,,multiple-documents,test,synthetic,Invoice followed by an unrelated newsletter; the invoice is the main document
+cv-with-cover-letter,documents/cv-with-cover-letter.txt,resume,,multiple_documents;contains_personal_data,,multiple-documents,tune,synthetic,"A CV followed by its cover letter: the CV is clearly the one the file is for, so resume with multiple_documents, not review (#19)"
 no-main-document,documents/no-main-document.txt,needs_review,,multiple_documents;contains_financial_amounts;time_sensitive,,no-main-document,tune,synthetic,"An invoice, a bank statement page and a support ticket, none of them the main one"
 garbled-text,documents/garbled-text.txt,needs_review,,,,garbled-text,tune,synthetic,OCR output that is mostly noise
 near-empty,documents/near-empty.txt,needs_review,,,,garbled-text,tune,synthetic,A near-empty page: the text is fragmentary

@@ -1,0 +1,23 @@
+WILLOWBANK VETERINARY PRACTICE
+88 Hallam Road, Sheffield XS10 5HN
+reception@willowbankvets.example.com | 0114 496 0388
+
+INVOICE
+
+Client: Mr Samuel Adebayo
+42 Thornfield Road, Sheffield XS10 3LP
+Client number: C-20417
+Patient: Biscuit (dog, Labrador)
+
+Invoice number: WV-118652
+Invoice date: 14 September 2026
+
+Date       Item                                              Amount
+14 Sep     Consultation                                   GBP 48.00
+14 Sep     Annual booster vaccination                     GBP 62.50
+14 Sep     Flea and worm treatment, 3 months              GBP 36.90
+
+Total (including VAT)                                    GBP 147.40
+Amount due                                               GBP 147.40
+
+Payment is due within 7 days of the invoice date.

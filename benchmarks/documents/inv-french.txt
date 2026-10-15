@@ -1,0 +1,25 @@
+FACTURE
+
+Atelier Lumière SARL
+Location de matériel d'éclairage et tirages photo
+Lyon, France
+compta@atelier-lumiere.example.net
+
+Facture n° : AL-2026-0412
+Date de facture : 15 octobre 2026
+Date d'échéance : 14 novembre 2026
+
+Client :
+Harbour Lane Studio Ltd
+3 Quay Street, Bristol XB1 4DB, Royaume-Uni
+
+Désignation                                   Qté    Prix unitaire        Montant
+Location de projecteurs LED, 4 x 3 jours        12         85,00 €       1 020,00 €
+Tirages grand format 60 x 90 cm                 12         19,50 €         234,00 €
+Frais de livraison                               1         45,00 €          45,00 €
+
+Total HT                                                                1 299,00 €
+TVA (autoliquidation)                                                       0,00 €
+Total TTC                                                               1 299,00 €
+
+Paiement par virement à réception de facture, au plus tard à la date d'échéance.

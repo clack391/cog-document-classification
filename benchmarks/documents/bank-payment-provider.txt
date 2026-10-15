@@ -1,0 +1,21 @@
+QUIDPAY
+Monthly account statement
+
+Account holder: Maya Okafor, trading as Pixel & Pine Design
+Account email: maya@pixelandpine.example.com
+Account ID: QP-88231-MO
+Currency: GBP
+Period: 1 October 2026 to 31 October 2026
+
+Date      Description                                     Out          In      Balance
+01 Oct    Opening balance                                                       212.65
+02 Oct    Payment received from VIN TRAVEL                        450.00       662.65
+06 Oct    Payment received from STONEGATE BREWERY                  780.00     1,442.65
+08 Oct    Subscription DESIGNSUITE PRO                 21.99                 1,420.66
+13 Oct    Withdrawal to bank account                1,000.00                   420.66
+20 Oct    Payment received from CARDIFF FOOD SHARE                  120.00       540.66
+27 Oct    Card payment PRINTWORKS BRISTOL              38.40                   502.26
+31 Oct    Closing balance                                                       502.26
+
+Total received: 1,350.00   Total sent and spent: 1,060.39
+Quidpay is an electronic money institution. Your balance is not covered by deposit insurance; it is safeguarded in a separate account.

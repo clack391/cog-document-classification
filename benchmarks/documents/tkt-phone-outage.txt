@@ -1,0 +1,14 @@
+Ledgerly Support - phone call log
+Ticket #49577
+Logged by: Daniel (support agent), 14 October 2026, 09:20 UTC
+Caller: Ana Lima, Harbour Lane Studio. Callback number: 020 7946 0384
+Priority: Urgent
+
+Summary of call:
+Since about 08:45 nobody at the customer's company can log in. The login page shows "Service temporarily unavailable". The caller says the whole team is blocked, and their VAT return has to be filed by 5 pm today.
+
+Checked our status page: no incident posted yet. Other customers have reported the same error in the last 30 minutes.
+
+Next steps:
+- Escalated to the on-call engineer as a possible outage.
+- Promised the caller an update by 10:00 UTC, by phone.

@@ -1,0 +1,13 @@
+From: Ana Lima <ana.lima@harbourlane.example.com>
+To: support@ledgerly.example.com
+Subject: How do I export last year's invoices as PDFs?
+
+Hi Ledgerly support,
+
+Our accountant has asked for copies of every sales invoice from the last financial year (April 2025 to March 2026) as PDFs. I can only see a way to download them one at a time from the Sales page.
+
+Is there a way to export them all at once? If not, can you send them to me as a single zip file?
+
+Thanks,
+Ana Lima
+Office Manager, Harbour Lane Studio
