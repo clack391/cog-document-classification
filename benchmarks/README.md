@@ -25,7 +25,10 @@ The benchmark set has three jobs:
 - **Other details must not be real either.** UK postcodes start with `X`,
   which no real postcode does, so no address exists. German postcodes start
   with `00`, which none does. There are no company registration numbers or
-  sort codes, and the VAT numbers fail their check digits.
+  sort codes, and the VAT numbers fail their check digits. Organisation names
+  are invented too: before using a name for a bank, credit union, building
+  society or payment provider, search for it, so that no made-up statement
+  appears under a real institution's name.
 - **Public documents need a licence** that allows it, recorded in `source` as
   `public:<licence>`. They go in `benchmarks/external/`, which Git ignores, and
   labels point at them as `external/<file>`. Synthetic documents go in

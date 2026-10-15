@@ -1,4 +1,4 @@
-MERIDIAN BANK
+FERNMOOR BANK
 Business Current Account Statement
 
 Account holder: Harbour Lane Studio Ltd
@@ -9,7 +9,7 @@ Date      Description                               Paid out     Paid in      Ba
 01 Oct    Balance brought forward                                            14,741.90
 01 Oct    Faster payment from VIN TRAVEL                        6,000.00    20,741.90
 02 Oct    Faster payment BRIGHTLINE IT SERVICES     1,395.12                19,346.78
-05 Oct    Loan repayment MERIDIAN BANK              1,152.40                18,194.38
+05 Oct    Loan repayment FERNMOOR BANK              1,152.40                18,194.38
 09 Oct    Faster payment from WESTGATE EVENTS                   4,850.00    23,044.38
 12 Oct    Faster payment TIDEWATER AUDIO SUPPLIES    1,622.40                21,421.98
 15 Oct    Faster payment PIXEL AND PINE DESIGN        990.00                20,431.98
@@ -20,4 +20,4 @@ Date      Description                               Paid out     Paid in      Ba
 
 Total paid in: 14,450.00     Total paid out: 24,600.47
 
-Business customers can view their statements and download transactions in Meridian Online for Business.
+Business customers can view their statements and download transactions in Fernmoor Online for Business.

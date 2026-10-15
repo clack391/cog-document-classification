@@ -2,7 +2,7 @@ Profile export: Proflink
 Exported 3 October 2026
 
 Ruth Okonkwo
-Senior Data Analyst at Meridian Bank
+Senior Data Analyst at Fernmoor Bank
 Manchester, England, United Kingdom
 Contact: ruth.okonkwo@example.org | proflink.example.com/in/ruth-okonkwo
 
@@ -10,7 +10,7 @@ About
 Data analyst with 8 years in retail banking. I turn messy transaction data into decisions about fraud, pricing and customer experience.
 
 Experience
-Senior Data Analyst, Meridian Bank
+Senior Data Analyst, Fernmoor Bank
 Jan 2022 to present (4 yrs 10 mos)
 Built the fraud-alert dashboard used by 300 branch staff.
 
