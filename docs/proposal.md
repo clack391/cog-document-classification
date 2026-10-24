@@ -104,12 +104,12 @@ To ensure accountability and prevent misclassification:
    * Draft `document-taxonomy.frame.md` and encode it in `questions.json`. *(Done 12 Oct 2026: the working assumptions and 16 tags are confirmed, and the questions are in `context/questions.json`.)*
    * Write `COG.md` and the input and output schemas. *(Provisional schemas are in place: text input, and no metadata fields yet. Decision 3 has settled what the metadata is, and its fields arrive with file input in Phase 2. The final input schema waits on decision 4. `COG.md` is written, from the proposal and the taxonomy Frame.)*
    * Smith validation passes from this phase onward. *(It passes, and CI runs it on Linux and macOS for every push.)*
-* **Phase 2: Extraction & Provider** *(next: decision 2 is settled, connecting local Qwen is #6, and the extraction prototype is #3)*
+* **Phase 2: Extraction & Provider** *(in progress: local Qwen is connected and runs live; the extraction prototype is #3)*
    * Add the extraction dependencies to `pixi.toml` and commit `pixi.lock`.
    * Build the extraction module. Its limits:
-      * up to 512 KiB of text per document, and about 8,000 tokens for local Qwen;
+      * up to 512 KiB of text per document, and about 8,000 tokens for local Qwen, which with thinking leaves roughly 6,000 to 8,000 characters of text (see the suite notes);
       * 240 seconds for each stage of our code.
-   * Settle decision 2, then set up the provider in cog-workbench. *(Decision 2 settled 15 Oct 2026: local Qwen. Setting it up is #6.)*
+   * Settle decision 2, then set up the provider in cog-workbench. *(Decision 2 settled 15 Oct 2026: local Qwen. Set up 19 Oct 2026 with three local changes to the suite: a GPU build of llama.cpp, the adapter enforcing the answer format, and Qwen's thinking turned on. See "Running local Qwen" in the suite notes, and #6.)*
 * **Phase 3: Decision Policy & Review** *(mostly done early: the policy, the review warning and the Guards are in place; the no-main-document rule (#19) and review routing (#5) are designed and agreed)*
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
@@ -117,7 +117,7 @@ To ensure accountability and prevent misclassification:
    * Add Guards to the Frame and run them on every result. *(Defined 13 Oct 2026, after the 12 October sync. They run in CI and in benchmark runs; running them on live results is still to do, in #20.)*
 * **Phase 4: Benchmarks, Validation & Handoff** *(benchmark set started early)*
    * Build the benchmark set. *(Started 13 Oct 2026: 94 labeled synthetic documents covering every Frame rule and tag, plus the runner, the scorer and the targets: ≤ 2% silent errors, ≤ 15% sent to a person. Long documents, to test trimming, come with extraction.)*
-   * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds.
+   * Run the benchmark sets live, measure accuracy and calibration, and tune the thresholds. *(Started 19 Oct 2026 with local Qwen: silent errors fell from 10.6% to 1.1 to 2.1% across the changes, with about 13% sent to a person. Qwen's confidence is almost always 1.0, so the thresholds can't be tuned usefully with it. See the benchmark README's live results.)*
    * Save real answers as replay tests.
    * Run the final validation with cog-smith (`check --tests` and `card`).
    * Publish integration notes so downstream Cogs can consume the `decision` schema.
@@ -125,7 +125,7 @@ To ensure accountability and prevent misclassification:
 **5. Open Decisions**
 
 1. **Which cog-smith version:** *settled 12 Oct 2026.* The suite's pins moved on 10 October to include the newer cog-smith, with input warnings and test-fixture export (decision machinery 0.1.4). We build on the suite's current pins.
-2. **Cloud Jev or local Qwen:** *settled 15 Oct 2026: local Qwen.* Trent has no company TypeSafe key, and a Jev key needs prepaid credit, so we chose local Qwen as a team. It's free, needs no key, and documents never leave our machines. Its confidence isn't calibrated, so the review threshold is tuned on the benchmark set (#8). The fallbacks are Jev, and Kev, an open-weight Jev-like model with Jev's API. Trent was told on 15 Oct and can still object.
+2. **Cloud Jev or local Qwen:** *settled 15 Oct 2026: local Qwen.* Trent has no company TypeSafe key, and a Jev key needs prepaid credit, so we chose local Qwen as a team. It's free, needs no key, and documents never leave our machines. Its confidence isn't calibrated, so the review threshold is tuned on the benchmark set (#8). The fallbacks are Jev, and Kev, an open-weight Jev-like model with Jev's API. Trent was told on 15 Oct and can still object. The first live runs (19 to 23 Oct) showed that Qwen3-4B needs its thinking turned on and the answer format enforced, and that its confidence is not calibrated, so the remaining borderline mistakes can't be caught by a threshold. Jev, trained for calibration, stays the option if quality must improve further.
 3. **What "metadata" covers:** *settled 13 Oct 2026 by Precious and Francis.* File and extraction facts only: file type, page count, size, sha256, and whether OCR was used. Content fields such as invoice numbers need a model that writes text, so they're left to the specialised Cogs downstream. Shared with Trent & Inessa, who can still object.
 4. **How documents arrive:** a file path with its sha256 recorded, or the file embedded in the input; plus the supported formats and maximum length. Owner: Francis. Needed before the input schema is fixed.
 5. **Tag vocabulary:** *settled 12 Oct 2026.* 16 tags, confirmed by Precious, are listed in the taxonomy Frame.

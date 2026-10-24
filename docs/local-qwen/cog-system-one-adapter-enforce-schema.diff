@@ -1,0 +1,79 @@
+diff --git a/binding/provider.json b/binding/provider.json
+index dbab953..c2aced0 100644
+--- a/binding/provider.json
++++ b/binding/provider.json
+@@ -60,6 +60,11 @@
+         "default": false,
+         "description": "Ask the model gateway for JSON mode (response_format json_object). Off by default: the adapter's prompt asks for JSON and it validates locally, which tolerates small models that add trailing text."
+       },
++      "enforce_schema": {
++        "type": "boolean",
++        "default": false,
++        "description": "Also ask the model gateway to enforce the answer schema (response_format json_schema, strict); the schema stays in the prompt. The model binding must have json-schema."
++      },
+       "corrective_retries": {
+         "type": "integer",
+         "minimum": 0,
+diff --git a/src/adapter_runtime.py b/src/adapter_runtime.py
+index d6fd273..9b1ef12 100644
+--- a/src/adapter_runtime.py
++++ b/src/adapter_runtime.py
+@@ -46,7 +46,7 @@ FEATURES = frozenset(s1.QUESTION_TYPES)
+ MAX_BYTES = 8 * 1024 * 1024
+ TURN_SECONDS = 600
+ DEFAULTS = {"locality": "cloud", "answer_mode": "probabilities", "json_mode": False,
+-            "corrective_retries": 1}
++            "enforce_schema": False, "corrective_retries": 1}
+ # The model gateways this harness may call, and the one credential reference
+ # each accepts. Same allowlist as cog-turn-harness.
+ GATEWAY_TOKENS = {"openteams/cog-openrouter": "env:OPENROUTER_COG_TOKEN",
+@@ -169,6 +169,8 @@ def check_turn(request, binding, model_binding):
+             "Harness locality differs from its model binding.")
+     options = settings(binding["configuration"])
+     needed = {"text-generation", "json-output"} if options["json_mode"] else {"text-generation"}
++    if options["enforce_schema"]:
++        needed |= {"json-schema"}
+     require(needed <= set(model_binding["features"]), "incompatible-requirement",
+             f"The model binding lacks features {sorted(needed - set(model_binding['features']))}.")
+     try:
+@@ -192,7 +194,7 @@ class GatewayProvider:
+     Each completed call must carry the gateway's own provenance for exactly
+     the admitted model binding."""
+ 
+-    def __init__(self, model_binding, deadline, opener=None, json_mode=False):
++    def __init__(self, model_binding, deadline, opener=None, json_mode=False, enforce_schema=False):
+         address = model_binding["invocation"]["address"]
+         parsed = urlsplit(address)
+         require(parsed.scheme == "http" and parsed.hostname == "127.0.0.1" and parsed.port
+@@ -213,6 +215,7 @@ class GatewayProvider:
+         self.opener = opener or urllib.request.build_opener(NoRedirect)
+         self.model_name = model_binding["model"]["id"]
+         self.json_mode = json_mode
++        self.enforce_schema = enforce_schema
+         self.gateway_records = []
+         self.salvaged = 0
+ 
+@@ -224,7 +227,12 @@ class GatewayProvider:
+         # (Gateway strict-schema mode turns a violation into an HTTP error,
+         # which would bypass the adapter's corrective re-asks.)
+         require(not structured, "invalid-configuration", "Structured output mode is not supported.")
+-        if self.json_mode:
++        if self.enforce_schema:
++            # The schema stays in the prompt too; the gateway enforces it, so a
++            # small model cannot echo the schema or answer in the wrong shape.
++            body["response_format"] = {"type": "json_schema", "json_schema": {
++                "name": "system_one_answers", "strict": True, "schema": schema}}
++        elif self.json_mode:
+             body["response_format"] = {"type": "json_object"}
+         left = self.deadline - time.monotonic()
+         require(left > 0, "provider-unavailable", "The turn deadline passed before the model call.")
+@@ -315,7 +323,8 @@ def ask(task, binding, model_binding, deadline, opener=None):
+     from typesafe_sdk import TypeSafeError
+     from pydantic import ValidationError
+     options = settings(binding["configuration"])
+-    provider = GatewayProvider(model_binding, deadline, opener, json_mode=options["json_mode"])
++    provider = GatewayProvider(model_binding, deadline, opener, json_mode=options["json_mode"],
++                               enforce_schema=options["enforce_schema"])
+     client = SystemOneAdapterClient(structured_outputs=False,
+                                     llm_answer_mode=options["answer_mode"],
+                                     normalize_probabilities=True,

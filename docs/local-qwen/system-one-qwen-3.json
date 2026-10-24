@@ -1,0 +1,43 @@
+{
+  "document_kind": "bind_request",
+  "contract": "openteams/satisfier-binding [0.1-draft]",
+  "request_id": "request-system-one-adapter-3",
+  "binding_id": "binding-system-one-qwen",
+  "revision": 3,
+  "provider": {
+    "id": "openteams/cog-system-one-adapter",
+    "version": "0.1.0"
+  },
+  "requirement": {
+    "id": "system-one-decisions",
+    "capability": "system-one/decisions",
+    "accepted_compositions": [
+      "harness"
+    ],
+    "features": [
+      "choice",
+      "noul",
+      "score"
+    ],
+    "model_id": null,
+    "allowed_localities": [
+      "local"
+    ],
+    "evidence_level": "declaration",
+    "identity_verified": false,
+    "revision_pinned": false
+  },
+  "configuration": {
+    "memory_mode": "none",
+    "tool_policy": "no-tools",
+    "model_binding": {
+      "binding_id": "qwen-local",
+      "revision": 3
+    },
+    "locality": "local",
+    "answer_mode": "probabilities",
+    "corrective_retries": 1,
+    "enforce_schema": true
+  },
+  "credential_refs": {}
+}

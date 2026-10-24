@@ -1,0 +1,40 @@
+{
+  "document_kind": "bind_request",
+  "contract": "openteams/satisfier-binding [0.1-draft]",
+  "request_id": "qwen-local-3",
+  "binding_id": "qwen-local",
+  "revision": 3,
+  "provider": {
+    "id": "openteams/cog-qwen",
+    "version": "0.1.0"
+  },
+  "requirement": {
+    "id": "author-inference",
+    "capability": "model-endpoint/openai-compatible",
+    "accepted_compositions": [
+      "model"
+    ],
+    "features": [
+      "text-generation",
+      "json-output",
+      "json-schema"
+    ],
+    "model_id": "qwen3-4b-q4_k_m",
+    "allowed_localities": [
+      "local"
+    ],
+    "evidence_level": "probe",
+    "identity_verified": false,
+    "revision_pinned": false
+  },
+  "configuration": {
+    "model_id": "qwen3-4b-q4_k_m",
+    "gateway_base_url": "http://127.0.0.1:8114",
+    "max_output_tokens": 4096,
+    "enable_thinking": true
+  },
+  "credential_refs": {
+    "api_key": "env:COG_QWEN_BACKEND_TOKEN",
+    "gateway_token": "env:COG_QWEN_TOKEN"
+  }
+}

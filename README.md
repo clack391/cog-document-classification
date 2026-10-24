@@ -19,9 +19,11 @@ read and test.
 
 ## Status
 
-Phase 1 is done apart from the final input format (decision 4, #2). Phase 2,
-extraction and connecting the model, is next. Much of Phases 3 and 4 is done
-early: the decision policy, the Guards and the benchmark set. The package
+Phase 1 is done apart from the final input format (decision 4, #2). In Phase
+2 the model is connected: the Cog runs live with local Qwen, with three local
+changes to the suite (#6). Extraction is next. Much of Phases 3 and 4 is done
+early: the decision policy, the Guards, the benchmark set and its first live
+runs. The package
 passes Smith's checks and its offline tests on the suite's current pins, and
 CI runs both on Linux and macOS for every push.
 
@@ -41,11 +43,12 @@ CI runs both on Linux and macOS for every push.
 - Guards that check results independently of the Cog, and a repository Guard. See
   [Guards](#guards).
 - The [benchmark set](benchmarks/README.md): 94 labeled synthetic documents
-  covering every Frame rule and tag, with a runner, a scorer and a threshold sweep. It
-  is checked offline today and runs live once a model is connected.
-- cog-workbench recognises the Cog, and both model providers (TypeSafe's Jev and
-  the System One adapter) match its requirements. Decision 2 chose local Qwen
-  through the System One adapter; connecting it is #6.
+  covering every Frame rule and tag, with a runner, a scorer and a threshold sweep.
+  The latest live run gave 2.1% silent errors and sent 12.8% to a person, against
+  targets of 2% and 15%; see [Live results](benchmarks/README.md#live-results).
+- Live runs with local Qwen (Qwen3-4B with thinking) through the System One
+  adapter, as decision 2 chose. The suite needed three local changes, which are in
+  [Running local Qwen](docs/suite-notes.md#running-local-qwen).
 
 **What is provisional**
 - The input is the document's extracted text. File input and extraction come
@@ -53,7 +56,9 @@ CI runs both on Linux and macOS for every push.
 - The output schema has no metadata fields yet. Decision 3 settled what they
   are (file type, page count, size, sha256, and whether OCR was used), and they
   arrive with file input in Phase 2.
-- The thresholds are placeholders until the benchmark sets tune them.
+- The thresholds are placeholders. With local Qwen they can't be tuned
+  usefully, because its confidence is almost always 1.0; a calibrated model
+  such as Jev would make tuning meaningful (#8).
 
 **Review works by flagging (decision 6):** a document the Cog is unsure of is
 marked `needs_review` with its reasons and a warning, and whichever workflow
@@ -124,8 +129,10 @@ pixi run replay -- --bundle examples/sample-bundle.json --result examples/sample
 answers.
 
 Live runs need a model provider admitted in cog-workbench. We use local Qwen
-through the System One adapter (decision 2). The fallbacks are TypeSafe's Jev in
-the cloud, and Kev, an open-weight Jev-like model; see the proposal. Until a provider is activated, `pixi run ask-composed`
+through the System One adapter (decision 2); the setup and the three local
+changes it needs are in [Running local Qwen](docs/suite-notes.md#running-local-qwen).
+The fallbacks are TypeSafe's Jev in the cloud, and Kev, an open-weight Jev-like
+model; see the proposal. Until a provider is activated, `pixi run ask-composed`
 stops with an error that `.op-composition.json` is missing. That file is
 written when Workbench activates a provider for this Cog.
 

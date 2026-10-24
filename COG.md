@@ -170,9 +170,14 @@ the envelope binding carries the host's full composition provenance.
 `decide` isn't told which model answered, so the same thresholds apply to
 every provider for now. Treat answers from the adapter as weaker evidence.
 The `calibrated-answers` Guard warns when an LLM answered. We use local Qwen
-through the adapter (decision 2), so the thresholds will be tuned for its
-answers on the benchmark set (#8). While we use Qwen, every live result
-carries the `calibrated-answers` warning. That's expected, not a fault.
+through the adapter (decision 2). Its confidence is almost always 1.0 or 0.0,
+so tuning the thresholds doesn't help with it (#8); the review rules that work
+are the ones that check answers against each other or count words. It also
+needs the adapter to enforce the answer format and Qwen's thinking turned on,
+which the suite doesn't offer yet: see
+[Running local Qwen](docs/suite-notes.md#running-local-qwen). While we use
+Qwen, every live result carries the `calibrated-answers` warning. That's
+expected, not a fault.
 
 ## Using it
 

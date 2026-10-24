@@ -1,0 +1,16 @@
+# A CUDA build of the llama.cpp version cog-qwen locks (10751), to serve
+# cog-qwen's pinned model on an NVIDIA GPU. cog-qwen's own linux-64 build
+# (cpu_mkl) has no AVX2 code: on an i7-8750H it wrote under 1 token a second,
+# against about 30 on a GTX 1070 with this build.
+# Copy this folder's pixi.toml, serve.sh and restart.sh into llama-cuda/ in
+# the suite workspace, next to cog-qwen/, and run `pixi install` there.
+[workspace]
+name = "llama-cuda"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[system-requirements]
+cuda = "12"
+
+[dependencies]
+"llama.cpp" = { version = "==10751", build = "cuda129*" }
