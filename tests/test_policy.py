@@ -19,9 +19,13 @@ def bundle():
     return json.loads((ROOT / "examples" / "sample-bundle.json").read_text(encoding="utf-8"))
 
 
-def result(top=None, confidence=None, **nouls):
-    """The saved sample answers, with the top type, its confidence and any
-    yes/no answers (by question id) replaced."""
+ISSUERS = ("bank_or_card_issuer", "supplier_or_seller", "lender", "employer",
+           "investment_or_pension_provider", "anyone_else")
+
+
+def result(top=None, confidence=None, issuer=None, **nouls):
+    """The saved sample answers, with the top type, its confidence, the issuer
+    and any yes/no answers (by question id) replaced."""
     value = json.loads((ROOT / "examples" / "sample-result.json").read_text(encoding="utf-8"))
     answer = value["answers"]["document_type"]
     if top:
@@ -30,13 +34,19 @@ def result(top=None, confidence=None, **nouls):
         answer["probabilities"] = {t: (0.8 if t == top else rest) for t in TYPES}
     if confidence is not None:
         answer["confidence"] = confidence
+    if issuer:
+        value["answers"]["issuer"].update(choice=issuer, confidence=0.88,
+                                          probabilities={i: (0.9 if i == issuer else 0.02) for i in ISSUERS})
     for qid, probability in nouls.items():
         value["answers"][qid]["noul"] = probability
     return value
 
 
-def run(r):
-    envelope = cog_core.finish(bundle(), r, {"kind": "test"})
+def run(r, text=None):
+    document = bundle()
+    if text is not None:
+        document["text"] = text
+    envelope = cog_core.finish(document, r, {"kind": "test"})
     assert envelope["ok"], envelope
     return envelope["payload"]["decision"], envelope["problems"]
 
@@ -60,11 +70,24 @@ class Classified(unittest.TestCase):
         self.assertNotIn("invoice_reminder", decision["tags"])
 
     def test_a_bank_statement_is_classified_with_general_tags_only(self):
-        decision, problems = run(result(top="bank_statement", tag_contains_personal_data=0.9,
-                                        tag_time_sensitive=0.1))
+        decision, problems = run(result(top="bank_statement", issuer="bank_or_card_issuer",
+                                        tag_contains_personal_data=0.9, tag_time_sensitive=0.1))
         self.assertEqual(problems, [])
         self.assertEqual((decision["status"], decision["document_type"]), ("classified", "bank_statement"))
         self.assertEqual(decision["tags"], ["contains_personal_data", "contains_financial_amounts"])
+
+    def test_the_issuer_only_matters_for_a_bank_statement(self):
+        decision, _ = run(result(top="other", issuer="lender"))
+        self.assertEqual((decision["status"], decision["document_type"]), ("classified", "other"))
+
+    def test_text_at_the_word_floor_is_enough(self):
+        decision, _ = run(result(), text=" ".join(["word"] * task_logic.MIN_WORDS))
+        self.assertEqual(decision["status"], "classified")
+
+    def test_numbers_are_not_words_but_cjk_characters_are(self):
+        self.assertEqual(task_logic.word_count("Page 2 of 2"), 2)
+        self.assertEqual(task_logic.word_count("Total GBP 40.00, invoice 12"), 3)
+        self.assertEqual(task_logic.word_count("这是一份合同"), 6)
 
     def test_a_tag_needs_the_tag_threshold(self):
         decision, _ = run(result(tag_signed=task_logic.TAG_THRESHOLD - 0.01))
@@ -74,8 +97,8 @@ class Classified(unittest.TestCase):
 
 
 class NeedsReview(unittest.TestCase):
-    def assert_review(self, r, flag):
-        decision, problems = run(r)
+    def assert_review(self, r, flag, text=None):
+        decision, problems = run(r, text)
         self.assertEqual(decision["status"], "needs_review")
         self.assertIsNone(decision["document_type"])
         self.assertIn(flag, decision["flags"])
@@ -92,6 +115,30 @@ class NeedsReview(unittest.TestCase):
 
     def test_illegible_text(self):
         self.assert_review(result(text_legible=0.2), "illegible-text")
+
+    def test_no_clear_main_document(self):
+        self.assert_review(result(main_document_clear=0.2, tag_multiple_documents=0.9), "no-main-document")
+
+    def test_several_documents_with_a_clear_main_one_are_classified(self):
+        decision, _ = run(result(main_document_clear=0.9, tag_multiple_documents=0.9))
+        self.assertEqual(decision["status"], "classified")
+        self.assertIn("multiple_documents", decision["tags"])
+
+    def test_too_little_text(self):
+        decision = self.assert_review(result(), "illegible-text", text="Page 2 of 2")
+        self.assertIn("2 words", decision["reasons"][0])
+        self.assert_review(result(), "illegible-text", text=" ".join(["word"] * (task_logic.MIN_WORDS - 1)))
+
+    def test_too_little_and_illegible_text_give_one_flag_and_both_reasons(self):
+        decision = self.assert_review(result(text_legible=0.1), "illegible-text", text="Page 2 of 2")
+        self.assertEqual(decision["flags"], ["illegible-text"])
+        self.assertEqual(len(decision["reasons"]), 2)
+
+    def test_a_bank_statement_from_someone_other_than_a_bank(self):
+        for issuer in ISSUERS[1:]:
+            with self.subTest(issuer=issuer):
+                decision = self.assert_review(result(top="bank_statement", issuer=issuer), "signals-disagree")
+                self.assertIn(f"the issuer is {issuer}", " ".join(decision["reasons"]))
 
     def test_a_strong_tag_for_another_type(self):
         self.assert_review(result(top="other", tag_contract_nda=0.95), "signals-disagree")
@@ -126,7 +173,7 @@ class ContractDocument(unittest.TestCase):
         stated = {name: float(value) for name, value in re.findall(r"`([A-Z_]+)` = ([0-9]+(?:\.[0-9]+)?)", text)}
         # Every threshold in the decision code, so one added only to the code fails too.
         used = {name: value for name, value in vars(task_logic).items()
-                if name.isupper() and isinstance(value, float)}
+                if name.isupper() and isinstance(value, (int, float)) and not isinstance(value, bool)}
         self.assertEqual(stated, used, "COG.md must state every threshold in src/task_logic.py, with its value")
 
 

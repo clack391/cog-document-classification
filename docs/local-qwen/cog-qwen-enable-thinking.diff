@@ -1,0 +1,44 @@
+diff --git a/binding/provider.json b/binding/provider.json
+index 643f1e0..86f477e 100644
+--- a/binding/provider.json
++++ b/binding/provider.json
+@@ -25,6 +25,11 @@
+         "type": "integer",
+         "minimum": 128,
+         "maximum": 8192
++      },
++      "enable_thinking": {
++        "type": "boolean",
++        "default": false,
++        "description": "Let Qwen3 reason before it answers (its thinking mode). The reasoning comes back separately from the answer and counts toward max_output_tokens."
+       }
+     },
+     "required": [
+diff --git a/src/gateway.py b/src/gateway.py
+index 0884c61..36fb17f 100644
+--- a/src/gateway.py
++++ b/src/gateway.py
+@@ -74,6 +74,9 @@ def infer(store, api, binding_id, revision, body, gateway_base_url):
+         sent = copy.deepcopy(body)
+         if 'max_tokens' not in sent and 'max_completion_tokens' not in sent:
+             sent['max_tokens'] = config['max_output_tokens']
++        # Qwen3's thinking is a binding setting, never a client one: check_request
++        # refuses unknown request fields, so only the admitted binding turns it on.
++        sent['chat_template_kwargs'] = {'enable_thinking': config.get('enable_thinking') is True}
+         response = api.completion(routed(config, sent), key)
+         record['response_sha256'] = digest(response)
+         facts = observe(response, config, endpoints, api, key, trace=record)
+diff --git a/src/local_http.py b/src/local_http.py
+index 3f20193..578acb4 100644
+--- a/src/local_http.py
++++ b/src/local_http.py
+@@ -40,7 +40,8 @@ class LocalHTTP:
+ 
+     def completion(self, body, key):
+         require(body.get('model') == MODEL_ID, 'unsupported-model', 'No model override is supported.')
+-        sent = dict(body, chat_template_kwargs={'enable_thinking': False})
++        thinking = (body.get('chat_template_kwargs') or {}).get('enable_thinking') is True
++        sent = dict(body, chat_template_kwargs={'enable_thinking': thinking})
+         if 'max_completion_tokens' in sent:
+             sent['max_tokens'] = sent.pop('max_completion_tokens')
+         return self.request('/v1/chat/completions', key, sent)

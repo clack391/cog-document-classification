@@ -2,14 +2,15 @@
 
 A System One model answers the typed questions in context/questions.json about
 one document's text: which of six types it is, whether the text is legible,
-and one yes/no question per tag. This code turns those answers into the
-classification, applying the policy in taxonomy/document-taxonomy.frame.md:
+who issued it, and one yes/no question per tag. This code turns those answers
+into the classification, applying the policy in
+taxonomy/document-taxonomy.frame.md:
 
 - the type is the model's `document_type` choice when its confidence is at
   least MIN_TYPE_CONFIDENCE;
-- low confidence, illegible text or contradicting answers send the document to
-  review instead; a document in review gets no type, and every reason is
-  stated;
+- low confidence, illegible or too little text, or contradicting answers send
+  the document to review instead; a document in review gets no type, and every
+  reason is stated;
 - tags apply at TAG_THRESHOLD, and a type's own tags are reported only with
   that type.
 
@@ -17,14 +18,24 @@ Provisional: the input is the document's extracted text until extraction is
 built (Phase 2), and the thresholds are placeholders until the benchmark sets
 tune them.
 """
+import re
 
 # Placeholder thresholds (taxonomy/README.md). decide() is not told which model
 # answered, so one set of thresholds applies to every provider for now.
 MIN_TYPE_CONFIDENCE = 0.85
 TAG_THRESHOLD = 0.7
 MIN_LEGIBLE = 0.5
+MIN_MAIN_DOCUMENT = 0.5    # below this, no document in the text is clearly the main one
 CONTRADICTION = 0.9         # a type tag this strong for another type contradicts the type
 INVOICE_MIN_AMOUNTS = 0.3   # an invoice whose amounts answer is below this is suspect
+MIN_WORDS = 20              # fewer words than this is too little text to classify
+
+# Only these issue a bank statement (Frame: a bank, card issuer or payment provider).
+BANK_ISSUER = "bank_or_card_issuer"
+# Chinese, Japanese and Korean script, where each character counts as a word,
+# since those languages don't put spaces between words.
+CJK = re.compile(r"[぀-ヿ㐀-䶿一-鿿가-힯]")
+WORD = re.compile(r"[^\W\d_]{2,}")  # two or more letters; numbers are not words
 
 TAG_PREFIX = "tag_"
 GENERAL_TAGS = ("contains_personal_data", "contains_financial_amounts", "time_sensitive",
@@ -62,6 +73,10 @@ def _probability(answers, tag):
     return answers[TAG_PREFIX + tag]["noul"]
 
 
+def word_count(text):
+    return len(WORD.findall(CJK.sub(" ", text))) + len(CJK.findall(text))
+
+
 def decide(bundle, answers):
     answer = answers["document_type"]
     top, confidence = answer["choice"], answer["confidence"]
@@ -74,6 +89,19 @@ def decide(bundle, answers):
     if legible < MIN_LEGIBLE:
         flags.append("illegible-text")
         reasons.append(f"text legibility {legible:.2f} is below {MIN_LEGIBLE}")
+    main = answers["main_document_clear"]["noul"]
+    if main < MIN_MAIN_DOCUMENT:
+        flags.append("no-main-document")
+        reasons.append(f"main-document clarity {main:.2f} is below {MIN_MAIN_DOCUMENT}: no document is clearly the main one")
+    words = word_count(bundle["text"])
+    if words < MIN_WORDS:
+        if "illegible-text" not in flags:
+            flags.append("illegible-text")
+        reasons.append(f"the text has {words} words, fewer than {MIN_WORDS}: too little to classify")
+    issuer = answers["issuer"]["choice"]
+    if top == "bank_statement" and issuer != BANK_ISSUER:
+        flags.append("signals-disagree")
+        reasons.append(f"the top type is bank_statement but the issuer is {issuer}")
     for other_type, tags in TYPE_TAGS.items():
         for tag in tags if other_type != top else ():
             if _probability(answers, tag) >= CONTRADICTION:

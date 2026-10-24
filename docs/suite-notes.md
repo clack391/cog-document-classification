@@ -67,6 +67,82 @@ different threshold to each provider. To treat providers differently, use
 `check_output`, which sees the whole payload, or ask cog-smith to pass
 `answered_by` to `decide`.
 
+## Running local Qwen
+
+Since 19 October 2026 the Cog runs live with local Qwen (decision 2):
+cog-qwen serves Qwen3-4B (Q4_K_M) on this machine, cog-system-one-adapter asks
+it the Cog's questions, and Workbench binds both and activates them for this
+Cog. It needed three local changes, and a cap on thinking. The files are in
+[`local-qwen/`](local-qwen/README.md).
+
+**Three problems, and what we did**
+
+| Problem | Effect | What we did |
+|---|---|---|
+| cog-qwen's Linux build of llama.cpp (`cpu_mkl`) has no AVX2 or FMA code | On an i7-8750H, Qwen wrote under 1 token a second, and every call hit the gateway's 180-second limit | Serve the same pinned, checksum-checked model with a CUDA build of the same llama.cpp version, on a GTX 1070: about 30 tokens a second (`serve.sh`) |
+| The adapter asks for JSON only in the prompt | Qwen3-4B copied the whole answer schema back, then answered in the wrong shape, so every call failed | Adapter setting `enforce_schema`: the gateway enforces the answer schema, which cog-qwen already supports as `json-schema` |
+| cog-qwen always turns Qwen3's thinking off | 10.6% silent errors on the benchmark without thinking, 5.3% with it | cog-qwen setting `enable_thinking`, set by the binding, never by a caller |
+
+The adapter answers at temperature 0, and at temperature 0 Qwen's thinking
+sometimes loops until the output limit, so the call fails. `serve.sh` caps
+thinking at 3,000 tokens (llama.cpp `--reasoning-budget`) and then makes Qwen
+answer. Normal thinking stayed under 2,400 tokens. Qwen's recommended sampling
+for thinking (temperature 0.6, top-p 0.95, top-k 20) also stops the loops, but
+it made borderline answers random enough to turn a caught mistake into a silent
+one.
+
+The three problems are worth raising with the suite team.
+
+**Setup**, in the suite workspace:
+
+1. cog-qwen: `pixi install`, `pixi run fetch`, and the two tokens from its
+   README in `COG_QWEN_BACKEND_TOKEN` and `COG_QWEN_TOKEN`. Apply
+   `cog-qwen-enable-thinking.diff`.
+2. `llama-cuda/`: copy `pixi.toml`, `serve.sh` and `restart.sh` there, run
+   `pixi install`, then `./restart.sh` to start the model server.
+3. cog-qwen: start the gateway with
+   `pixi run serve -- --state-dir ../cog-workbench/var/suite/qwen --port 8114`.
+4. cog-system-one-adapter: apply `cog-system-one-adapter-enforce-schema.diff`
+   and run `pixi install`.
+5. cog-workbench: bind `qwen-local-3.json` with `--provider cog-qwen`, then
+   `system-one-qwen-3.json` with `--provider cog-system-one-adapter`, using
+   absolute paths, since pixi runs from cog-workbench. Then activate revision 3
+   for this Cog (see Useful commands).
+6. Here, with the tokens set: `pixi run ask-composed -- --request examples/sample-bundle.json`.
+
+Keep the model server and the gateway running in the background, detached
+from the terminal. A document takes 30 to 40 seconds on the GTX 1070, and a
+benchmark run about 50 minutes. If the GPU drops to a low-power state, for
+example on battery, or other programs load the CPU, Qwen slows to 6 to 20
+tokens a second, and long thoughts hit the gateway's 180-second limit.
+
+**Context.** The fixed part of the prompt, with 20 questions, is about 2,900
+tokens. Thinking takes up to about 2,400 tokens (3,000 at the cap) and the
+answer about 300. To leave room for a capped thought within 8,192 tokens, the
+text must stay under about 2,000 tokens: roughly 6,000 to 8,000 characters.
+That is the limit for decision 4 (#2) while thinking is on, unless the context
+grows to 16,384 tokens, which the GPU can hold but cog-qwen fixes at 8,192.
+
+**What we learned about Qwen3-4B**
+
+- **Answers vary between runs,** even at temperature 0: a restarted server is
+  enough to flip a borderline document. Judge changes on more than one run.
+- **It reads exclusions in an option's description and still overrides
+  them.** Clearer wording fixed none of five targeted mistakes. A rule holds
+  only when a simple question feeds `decide`, which applies it in code.
+- **One fact per question.** It answered half of a two-part question and
+  ignored the rest. Multiple choice worked better than yes/no for "who issued
+  this?". The question's ID is part of the prompt, and "provider" in
+  `issued_by_account_provider` misled it.
+- **Answers in one call aren't independent.** Once it has decided on a type,
+  its other answers tend to agree with that type, so the `issuer` question
+  catches about half of its bank statement mistakes.
+- **Its confidence is almost always 1.0 or 0.0,** so no threshold helps, and
+  the `calibrated-answers` Guard warns on every result.
+- **With several documents in one file,** the type question's "classify the
+  main one" makes it pick a main document, usually the first page, so the
+  `main_document_clear` question rarely fires.
+
 ## Limits that shape the design
 
 **Model input**
@@ -176,7 +252,9 @@ pixi run python benchmarks/run.py live --name NAME                   # once a pr
 pixi run python benchmarks/score.py benchmarks/results/NAME --split tune
 ```
 
-Live, after admitting a provider in cog-workbench:
+Live, after admitting a provider in cog-workbench. For local Qwen (see
+[Running local Qwen](#running-local-qwen)), the binding is
+`binding-system-one-qwen`, revision 3:
 
 ```bash
 # in cog-workbench
@@ -184,3 +262,7 @@ pixi run suite -- activate-composition --context cog-document-classification --b
 # in this package
 pixi run ask-composed -- --request bundle.json
 ```
+
+Activate again after any change to `pixi.toml`, `src/`, `scripts/` or
+`context/`: Workbench refuses a call when this package's fingerprint has
+changed.

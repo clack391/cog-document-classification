@@ -48,12 +48,18 @@ def oracle_result(row, top=None, probability=None):
     rest = round((1 - probability) / (len(TYPES) - 1), 6)
     answers = {}
     for qid, question in cog_core.QUESTIONS.items():
-        if question["type"] == "choice":
+        if qid == "issuer":
+            issuer = "bank_or_card_issuer" if top == "bank_statement" else "anyone_else"
+            answers[qid] = {"type": "choice", "choice": issuer, "confidence": 0.94,
+                            "probabilities": {o: (0.95 if o == issuer else 0.01) for o in question["criteria"]}}
+        elif question["type"] == "choice":
             confidence = round((probability - 1 / len(TYPES)) / (1 - 1 / len(TYPES)), 2)
             answers[qid] = {"type": "choice", "choice": top, "confidence": confidence,
                             "probabilities": {t: (probability if t == top else rest) for t in TYPES}}
         elif qid == "text_legible":
             answers[qid] = {"type": "noul", "noul": 0.1 if row["frame_rule"] == "garbled-text" else 0.95}
+        elif qid == "main_document_clear":
+            answers[qid] = {"type": "noul", "noul": 0.1 if row["frame_rule"] == "no-main-document" else 0.95}
         else:
             answers[qid] = {"type": "noul", "noul": 0.9 if qid[len("tag_"):] in row["tags"] else 0.05}
     return {"model": "oracle", "answer_source": "system-one-model", "answers": answers,
@@ -218,12 +224,20 @@ class Scoring(Workspace):
     def test_confident_wrong_answers_are_silent_errors(self):
         results = {r["id"]: oracle_result(r) for r in ROWS}
         results["inv-standard"] = oracle_result(next(r for r in ROWS if r["id"] == "inv-standard"), top="other")
-        unclear = next(r for r in ROWS if r["id"] == "unclear-attachment-note")
+        unclear = next(r for r in ROWS if r["id"] == "unclear-invoice-or-statement")
         results[unclear["id"]] = oracle_result(unclear, top="other", probability=0.95)
         overall = score.score(self.run_with(results))["overall"]
-        self.assertEqual(sorted(overall["silent_errors"]), ["inv-standard", "unclear-attachment-note"])
+        self.assertEqual(sorted(overall["silent_errors"]), ["inv-standard", "unclear-invoice-or-statement"])
         self.assertAlmostEqual(overall["silent_error_rate"], 2 / len(ROWS))
         self.assertFalse(overall["meets_silent_error_target"])
+
+    def test_too_little_text_goes_to_review_even_when_answered_confidently(self):
+        results = {r["id"]: oracle_result(r) for r in ROWS}
+        short = next(r for r in ROWS if r["id"] == "unclear-attachment-note")
+        results[short["id"]] = oracle_result(short, top="other", probability=0.95)
+        report = score.score(self.run_with(results))
+        self.assertEqual(report["overall"]["silent_errors"], [])
+        self.assertEqual(report["by_document"][short["id"]]["judged"], "correct")
 
     def test_unsure_wrong_answers_go_to_review_instead(self):
         results = {r["id"]: oracle_result(r) for r in ROWS}

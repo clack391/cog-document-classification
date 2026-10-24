@@ -138,11 +138,12 @@ Set in `targets.json`; changing them is a policy decision.
 
 ## Running it
 
-**Live**, once a model provider is activated (#6):
+**Live**, once a model provider is activated. For local Qwen, see
+[Running local Qwen](../docs/suite-notes.md#running-local-qwen):
 
 ```bash
-pixi run python benchmarks/run.py live --name jev-2026-10-20
-pixi run python benchmarks/score.py benchmarks/results/jev-2026-10-20 --split tune
+pixi run python benchmarks/run.py live --name qwen3-4b-2026-10-24
+pixi run python benchmarks/score.py benchmarks/results/qwen3-4b-2026-10-24 --split tune
 ```
 
 **From saved answers**, with no model: put one `<id>.json` per document in a
@@ -162,6 +163,40 @@ never reused. The scorer adds `report.md` and `report.json`.
 
 The live tests never call a model; they use a fake subprocess, so
 `pixi run test` stays free even after a provider is activated.
+
+## Live results
+
+All 94 documents, run live with local Qwen (Qwen3-4B, Q4_K_M) on a GTX 1070.
+Each row adds one change to the row above.
+
+| Run | Setup | Silent errors | Sent to a person | Correct when classified | Tags (precision / recall) | Failed calls |
+|---|---|---|---|---|---|---|
+| 19 Oct | Qwen3-4B, schema enforced, no thinking | 10.6% (10) | 9.6% | 88.2% | 87.0% / 88.9% | 0 |
+| 19 Oct | + thinking | 5.3% (5) | 9.6% | 94.1% | 79.8% / 92.7% | 1 |
+| 19 Oct | + issuer question and 20-word minimum | 1.1% (1) | 12.8% | 98.8% | 86.2% / 92.6% | 2 |
+| 23 Oct | + no-main-document rule (#19) and 3,000-token thinking cap | 2.1% (2) | 12.8% | 97.6% | 79.5% / 92.1% | 1 |
+
+- **Thinking helped most.** All 13 résumés came out right, and the non-English
+  tag was found on 6 of 6 documents, against 0 without thinking.
+- **The issuer question catches a bank statement mistake only when Qwen
+  answers it right,** about half the time. It caught the supplier and mortgage
+  statements on 19 October and missed both on 23 October.
+- **Most unnecessary reviews come from support-ticket tags on other
+  documents,** mainly `ticket_billing` on bills and statements, which trips the
+  contradiction rule. The same stray tags also caught two real mistakes, so
+  ignoring them isn't a free fix.
+- **Failed calls** were thinking that ran to the output limit (before the
+  cap), and on 23 October one gateway timeout while other programs loaded the
+  CPU. A failed call counts as sent to a person.
+- **Splits on 23 October:** 2 silent errors in 61 tune documents (9.8% sent to
+  a person), and 0 in 33 test documents (18.2% sent to a person).
+- **Confidence is 1.0 almost always,** so the threshold sweep can't trade
+  review for accuracy.
+
+Two comparable runs differ by a document or two, so with Qwen3-4B the Cog sits
+at about 1 to 2% silent errors and 13% sent to a person: around the targets,
+not safely inside them. The run folders aren't committed; these numbers come
+from their `report.json`.
 
 ## What the report shows
 

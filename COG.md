@@ -38,14 +38,16 @@ because filenames are often wrong and can contain personal data. Text that is
 empty or only whitespace is refused with an input error, and so is text over
 100,000 characters or a `document_id` over 200 characters.
 
-**Questions.** A System One model answers 18 questions about the text,
+**Questions.** A System One model answers 20 questions about the text,
 declared in `context/questions.json`:
 
 | Question | Type | Asks |
 |---|---|---|
 | `document_type` | choice: `invoice` / `contract` / `resume` / `support_ticket` / `bank_statement` / `other` | What the document is for, judged by its purpose, not its topics |
 | `text_legible` | noul | Does the text read as a coherent document rather than garbled OCR output or fragments? |
+| `main_document_clear` | noul | Is the text one document, or is one of the documents in it clearly the one the file is for? |
 | `tag_<tag>`, one per tag | noul | Does this tag's statement clearly hold? |
+| `issuer` | choice: `bank_or_card_issuer` / `supplier_or_seller` / `lender` / `employer` / `investment_or_pension_provider` / `anyone_else` | Who issued the document, judged by who sent it and what the account is for, not by its layout |
 
 The 16 tag questions cover these tags:
 
@@ -68,11 +70,18 @@ review rules applies:
 |---|---|---|
 | The type's confidence is below the minimum | `MIN_TYPE_CONFIDENCE` = 0.85 | `low-confidence` |
 | `text_legible` is below the minimum | `MIN_LEGIBLE` = 0.5 | `illegible-text` |
+| `main_document_clear` is below the minimum: no document is clearly the main one | `MIN_MAIN_DOCUMENT` = 0.5 | `no-main-document` |
+| The text has fewer words than the minimum, counted by the code, not the model | `MIN_WORDS` = 20 | `illegible-text` |
 | A type tag for a different type than the chosen one is this strong | `CONTRADICTION` = 0.9 | `signals-disagree` |
+| The type is `bank_statement` but the `issuer` choice is not `bank_or_card_issuer` | none | `signals-disagree` |
 | The type is `invoice` but `contains_financial_amounts` is below the minimum | `INVOICE_MIN_AMOUNTS` = 0.3 | `invoice-without-amounts` |
 
 The confidence is the `document_type` answer's confidence, not the top
 option's probability.
+
+For `MIN_WORDS`, a word is two or more letters in a row, so numbers don't
+count. In Chinese, Japanese and Korean script, which don't separate words with
+spaces, each character counts as a word.
 
 A tag applies when its answer is at or above `TAG_THRESHOLD` = 0.7. A
 classified document gets the general tags and its own type's tags that pass.
@@ -142,9 +151,9 @@ result for every push, and every benchmark run checks every document.
   `needs_review`, and the workflow and a person decide what happens next.
 - **No more than one type.** A file holding several documents is classified
   by its main one and tagged `multiple_documents`. If no document is clearly
-  the main one, it should go to review. No rule enforces this yet: it relies on
-  the model being unsure of the type, so that the confidence falls below
-  `MIN_TYPE_CONFIDENCE` (#19).
+  the main one, it goes to review with the `no-main-document` flag. That
+  includes two unrelated documents of the same type, such as two invoices:
+  sending them to review is on purpose, the safe side.
 - **No new types or tags.** Only the Frame's six types and 16 tags are used.
 - **No inferences about people.** It doesn't infer age, gender, ethnicity,
   religion, health, disability or any other protected characteristic.
@@ -170,9 +179,14 @@ the envelope binding carries the host's full composition provenance.
 `decide` isn't told which model answered, so the same thresholds apply to
 every provider for now. Treat answers from the adapter as weaker evidence.
 The `calibrated-answers` Guard warns when an LLM answered. We use local Qwen
-through the adapter (decision 2), so the thresholds will be tuned for its
-answers on the benchmark set (#8). While we use Qwen, every live result
-carries the `calibrated-answers` warning. That's expected, not a fault.
+through the adapter (decision 2). Its confidence is almost always 1.0 or 0.0,
+so tuning the thresholds doesn't help with it (#8); the review rules that work
+are the ones that check answers against each other or count words. It also
+needs the adapter to enforce the answer format and Qwen's thinking turned on,
+which the suite doesn't offer yet: see
+[Running local Qwen](docs/suite-notes.md#running-local-qwen). While we use
+Qwen, every live result carries the `calibrated-answers` warning. That's
+expected, not a fault.
 
 ## Using it
 
