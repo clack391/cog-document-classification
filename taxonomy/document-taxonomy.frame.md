@@ -3,7 +3,7 @@ type: frame [0.2]
 name: Document Type Taxonomy
 description: Defines the standard document types, boundary rules and tag vocabulary for classifying one incoming business document by its purpose. Use it whenever a document must get exactly one type and tags from a fixed list, or go to review when that cannot be done reliably.
 visibility: internal
-version: 0.4.2
+version: 0.4.3
 scope: task-family
 maintainer: Document Classification Cog team
 ---
@@ -112,6 +112,7 @@ Tagging:
 - Type tags describe a document of their own type, so a strong type tag for another type is a contradiction.
 - Contradictions go to review:
   - a type tag clearly holds for a different type than the one chosen;
+  - the type is `bank_statement`, but a bank, card issuer or payment provider did not issue it;
   - an `invoice` states no monetary amounts.
 
 Review:

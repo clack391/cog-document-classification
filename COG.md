@@ -38,7 +38,7 @@ because filenames are often wrong and can contain personal data. Text that is
 empty or only whitespace is refused with an input error, and so is text over
 100,000 characters or a `document_id` over 200 characters.
 
-**Questions.** A System One model answers 18 questions about the text,
+**Questions.** A System One model answers 19 questions about the text,
 declared in `context/questions.json`:
 
 | Question | Type | Asks |
@@ -46,6 +46,7 @@ declared in `context/questions.json`:
 | `document_type` | choice: `invoice` / `contract` / `resume` / `support_ticket` / `bank_statement` / `other` | What the document is for, judged by its purpose, not its topics |
 | `text_legible` | noul | Does the text read as a coherent document rather than garbled OCR output or fragments? |
 | `tag_<tag>`, one per tag | noul | Does this tag's statement clearly hold? |
+| `issuer` | choice: `bank_or_card_issuer` / `supplier_or_seller` / `lender` / `employer` / `investment_or_pension_provider` / `anyone_else` | Who issued the document, judged by who sent it and what the account is for, not by its layout |
 
 The 16 tag questions cover these tags:
 
@@ -68,11 +69,17 @@ review rules applies:
 |---|---|---|
 | The type's confidence is below the minimum | `MIN_TYPE_CONFIDENCE` = 0.85 | `low-confidence` |
 | `text_legible` is below the minimum | `MIN_LEGIBLE` = 0.5 | `illegible-text` |
+| The text has fewer words than the minimum, counted by the code, not the model | `MIN_WORDS` = 20 | `illegible-text` |
 | A type tag for a different type than the chosen one is this strong | `CONTRADICTION` = 0.9 | `signals-disagree` |
+| The type is `bank_statement` but the `issuer` choice is not `bank_or_card_issuer` | none | `signals-disagree` |
 | The type is `invoice` but `contains_financial_amounts` is below the minimum | `INVOICE_MIN_AMOUNTS` = 0.3 | `invoice-without-amounts` |
 
 The confidence is the `document_type` answer's confidence, not the top
 option's probability.
+
+For `MIN_WORDS`, a word is two or more letters in a row, so numbers don't
+count. In Chinese, Japanese and Korean script, which don't separate words with
+spaces, each character counts as a word.
 
 A tag applies when its answer is at or above `TAG_THRESHOLD` = 0.7. A
 classified document gets the general tags and its own type's tags that pass.

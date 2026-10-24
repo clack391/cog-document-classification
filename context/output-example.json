@@ -94,6 +94,19 @@
     "tag_ticket_bug_report": {
       "type": "noul",
       "noul": 0.0
+    },
+    "issuer": {
+      "type": "choice",
+      "choice": "supplier_or_seller",
+      "probabilities": {
+        "bank_or_card_issuer": 0.01,
+        "supplier_or_seller": 0.95,
+        "lender": 0.0,
+        "employer": 0.0,
+        "investment_or_pension_provider": 0.0,
+        "anyone_else": 0.04
+      },
+      "confidence": 0.94
     }
   },
   "answered_by": {

@@ -26,7 +26,8 @@ types or the tags. Change the Frame first, then the rest, and run `pixi run test
 |---|---|
 | Type definitions, signals and borderline cases | Option descriptions of the `document_type` question |
 | Each tag in the Tag Vocabulary | One yes/no question named `tag_<tag>` |
-| The rule on garbled or fragmentary text | The `text_legible` question |
+| The rule on garbled or fragmentary text | The `text_legible` question, and `MIN_WORDS` in `decide` for text that is nearly empty |
+| Who issues a bank statement | The `issuer` question, checked in `decide` |
 | Review, contradiction and tag-reporting rules | `decide` in `src/task_logic.py` |
 | "Not the filename" | `state` sends only the text |
 
@@ -85,6 +86,17 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
   question now say "contact details (work or personal)". The document
   identifier is skipped only when it matches the input's, so an altered one is
   still checked. The Frame is now v0.4.2.
+- **19 Oct 2026:** from the first live runs with local Qwen (Qwen3-4B with
+  thinking), two rules moved out of the question wording and into code,
+  because the model read the exclusions in the option descriptions and still
+  overrode them. A new `issuer` question asks who issued the document, and
+  `decide` sends a `bank_statement` that a bank, card issuer or payment
+  provider didn't issue to review (`signals-disagree`). That catches supplier
+  statements of account and mortgage statements. Text under `MIN_WORDS` = 20
+  words goes to review as `illegible-text`, whatever the model says: on the
+  tune split the review cases have 2 and 11 words, and the shortest real
+  document has 35. Precious chose 20 words and reusing the existing flags.
+  The Frame is now v0.4.3.
 
 ## Validation
 

@@ -149,5 +149,20 @@
       "true": "Reports a defect or error",
       "false": "Does not report a defect"
     }
+  },
+  "issuer": {
+    "type": "choice",
+    "instructions": {
+      "question": "Who issued `text`?",
+      "note": "Judge by who sent the document and what the account is for, not by its layout."
+    },
+    "criteria": {
+      "bank_or_card_issuer": "A bank, building society, credit union, credit card issuer or payment provider, about a current, savings, credit card or payment account it holds for the customer",
+      "supplier_or_seller": "A business that sold goods or services to the customer, for example a supplier sending a statement of account or an invoice",
+      "lender": "A lender, about a loan or mortgage the customer is repaying, even when the lender is a bank",
+      "employer": "An employer, for example on a payslip",
+      "investment_or_pension_provider": "An investment, pension or insurance provider",
+      "anyone_else": "Anyone else"
+    }
   }
 }

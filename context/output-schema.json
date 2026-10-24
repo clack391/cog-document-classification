@@ -148,7 +148,8 @@
         "tag_ticket_urgent",
         "tag_ticket_complaint",
         "tag_ticket_billing",
-        "tag_ticket_bug_report"
+        "tag_ticket_bug_report",
+        "issuer"
       ],
       "properties": {
         "document_type": {
@@ -525,6 +526,80 @@
               "const": "noul"
             },
             "noul": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "issuer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "choice",
+            "probabilities",
+            "confidence"
+          ],
+          "properties": {
+            "type": {
+              "const": "choice"
+            },
+            "choice": {
+              "enum": [
+                "bank_or_card_issuer",
+                "supplier_or_seller",
+                "lender",
+                "employer",
+                "investment_or_pension_provider",
+                "anyone_else"
+              ]
+            },
+            "probabilities": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "bank_or_card_issuer",
+                "supplier_or_seller",
+                "lender",
+                "employer",
+                "investment_or_pension_provider",
+                "anyone_else"
+              ],
+              "properties": {
+                "bank_or_card_issuer": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "supplier_or_seller": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "lender": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "employer": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "investment_or_pension_provider": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "anyone_else": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              }
+            },
+            "confidence": {
               "type": "number",
               "minimum": 0,
               "maximum": 1
