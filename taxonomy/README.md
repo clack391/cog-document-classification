@@ -27,6 +27,7 @@ types or the tags. Change the Frame first, then the rest, and run `pixi run test
 | Type definitions, signals and borderline cases | Option descriptions of the `document_type` question |
 | Each tag in the Tag Vocabulary | One yes/no question named `tag_<tag>` |
 | The rule on garbled or fragmentary text | The `text_legible` question, and `MIN_WORDS` in `decide` for text that is nearly empty |
+| The rule on a file with no clear main document | The `main_document_clear` question |
 | Who issues a bank statement | The `issuer` question, checked in `decide` |
 | Review, contradiction and tag-reporting rules | `decide` in `src/task_logic.py` |
 | "Not the filename" | `state` sends only the text |
@@ -86,6 +87,14 @@ cannot apply a different threshold to Jev and to an LLM. The options are:
   question now say "contact details (work or personal)". The document
   identifier is skipped only when it matches the input's, so an altered one is
   still checked. The Frame is now v0.4.2.
+- **19 Oct 2026:** the Frame's rule that a file with no clear main document
+  goes to review now has its own question, `main_document_clear`, and review
+  rule, `MIN_MAIN_DOCUMENT` = 0.5 with the `no-main-document` flag (#19, agreed
+  with Francis on 15 Oct). Before this it relied on the model being unsure of
+  the type. It's the first change to the output schema's flags since COG.md.
+  Two unrelated documents of the same type, such as two invoices, also go to
+  review. That's on purpose, the safe side, even though the type would be
+  right whichever one was picked.
 - **19 Oct 2026:** from the first live runs with local Qwen (Qwen3-4B with
   thinking), two rules moved out of the question wording and into code,
   because the model read the exclusions in the option descriptions and still

@@ -31,6 +31,10 @@
       "type": "noul",
       "noul": 0.98
     },
+    "main_document_clear": {
+      "type": "noul",
+      "noul": 0.97
+    },
     "tag_contains_personal_data": {
       "type": "noul",
       "noul": 0.1

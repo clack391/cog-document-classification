@@ -58,6 +58,8 @@ def oracle_result(row, top=None, probability=None):
                             "probabilities": {t: (probability if t == top else rest) for t in TYPES}}
         elif qid == "text_legible":
             answers[qid] = {"type": "noul", "noul": 0.1 if row["frame_rule"] == "garbled-text" else 0.95}
+        elif qid == "main_document_clear":
+            answers[qid] = {"type": "noul", "noul": 0.1 if row["frame_rule"] == "no-main-document" else 0.95}
         else:
             answers[qid] = {"type": "noul", "noul": 0.9 if qid[len("tag_"):] in row["tags"] else 0.05}
     return {"model": "oracle", "answer_source": "system-one-model", "answers": answers,

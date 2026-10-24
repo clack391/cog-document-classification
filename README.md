@@ -32,12 +32,12 @@ CI runs both on Linux and macOS for every push.
   questions and thresholds, the review rules, the Guards, and what it doesn't
   do.
 - The confirmed taxonomy: the [Frame](taxonomy/document-taxonomy.frame.md) and
-  the 19 questions in `context/questions.json` built from it.
+  the 20 questions in `context/questions.json` built from it.
 - A first decision policy in `src/task_logic.py`:
   - the type is assigned at confidence 0.85 or above, and tags at 0.7;
-  - low confidence, illegible or too little text, a bank statement not issued
-    by a bank, card issuer or payment provider, or contradicting answers send
-    the document to review;
+  - low confidence, illegible or too little text, no clear main document, a
+    bank statement not issued by a bank, card issuer or payment provider, or
+    contradicting answers send the document to review;
   - review is also reported to workflows as a warning.
 - Tests that keep the Frame, the questions, the policy and the output schema in
   agreement.

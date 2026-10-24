@@ -22,6 +22,14 @@
       "false": "Mostly garbled characters, broken words or meaningless fragments"
     }
   },
+  "main_document_clear": {
+    "type": "noul",
+    "instructions": "`text` is one document, or one of the documents in it is clearly the main one.",
+    "criteria": {
+      "true": "A single document, or several where one is clearly the one the file is for, with the others attached to it or secondary",
+      "false": "Several distinct documents, and none of them is clearly the one the file is for"
+    }
+  },
   "tag_contains_personal_data": {
     "type": "noul",
     "instructions": "`text` names an identifiable person together with personal details such as contact details (work or personal), a home address, a date of birth or an ID number.",

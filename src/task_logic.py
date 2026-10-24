@@ -25,6 +25,7 @@ import re
 MIN_TYPE_CONFIDENCE = 0.85
 TAG_THRESHOLD = 0.7
 MIN_LEGIBLE = 0.5
+MIN_MAIN_DOCUMENT = 0.5    # below this, no document in the text is clearly the main one
 CONTRADICTION = 0.9         # a type tag this strong for another type contradicts the type
 INVOICE_MIN_AMOUNTS = 0.3   # an invoice whose amounts answer is below this is suspect
 MIN_WORDS = 20              # fewer words than this is too little text to classify
@@ -88,6 +89,10 @@ def decide(bundle, answers):
     if legible < MIN_LEGIBLE:
         flags.append("illegible-text")
         reasons.append(f"text legibility {legible:.2f} is below {MIN_LEGIBLE}")
+    main = answers["main_document_clear"]["noul"]
+    if main < MIN_MAIN_DOCUMENT:
+        flags.append("no-main-document")
+        reasons.append(f"main-document clarity {main:.2f} is below {MIN_MAIN_DOCUMENT}: no document is clearly the main one")
     words = word_count(bundle["text"])
     if words < MIN_WORDS:
         if "illegible-text" not in flags:

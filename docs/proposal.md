@@ -38,7 +38,7 @@ To ensure accountability and prevent misclassification:
    * Jev's confidence is trained for calibration; a local LLM's is not.
    * Limitation: the suite does not yet tell the decision code which model answered, so one set of thresholds applies to every model for now. The taxonomy notes list the ways around this.
 * **Escalation:**
-   * Unclear documents are marked `needs_review` and reported as a warning in the result, so any workflow or consumer sees them. This covers a confidence below the threshold, poor or partial text extraction, too little text to classify, and answers that contradict each other, such as a bank statement that a bank, card issuer or payment provider didn't issue.
+   * Unclear documents are marked `needs_review` and reported as a warning in the result, so any workflow or consumer sees them. This covers a confidence below the threshold, poor or partial text extraction, too little text to classify, a file where no document is clearly the main one, and answers that contradict each other, such as a bank statement that a bank, card issuer or payment provider didn't issue.
    * Documents with no extractable text are refused with a clear input error.
    * Whoever consumes the result routes `needs_review` documents to a person. We don't ship an Op with a human approval Gate (decision 6). Who reviews is configurable: whoever deploys the Cog maps each document group to a reviewer queue, with a default (#5).
 * **Accountability:** Every result records:
@@ -110,7 +110,7 @@ To ensure accountability and prevent misclassification:
       * up to 512 KiB of text per document, and about 8,000 tokens for local Qwen, which with thinking leaves roughly 6,000 to 8,000 characters of text (see the suite notes);
       * 240 seconds for each stage of our code.
    * Settle decision 2, then set up the provider in cog-workbench. *(Decision 2 settled 15 Oct 2026: local Qwen. Set up 19 Oct 2026 with three local changes to the suite: a GPU build of llama.cpp, the adapter enforcing the answer format, and Qwen's thinking turned on. See "Running local Qwen" in the suite notes, and #6.)*
-* **Phase 3: Decision Policy & Review** *(mostly done early: the policy, the review warning and the Guards are in place; the no-main-document rule (#19) and review routing (#5) are designed and agreed; the first live runs added an issuer rule for bank statements and a minimum of 20 words, on 19 Oct)*
+* **Phase 3: Decision Policy & Review** *(mostly done early: the policy, the review warning and the Guards are in place; the no-main-document rule (#19) is built, and review routing (#5) is designed and agreed; the first live runs added an issuer rule for bank statements and a minimum of 20 words, on 19 Oct)*
    * Implement the confidence policy and escalation triggers in the decision code. *(First version done 12 Oct 2026. The thresholds are placeholders until Phase 4.)*
    * Report `needs_review` as a warning, and refuse documents with no extractable text. *(Done 12 Oct 2026.)*
    * Settle decision 6, then implement the agreed review path. *(Settled 13 Oct 2026: flag and route. The `needs_review` flag and its warning are already in place. Who reviews is configurable per document group, as Trent advised on 15 Oct; the design is in #5.)*

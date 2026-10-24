@@ -94,7 +94,8 @@
               "low-confidence",
               "illegible-text",
               "signals-disagree",
-              "invoice-without-amounts"
+              "invoice-without-amounts",
+              "no-main-document"
             ]
           }
         },
@@ -133,6 +134,7 @@
       "required": [
         "document_type",
         "text_legible",
+        "main_document_clear",
         "tag_contains_personal_data",
         "tag_contains_financial_amounts",
         "tag_time_sensitive",
@@ -227,6 +229,24 @@
           }
         },
         "text_legible": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "noul"
+          ],
+          "properties": {
+            "type": {
+              "const": "noul"
+            },
+            "noul": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "main_document_clear": {
           "type": "object",
           "additionalProperties": false,
           "required": [

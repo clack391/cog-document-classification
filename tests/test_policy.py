@@ -116,6 +116,14 @@ class NeedsReview(unittest.TestCase):
     def test_illegible_text(self):
         self.assert_review(result(text_legible=0.2), "illegible-text")
 
+    def test_no_clear_main_document(self):
+        self.assert_review(result(main_document_clear=0.2, tag_multiple_documents=0.9), "no-main-document")
+
+    def test_several_documents_with_a_clear_main_one_are_classified(self):
+        decision, _ = run(result(main_document_clear=0.9, tag_multiple_documents=0.9))
+        self.assertEqual(decision["status"], "classified")
+        self.assertIn("multiple_documents", decision["tags"])
+
     def test_too_little_text(self):
         decision = self.assert_review(result(), "illegible-text", text="Page 2 of 2")
         self.assertIn("2 words", decision["reasons"][0])
